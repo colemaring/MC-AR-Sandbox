@@ -13,6 +13,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.gson.Gson;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,7 +39,8 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     private static String biome = "mountains";
     private static int waterlevel = -1;
     private static boolean autoupdate = false;
-    private static int timer = -1;
+    private static int timer = 10;
+    private static double heightMultipler = 1;
 
     @Override
     public void onEnable() {
@@ -43,6 +48,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     	getCommand("waterlevel").setExecutor(this);
     	getCommand("autoupdate").setExecutor(this);
     	getCommand("timer").setExecutor(this);
+    	getCommand("default").setExecutor(this);
     	loadVariables();
     	readFile();
     	setBlocks();
@@ -84,32 +90,32 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         player.sendMessage(ChatColor.GOLD + "Type /help for a list of available commands.");
         
         if (player.isOp()) {
-            ItemStack stick = new ItemStack(Material.STICK); // update terrain wand
+            ItemStack BLAZE_ROD = new ItemStack(Material.BLAZE_ROD); // update terrain wand
             ItemStack grass = new ItemStack(Material.GRASS_BLOCK); // normal mountain biome
             ItemStack snow = new ItemStack(Material.SNOW_BLOCK); // snowy mountain biome
             ItemStack mesa = new ItemStack(Material.RED_SAND); // mesa biome
             ItemStack ice = new ItemStack(Material.BLUE_ICE); // frozen ocean biome
-            stick.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 1);
+            BLAZE_ROD.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 1);
             grass.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 1);
             snow.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 1);
             mesa.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 1);
             ice.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 1);
-            ItemMeta stickmeta = stick.getItemMeta();
-            ItemMeta grassmeta = stick.getItemMeta();
-            ItemMeta snowmeta = stick.getItemMeta();
-            ItemMeta mesameta = stick.getItemMeta();
-            ItemMeta icemeta = stick.getItemMeta();
-            stickmeta.setDisplayName(ChatColor.GOLD + "Update Terrain");
+            ItemMeta BLAZE_RODmeta = BLAZE_ROD.getItemMeta();
+            ItemMeta grassmeta = grass.getItemMeta();
+            ItemMeta snowmeta = snow.getItemMeta();
+            ItemMeta mesameta = mesa.getItemMeta();
+            ItemMeta icemeta = ice.getItemMeta();
+            BLAZE_RODmeta.setDisplayName(ChatColor.GOLD + "Update Terrain");
             grassmeta.setDisplayName(ChatColor.GOLD + "Mountain Biome");
             snowmeta.setDisplayName(ChatColor.GOLD + "Snowy Biome");
             mesameta.setDisplayName(ChatColor.GOLD + "Mesa Biome");
             icemeta.setDisplayName(ChatColor.GOLD + "Icy Biome");
-            stick.setItemMeta(stickmeta);
+            BLAZE_ROD.setItemMeta(BLAZE_RODmeta);
             grass.setItemMeta(grassmeta);
             snow.setItemMeta(snowmeta);
             mesa.setItemMeta(mesameta);
             ice.setItemMeta(icemeta);
-            player.getInventory().addItem(stick);
+            player.getInventory().addItem(BLAZE_ROD);
             player.getInventory().addItem(grass);
             player.getInventory().addItem(snow);
             player.getInventory().addItem(mesa);
@@ -157,11 +163,19 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         	{
         		sender.sendMessage("Enabled auto terrain updating");
         		autoupdate = true;
+        		Bukkit.getScheduler().cancelTasks(this);
+                
+                Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
+                    public void run() {
+                        readFile();
+                    }
+                }, 0, timer * 20); // Convert seconds to ticks
         	}
         	else	
         	{
         		sender.sendMessage("Disabled auto terrain updating");
         		autoupdate = false;
+        		Bukkit.getScheduler().cancelTasks(this);
         	}
             
             
@@ -171,13 +185,35 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         
         else if (command.getName().equalsIgnoreCase("timer"))
         {
-        	if (args.length != 1) {
+            if (args.length != 1) {
                 sender.sendMessage("Usage: /timer <seconds>");
                 return false;
             }
-        	timer = Integer.parseInt(args[0]);
-        	
+            timer = Integer.parseInt(args[0]);
+            
+            // Cancel the existing task if autoupdate is true
+            if (autoupdate) {
+                Bukkit.getScheduler().cancelTasks(this);
+                Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
+                    public void run() {
+                        readFile();
+                    }
+                }, 0, timer * 20); // Convert seconds to ticks
+            }
+            
             sender.sendMessage("Changed timer to " + timer + " seconds");
+            
+            return true;
+        }
+        else if (command.getName().equalsIgnoreCase("default"))
+        {
+        	waterlevel = 10;
+        	autoupdate = false;
+        	timer = 10;
+        	
+        	setBlocks();
+        	
+            sender.sendMessage("Reset settings to defalut values");
             
             // Use the level variable as needed
             return true;
@@ -188,25 +224,31 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getItem() != null && event.getItem().getType() == Material.STICK && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Update Terrain") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
+    	Player player = event.getPlayer();
+        if (event.getItem() != null && event.getItem().getType() == Material.BLAZE_ROD && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Update Terrain") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             readFile();
 //            biome = "mountains";
+            player.sendMessage(ChatColor.GREEN + "Updating terrain..");
             setBlocks();
         }
         if (event.getItem() != null && event.getItem().getType() == Material.GRASS_BLOCK && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Mountain Biome") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             biome = "mountains";
+            player.sendMessage(ChatColor.GREEN + "Updating biome to normal mountains..");
             setBlocks();
         }
         if (event.getItem() != null && event.getItem().getType() == Material.SNOW_BLOCK && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Snowy Biome") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             biome = "snowy";
+            player.sendMessage(ChatColor.GREEN + "Updating biome to snowy mountains..");
             setBlocks();
         }
         if (event.getItem() != null && event.getItem().getType() == Material.RED_SAND && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Mesa Biome") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             biome = "mesa";
+            player.sendMessage(ChatColor.GREEN + "Updating biome to mesa..");
             setBlocks();
         }
         if (event.getItem() != null && event.getItem().getType() == Material.BLUE_ICE && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Icy Biome") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             biome = "icy";
+            player.sendMessage(ChatColor.GREEN + "Updating biome to frozen ocean..");
             setBlocks();
         }
         
@@ -220,22 +262,23 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 
             Player player = event.getPlayer();
             player.sendMessage(ChatColor.GOLD + "Help Menu:");
-            player.sendMessage(ChatColor.WHITE + "Left click with the stick to update the terrain");
+            player.sendMessage(ChatColor.WHITE + "Left click with the gold stick to manually update the terrain");
             player.sendMessage(ChatColor.WHITE + "Left click with a block to change the biome");
-            player.sendMessage(ChatColor.WHITE + "/waterlevel <y level>");
-            player.sendMessage(ChatColor.WHITE + "/autoupdate <on or off>");
-            player.sendMessage(ChatColor.WHITE + "/timer <seconds>");
+            player.sendMessage(ChatColor.WHITE + "/waterlevel <y level> - sets the water level");
+            player.sendMessage(ChatColor.WHITE + "/autoupdate <on or off> - toggle the auto update feature");
+            player.sendMessage(ChatColor.WHITE + "/timer <seconds> - set a timer in seconds for autoupdate");
+            player.sendMessage(ChatColor.WHITE + "/default - restores settings to default values");
+            player.spigot().sendMessage(new ComponentBuilder("check ")
+            	    .color(net.md_5.bungee.api.ChatColor.WHITE)
+            	    .append("here")
+            	    .color(net.md_5.bungee.api.ChatColor.AQUA)
+            	    .event(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/colemaring/MC-AR-Sandbox"))
+            	    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to visit GitHub page").color(net.md_5.bungee.api.ChatColor.WHITE).create()))
+            	    .append(" for additional help")
+            	    .color(net.md_5.bungee.api.ChatColor.WHITE)
+            	    .create());
+            
         }
-        
-//        if (args[0].equalsIgnoreCase("/waterlevel")) {
-//            event.setCancelled(true);
-//
-//            Player player = event.getPlayer();
-//            player.sendMessage(ChatColor.GOLD + "Help Menu:");
-//            player.sendMessage(ChatColor.WHITE + "Left click with the stick to update the terrain to match the sandbox.");
-//            player.sendMessage(ChatColor.WHITE + "Left click with a block to change the biome.");
-//            player.sendMessage(ChatColor.WHITE + "Use /waterlevel followed by a number to change the water level. eg. /waterlevel 10 sets the waterlevel at y pos 10.");
-//        }
     }
     
     @EventHandler
@@ -301,7 +344,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             for (int z = 0; z < array2D[x].length; z++) {
             	Location location = new Location(Bukkit.getWorlds().get(0), x, 0, z);
                 location.getBlock().setType(Material.BEDROCK);
-            	for (int i = 0; i < Math.abs((int)(array2D[x][z] * 0.05-82)); i++)
+            	for (int i = 0; i < Math.abs((int)(heightMultipler * array2D[x][z] * 0.05-82)); i++)
             	{
 //            		System.out.println(i);
             		Location location1 = new Location(Bukkit.getWorlds().get(0), x, i, z);
