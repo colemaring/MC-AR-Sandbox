@@ -1,17 +1,19 @@
 package com.cole.blankplugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.gson.Gson;
 
-
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -23,7 +25,6 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -32,11 +33,19 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     private static final String FILE_PATH = "C:\\Users\\colem\\OneDrive\\Desktop\\mc_test\\output.txt";
     private static int[][] array2D;
     private static String biome = "mountains";
+    private static int waterlevel = -1;
+    private static boolean autoupdate = false;
+    private static int timer = -1;
 
     @Override
     public void onEnable() {
     	getServer().getPluginManager().registerEvents(this, this);
-    	
+    	getCommand("waterlevel").setExecutor(this);
+    	getCommand("autoupdate").setExecutor(this);
+    	getCommand("timer").setExecutor(this);
+    	loadVariables();
+    	readFile();
+    	setBlocks();
     }
     
     @Override
@@ -46,6 +55,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             player.getInventory().setArmorContents(null);
             player.getInventory().setItemInOffHand(null);
         }
+        saveVariables();
     }
     
     @EventHandler
@@ -68,7 +78,10 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             return;
         }
         
-        player.sendMessage(ChatColor.WHITE + "Type /help for a list of available commands.");
+        player.sendMessage(ChatColor.WHITE + "Current waterlevel = " + waterlevel);
+        player.sendMessage(ChatColor.WHITE + "Auto update is set to " + autoupdate);
+        player.sendMessage(ChatColor.WHITE + "Timer set to " + timer);
+        player.sendMessage(ChatColor.GOLD + "Type /help for a list of available commands.");
         
         if (player.isOp()) {
             ItemStack stick = new ItemStack(Material.STICK); // update terrain wand
@@ -116,6 +129,63 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
          }
     }
     
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (command.getName().equalsIgnoreCase("waterlevel")) {
+            if (args.length != 1) {
+                sender.sendMessage("Usage: /waterlevel <level>");
+                return false;
+            }
+            int level = Integer.parseInt(args[0]);
+            waterlevel = level;
+            resetWater();
+            setWater(waterlevel);
+            sender.sendMessage("Changed water level to " + waterlevel);
+            
+            // Use the level variable as needed
+            return true;
+        }
+        
+        else if (command.getName().equalsIgnoreCase("autoupdate"))
+        {
+        	if (args.length != 1) {
+                sender.sendMessage("Usage: /autoupdate on or off");
+                return false;
+            }
+        	String state = args[0];
+        	if (state.equals("on"))
+        	{
+        		sender.sendMessage("Enabled auto terrain updating");
+        		autoupdate = true;
+        	}
+        	else	
+        	{
+        		sender.sendMessage("Disabled auto terrain updating");
+        		autoupdate = false;
+        	}
+            
+            
+            // Use the level variable as needed
+            return true;
+        }
+        
+        else if (command.getName().equalsIgnoreCase("timer"))
+        {
+        	if (args.length != 1) {
+                sender.sendMessage("Usage: /timer <seconds>");
+                return false;
+            }
+        	timer = Integer.parseInt(args[0]);
+        	
+            sender.sendMessage("Changed timer to " + timer + " seconds");
+            
+            // Use the level variable as needed
+            return true;
+        }
+        
+        return false;
+    }
+    
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getItem() != null && event.getItem().getType() == Material.STICK && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Update Terrain") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
@@ -150,9 +220,11 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 
             Player player = event.getPlayer();
             player.sendMessage(ChatColor.GOLD + "Help Menu:");
-            player.sendMessage(ChatColor.WHITE + "Left click with the stick to update the terrain to match the sandbox.");
-            player.sendMessage(ChatColor.WHITE + "Left click with a block to change the biome.");
-            player.sendMessage(ChatColor.WHITE + "Use /waterlevel followed by a number to change the water level. eg. /waterlevel 10 sets the waterlevel at y pos 10.");
+            player.sendMessage(ChatColor.WHITE + "Left click with the stick to update the terrain");
+            player.sendMessage(ChatColor.WHITE + "Left click with a block to change the biome");
+            player.sendMessage(ChatColor.WHITE + "/waterlevel <y level>");
+            player.sendMessage(ChatColor.WHITE + "/autoupdate <on or off>");
+            player.sendMessage(ChatColor.WHITE + "/timer <seconds>");
         }
         
 //        if (args[0].equalsIgnoreCase("/waterlevel")) {
@@ -174,12 +246,6 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         player.getInventory().setItemInOffHand(null);
     }
     
-    @EventHandler
-    public void onWorldLoad(WorldLoadEvent event) {
-        World world = event.getWorld();
-        world.setTime(6000); 
-        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);  // not working?
-    }
     
     private void resetBlocks() {
         World world = Bukkit.getWorlds().get(0);
@@ -188,6 +254,21 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
                 for (int z = 0; z < 120; z++) {
                     Location location = new Location(world, x, y, z);
                     location.getBlock().setType(Material.AIR);
+                }
+            }
+        }
+    }
+    
+    private void resetWater() {
+        World world = Bukkit.getWorlds().get(0);
+        for (int x = 0; x < world.getMaxHeight(); x++) {
+            for (int y = 0; y < world.getMaxHeight(); y++) {
+                for (int z = 0; z < 120; z++) {
+                    Location location = new Location(world, x, y, z);
+                    if (location.getBlock().getType() == Material.WATER) {
+                        location.getBlock().setType(Material.AIR);
+                    }
+                   
                 }
             }
         }
@@ -288,7 +369,48 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             	}
             }
         }
-        
-        setWater(10);
+        if (waterlevel == -1)
+        	setWater(0);
+        else
+        	setWater(waterlevel);
     }
+ 	
+//Save variables to config file
+ public void saveVariables() {
+	    File dataFolder = getDataFolder();
+	    if (!dataFolder.exists()) {
+	        dataFolder.mkdirs();
+	    }
+	    File configFile = new File(dataFolder, "config.yml");
+	    YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+	    config.set("waterlevel", waterlevel);
+	    config.set("autoupdate", autoupdate);
+	    config.set("timer", timer);
+	    try {
+	        config.save(configFile);
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+//Load variables from config file
+ public void loadVariables() {
+	    File dataFolder = getDataFolder();
+	    if (!dataFolder.exists()) {
+	        dataFolder.mkdirs();
+	    }
+	    File configFile = new File(dataFolder, "config.yml");
+	    if (!configFile.exists()) {
+	        try {
+	            configFile.createNewFile();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+	    waterlevel = config.getInt("waterlevel", -1); // -1 is the default value if the key is not found
+	    autoupdate = config.getBoolean("autoupdate"); 
+	    timer = config.getInt("timer"); 
+	}
+ 
 }
