@@ -43,6 +43,9 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     private static double heightMultipler = 1; // for later use
     private static World world;
     private static int scale = 150;
+    private static boolean fastrender = true;
+	private static double isRealTime = 1.0;
+
 
     // runs when the plugin is enabled after the server is started
     @Override
@@ -53,6 +56,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     	getCommand("timer").setExecutor(this);
     	getCommand("default").setExecutor(this);
     	getCommand("scale").setExecutor(this);
+    	getCommand("fastrender").setExecutor(this);
     	world = Bukkit.getWorlds().get(0);
     	loadVariables();
     	readFileAndSetBlocks();
@@ -127,14 +131,30 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             return;
         }
         
+        if (autoupdate == true)
+        {
+        	Bukkit.getScheduler().cancelTasks(this);
+            
+    		// scheduler to repeatedly run terrain update task
+            Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
+                public void run() {
+                    readFileAndSetBlocks();
+                }
+            }, 0, (long) (timer * 20 * isRealTime)); // 1 sec = 20 ticks
+        }
+        
         // player join message added too much clutter
         event.setJoinMessage(""); 
         
         // inform player of settings and help menu
         player.sendMessage(ChatColor.WHITE + "Current waterlevel = " + waterlevel);
         player.sendMessage(ChatColor.WHITE + "Auto update is set to " + autoupdate);
-        player.sendMessage(ChatColor.WHITE + "Timer set to " + timer);
+        if (timer == 0)
+        	player.sendMessage(ChatColor.WHITE + "Timer set to real-time");
+        else
+        	player.sendMessage(ChatColor.WHITE + "Timer set to " + timer); 
         player.sendMessage(ChatColor.WHITE + "Biome set to " + biome);
+        player.sendMessage(ChatColor.WHITE + "Fastrender set to " + fastrender);
         player.sendMessage(ChatColor.GOLD + "Type /help for a list of available commands.");
         
         // give op player items for changing terrain and biome
@@ -231,7 +251,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
                     public void run() {
                         readFileAndSetBlocks();
                     }
-                }, 0, timer * 20); // 1 sec = 20 ticks
+                }, 0, (long) (timer * 20 * isRealTime)); // 1 sec = 20 ticks
         	}
         	else	
         	{
@@ -245,11 +265,17 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         
         else if (command.getName().equalsIgnoreCase("timer"))
         {
+
             if (args.length != 1) {
                 sender.sendMessage("Usage: /timer <seconds>");
                 return false;
             }
             timer = Integer.parseInt(args[0]);
+            
+        	if (timer == 0)
+        		isRealTime = 0.75;
+        	else
+        		isRealTime = 1;
             
             // cancel existing task so we can create a new one of a different timer value
             if (autoupdate) {
@@ -258,8 +284,11 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
                     public void run() {
                     	readFileAndSetBlocks();
                     }
-                }, 0, timer * 20);
+                }, 0, (long) (timer * 20 * isRealTime));
             }
+            
+            if (timer == 0)
+            	sender.sendMessage("Changed timer to real-time");
             
             sender.sendMessage("Changed timer to " + timer + " seconds");
             
@@ -273,6 +302,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         	timer = 10;
         	biome = "mountains";
         	scale = 150; 
+        	fastrender = false;
         	
             sender.sendMessage("Reset settings to default values");
             
@@ -290,6 +320,27 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             
             return true;
         }
+        else if (command.getName().equalsIgnoreCase("fastrender"))
+        {
+        	if (args.length != 1) {
+                sender.sendMessage("Usage: /fastrender on or off");
+                return false;
+            }
+        	String state = args[0];
+        	if (state.equals("on"))
+        	{
+        		sender.sendMessage("Enabled faster rendering");
+        		fastrender = true;
+        	}
+        	else	
+        	{
+        		sender.sendMessage("Disabled faster rendering");
+        		fastrender = false;
+        	}
+            
+            return true;
+        }
+        
         
         return false;
     }
@@ -345,6 +396,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             player.sendMessage(ChatColor.WHITE + "/waterlevel <y level> - sets the water level");
             player.sendMessage(ChatColor.WHITE + "/autoupdate <on or off> - toggle the auto update feature");
             player.sendMessage(ChatColor.WHITE + "/timer <seconds> - set a timer in seconds for autoupdate");
+            player.sendMessage(ChatColor.WHITE + "/timer 0 will attempt to render in real time");
             player.sendMessage(ChatColor.WHITE + "/scale <length> - length in blocks of wanted x dimension");
             player.sendMessage(ChatColor.WHITE + "/default - restores settings to default values");
             player.spigot().sendMessage(new ComponentBuilder("check ")
@@ -371,6 +423,17 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     
     // replace blocks with air
     private void resetBlocks() {
+    	if (fastrender)
+    	{
+    		 for (int x = 0; x < 100; x++) {
+    	            for (int y = 0; y < world.getMaxHeight(); y++) {
+    	                for (int z = 0; z < 200; z++) {
+    	                    world.getBlockAt(x, y, z).setType(Material.AIR);
+    	                }
+    	            }
+    	        }
+    		 return;
+    	}
     	int xScan = 0; 
     	int zScan = 0;
     	// check blocks that need to be replaced
@@ -574,11 +637,25 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         // delete old blocks
         resetBlocks();
         
+        if (fastrender)
+        {
+        	for (int x = 0; x < array2D.length; x++) {
+                for (int z = 0; z < array2D[x].length; z++) {
+                	Block block;
+                	int i = 40 - Math.abs((int)(heightMultipler * array2D[x][z] * 0.05-110));
+                	block = world.getBlockAt(x, i, z);
+                	setBiomeBlock(block, i, biome);
+                }
+            }
+        	touchUpBiome(biome);
+        	return;
+        }
+        
         // for each block in the specified data range, chose that block's material and set it
         for (int x = 0; x < array2D.length; x++) {
             for (int z = 0; z < array2D[x].length; z++) {
             	Block block;
-            	for (int i = 0; i < 40 - Math.abs((int)(heightMultipler * array2D[x][z] * 0.05-82)); i++) {
+            	for (int i = 0; i < 40 - Math.abs((int)(heightMultipler * array2D[x][z] * 0.05-110)); i++) {
             	    block = world.getBlockAt(x, i, z);
             	    setBiomeBlock(block, i, biome);
             	}
@@ -600,6 +677,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 	    config.set("timer", timer);
 	    config.set("biome", biome);
 	    config.set("scale", scale);
+	    config.set("fastrender", fastrender);
 	    try {
 	        config.save(configFile);
 	    } catch (IOException e) {
@@ -627,6 +705,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 	    timer = config.getInt("timer"); 
 	    biome = config.getString("biome"); 
 	    scale = config.getInt("scale"); 
+	    fastrender = config.getBoolean("fastrender");
 	}
  
 }
