@@ -2,8 +2,10 @@
 A Minecraft terrain visualizer for augmented reality sandboxes using Xbox Kinect
 
 # Installation
+npm init && npm i <br>
 Download buildtools https://www.spigotmc.org/wiki/buildtools/ to compile the spigot 1.21 server jar <br>
-Put the plugin jar in the Plugins folder <br><br>
+Put the plugin jar in the Plugins folder <br>
+run launch.bar <br><br>
 
 # Usage
 The blaze rod (gold stick) is used to manually update the terrain. This is useful if autoupdate is off and you want to update the terrain. <br>
