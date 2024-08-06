@@ -40,9 +40,11 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     private static int waterlevel = -1;
     private static boolean autoupdate = false;
     private static int timer = 10;
-    private static double heightMultipler = 1;
+    private static double heightMultipler = 1; // for later use
     private static World world;
+    private static int scale = 150;
 
+    // runs when the plugin is enabled after the server is started
     @Override
     public void onEnable() {
     	getServer().getPluginManager().registerEvents(this, this);
@@ -50,13 +52,17 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     	getCommand("autoupdate").setExecutor(this);
     	getCommand("timer").setExecutor(this);
     	getCommand("default").setExecutor(this);
+    	getCommand("scale").setExecutor(this);
     	world = Bukkit.getWorlds().get(0);
     	loadVariables();
     	readFileAndSetBlocks();
-    	//setBlocks();
+    	
+    	
+    	
     	
     }
     
+    // runs on server / plugin stop
     @Override
     public void onDisable() {
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -67,6 +73,40 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         saveVariables();
     }
     
+    // WIP
+    // changes the scale of the 2d array
+    // think of this as converting a high resolution image to a lower resolution one,
+    public void scaleMatrix(int[][] arr, int newLength) {
+    	// newLength is the length, in blocks, that arr will be converted to fit
+    	int[][] newArr = new int[(int) (newLength)][(arr.length * newLength)/arr[0].length];
+    	
+    	System.out.println("size: " + newLength  + " " + (arr.length * newLength)/arr[0].length);
+    	
+    	double xIncrement = (double)arr.length / newLength;
+    	double zIncrement = (double)arr[0].length / ((arr.length * newLength)/(double)arr[0].length);
+    	System.out.println("xinc " + xIncrement + " yinc " + zIncrement);
+    	
+    	for (int x = 0; x < newArr.length; x++) {
+    		for (int z = 0; z < newArr[0].length; z++) {
+        		newArr[x][z] = arr[(int)(x*xIncrement)][(int)(z*zIncrement)];
+        	}
+    	}
+    	
+    	int[][] trimmed = new int[90][171];
+    	for (int x = 0; x < trimmed.length; x++) {
+    		for (int z = 0; z < trimmed[0].length; z++) {
+    			trimmed[x][z] = newArr[x+20][z+3];
+        	}
+    	}
+    	
+    	
+    	array2D = trimmed;
+    	
+    	System.out.println(newArr[0][0] + " " +  newArr[0][1] + " " + newArr[0][2] + " " +  newArr[0][3]);
+    	System.out.println(newArr[1][0] + " " +  newArr[2][0] + " " + newArr[3][0] + " " +  newArr[4][0]);	
+    }
+    
+    // prevent water from flowing
     @EventHandler
     public void onWaterFlow(BlockFromToEvent event) {
         if (event.getBlock().getType() == Material.WATER) {
@@ -74,6 +114,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         }
     }
     
+    // runs when a player joins
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (event == null) {
@@ -86,13 +127,17 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             return;
         }
         
-        event.setJoinMessage("");
+        // player join message added too much clutter
+        event.setJoinMessage(""); 
         
+        // inform player of settings and help menu
         player.sendMessage(ChatColor.WHITE + "Current waterlevel = " + waterlevel);
         player.sendMessage(ChatColor.WHITE + "Auto update is set to " + autoupdate);
         player.sendMessage(ChatColor.WHITE + "Timer set to " + timer);
+        player.sendMessage(ChatColor.WHITE + "Biome set to " + biome);
         player.sendMessage(ChatColor.GOLD + "Type /help for a list of available commands.");
         
+        // give op player items for changing terrain and biome
         if (player.isOp()) {
             ItemStack BLAZE_ROD = new ItemStack(Material.BLAZE_ROD); // update terrain wand
             ItemStack grass = new ItemStack(Material.GRASS_BLOCK); // normal mountain biome
@@ -133,19 +178,25 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         }
     }
     
+    // reads the Kinect DepthFrame output file on seperate thread
     public void readFileAndSetBlocks() {
         Gson gson = new Gson();
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             try {
                 String content = new String(Files.readAllBytes(Paths.get(FILE_PATH)));
                 array2D = gson.fromJson(content, int[][].class);
+                if (scale != -1)
+                	scaleMatrix(array2D, 150);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            
+            // wait until above process is done to call setBlocks()
            Bukkit.getScheduler().runTask(this, this::setBlocks);
         });
     }
     
+    // listener for player commands
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("waterlevel")) {
@@ -159,7 +210,6 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             setWater(waterlevel);
             sender.sendMessage("Changed water level to " + waterlevel);
             
-            // Use the level variable as needed
             return true;
         }
         
@@ -176,12 +226,12 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         		autoupdate = true;
         		Bukkit.getScheduler().cancelTasks(this);
                 
+        		// scheduler to repeatedly run terrain update task
                 Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
                     public void run() {
                         readFileAndSetBlocks();
-//                        setBlocks();
                     }
-                }, 0, timer * 20); // Convert seconds to ticks
+                }, 0, timer * 20); // 1 sec = 20 ticks
         	}
         	else	
         	{
@@ -190,8 +240,6 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         		Bukkit.getScheduler().cancelTasks(this);
         	}
             
-            
-            // Use the level variable as needed
             return true;
         }
         
@@ -203,15 +251,14 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             }
             timer = Integer.parseInt(args[0]);
             
-            // Cancel the existing task if autoupdate is true
+            // cancel existing task so we can create a new one of a different timer value
             if (autoupdate) {
                 Bukkit.getScheduler().cancelTasks(this);
                 Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
                     public void run() {
                     	readFileAndSetBlocks();
-                        //setBlocks();
                     }
-                }, 0, timer * 20); // Convert seconds to ticks
+                }, 0, timer * 20);
             }
             
             sender.sendMessage("Changed timer to " + timer + " seconds");
@@ -220,30 +267,39 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         }
         else if (command.getName().equalsIgnoreCase("default"))
         {
+        	// "default" values can be changed as seen fit
         	waterlevel = 10;
         	autoupdate = false;
         	timer = 10;
         	biome = "mountains";
-        	
-//        	setBlocks();
+        	scale = 150; 
         	
             sender.sendMessage("Reset settings to default values");
             
-            // Use the level variable as needed
+            return true;
+        }
+        else if (command.getName().equalsIgnoreCase("scale"))
+        {
+            if (args.length != 1) {
+                sender.sendMessage("Usage: /scale <length>");
+                return false;
+            }
+            scale = Integer.parseInt(args[0]);
+            
+            sender.sendMessage("Changed scale to " + scale + " blocks");
+            
             return true;
         }
         
         return false;
     }
     
+    // event handler for player interacting with an item 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
     	Player player = event.getPlayer();
         if (event.getItem() != null && event.getItem().getType() == Material.BLAZE_ROD && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Update Terrain") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
-            
-//            biome = "mountains";
             player.sendMessage(ChatColor.GREEN + "Updating terrain..");
-            //setBlocks();
             readFileAndSetBlocks();
         }
         if (event.getItem() != null && event.getItem().getType() == Material.GRASS_BLOCK && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Mountain Biome") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
@@ -274,6 +330,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         
     }
     
+    // why am i using this and onCommand?
     @SuppressWarnings("deprecation") // not an important feature anyways
 	@EventHandler
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
@@ -288,6 +345,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             player.sendMessage(ChatColor.WHITE + "/waterlevel <y level> - sets the water level");
             player.sendMessage(ChatColor.WHITE + "/autoupdate <on or off> - toggle the auto update feature");
             player.sendMessage(ChatColor.WHITE + "/timer <seconds> - set a timer in seconds for autoupdate");
+            player.sendMessage(ChatColor.WHITE + "/scale <length> - length in blocks of wanted x dimension");
             player.sendMessage(ChatColor.WHITE + "/default - restores settings to default values");
             player.spigot().sendMessage(new ComponentBuilder("check ")
             	    .color(net.md_5.bungee.api.ChatColor.WHITE)
@@ -304,13 +362,14 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
+    	// remove contents of inventory when player leaves
         Player player = event.getPlayer();
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
         player.getInventory().setItemInOffHand(null);
     }
     
-    
+    // replace blocks with air
     private void resetBlocks() {
     	int xScan = 0; 
     	int zScan = 0;
@@ -328,45 +387,38 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         for (int x = 0; x < xScan; x++) {
             for (int y = 0; y < world.getMaxHeight(); y++) {
                 for (int z = 0; z < zScan; z++) {
-//                    Location location = new Location(world, x, y, z);
-//                    location.getBlock().setType(Material.AIR);
                     world.getBlockAt(x, y, z).setType(Material.AIR);
                 }
             }
         }
     }
     
+    // used for changing water level
     private void resetWater() {
-        
         for (int x = 0; x < array2D.length; x++) {
             for (int y = 0; y < world.getMaxHeight(); y++) {
                 for (int z = 0; z < array2D[x].length; z++) {
-//                    Location location = new Location(world, x, y, z);
-                    if (world.getBlockAt(x, y, z).getType() == Material.WATER) {
+                    if (world.getBlockAt(x, y, z).getType() == Material.WATER) 
                     	world.getBlockAt(x, y, z).setType(Material.AIR);
-                    }
-                   
                 }
             }
         }
     }
     
-    private void setWater(int waterlevel)
-    {
+    // sets the terrain water level
+    private void setWater(int waterlevel) {
     	for (int x = 0; x < array2D.length; x++) {
             for (int z = 0; z < array2D[x].length; z++) {
-            	for(int y = 0; y < waterlevel; y++)
-            	{
-//            		Location location2 = new Location(Bukkit.getWorlds().get(0), x, y, z);
-            		if (world.getBlockAt(x, y, z).getType() == Material.AIR) {
+            	for(int y = 0; y < waterlevel; y++) {
+            		if (world.getBlockAt(x, y, z).getType() == Material.AIR) 
                     	world.getBlockAt(x, y, z).setType(Material.WATER);
-                    }
             	}
             }
         }
     }
     
-    void setBiome(Block block, int i, String biome)
+    // chooses what blocks are at what y level
+    void setBiomeBlock(Block block, int i, String biome)
     {
     	if (biome.equals("mountains")) {
 	        block.setType(i > 22 ? Material.DIRT : Material.STONE);
@@ -434,26 +486,12 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 	        }
 	    }
     }
-
-    void setBlocks() {
-        if (array2D == null) return;
-        
-       
-        resetBlocks();
-        
-//        getLogger().info("Setting blocks");
-
-        for (int x = 0; x < array2D.length; x++) {
-            for (int z = 0; z < array2D[x].length; z++) {
-            	Block block;
-            	for (int i = 0; i < Math.abs((int)(heightMultipler * array2D[x][z] * 0.05-82)); i++) {
-            	    block = world.getBlockAt(x, i, z);
-            	    setBiome(block, i, biome);
-            	}
-            }
-        }
-        // non cross sectional stuff
-        if (biome == "mesa")
+    
+    // makes the given biome look more natural
+    public void touchUpBiome(String biome)
+    {
+    	// non cross sectional stuff
+        if (biome.equals("mesa"))
         {
         	 //scan for where to place red sand 
 	        for (int a = 0; a < array2D.length; a++) {
@@ -467,7 +505,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 	            }
 	        }
         }
-        if (biome == "desert")
+        if (biome.equals("desert"))
         {
         	 //scan for where to place red sand 
 	        for (int a = 0; a < array2D.length; a++) {
@@ -483,7 +521,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 	            }
 	        }
         }
-        if (biome == "snowy")
+        if (biome.equals("snowy"))
         {
         	 //scan for where to place red sand 
 	        for (int a = 0; a < array2D.length; a++) {
@@ -498,7 +536,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 	            }
 	        }
         }
-        if (biome == "mountains")
+        if (biome.equals("mountains"))
         {
         	 //scan for where to place red sand 
 	        for (int a = 0; a < array2D.length; a++) {
@@ -519,20 +557,38 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         }
         if (waterlevel == -1)
         	setWater(0);
-        else if (biome == "mesa")
+        else if (biome.equals("mesa"))
         	setWater(0);
-        else if (biome == "desert")
+        else if (biome.equals("desert"))
         	setWater(0);
-        else if (biome == "icy")
+        else if (biome.equals("icy"))
         	setWater(25);
         else
         	setWater(waterlevel);
+    }
+
+    // replace terrain with new data
+    void setBlocks() {
+        if (array2D == null) return;
+            
+        // delete old blocks
+        resetBlocks();
         
-        getLogger().info("done setblocks");
+        // for each block in the specified data range, chose that block's material and set it
+        for (int x = 0; x < array2D.length; x++) {
+            for (int z = 0; z < array2D[x].length; z++) {
+            	Block block;
+            	for (int i = 0; i < 40 - Math.abs((int)(heightMultipler * array2D[x][z] * 0.05-82)); i++) {
+            	    block = world.getBlockAt(x, i, z);
+            	    setBiomeBlock(block, i, biome);
+            	}
+            }
+        }
+        touchUpBiome(biome);
     }
  	
-//Save variables to config file
- public void saveVariables() {
+    // save variables to config.yml in plugin data folder
+    public void saveVariables() {
 	    File dataFolder = getDataFolder();
 	    if (!dataFolder.exists()) {
 	        dataFolder.mkdirs();
@@ -543,6 +599,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 	    config.set("autoupdate", autoupdate);
 	    config.set("timer", timer);
 	    config.set("biome", biome);
+	    config.set("scale", scale);
 	    try {
 	        config.save(configFile);
 	    } catch (IOException e) {
@@ -550,8 +607,8 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 	    }
 	}
 
-//Load variables from config file
- public void loadVariables() {
+    // load variables from config.yml file
+    public void loadVariables() {
 	    File dataFolder = getDataFolder();
 	    if (!dataFolder.exists()) {
 	        dataFolder.mkdirs();
@@ -565,10 +622,11 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 	        }
 	    }
 	    YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-	    waterlevel = config.getInt("waterlevel", -1); // -1 is the default value if the key is not found
+	    waterlevel = config.getInt("waterlevel", -1);
 	    autoupdate = config.getBoolean("autoupdate"); 
 	    timer = config.getInt("timer"); 
 	    biome = config.getString("biome"); 
+	    scale = config.getInt("scale"); 
 	}
  
 }
