@@ -1,6 +1,10 @@
 # MC-AR-Sandbox
 A Minecraft terrain visualizer for augmented reality sandboxes using Xbox Kinect
 
+# Installation
+Download buildtools https://www.spigotmc.org/wiki/buildtools/ to compile the spigot 1.21 server jar <br>
+Put the plugin jar in the Plugins folder <br><br>
+
 # Usage
 The blaze rod (gold stick) is used to manually update the terrain. This is useful if autoupdate is off and you want to update the terrain. <br>
 The other blocks in the inventory represet different biomes that you can choose from. When you select a biome, all subsequent terrain updates will reflect that chosen biome. You can go back by selecting a differnt biome <br><br>
