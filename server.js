@@ -1,28 +1,46 @@
+const Kinect2 = require("kinect2");
+const kinect = new Kinect2();
 const fs = require("fs");
 
-//512x424
-function generate2DArray() {
-  const array = [];
-  for (let i = 0; i < 100; i++) {
-    const row = [];
-    for (let j = 0; j < 100; j++) {
-      row.push(parseInt(Math.random() * 500) + 1000);
+const main = async () => {
+  if (kinect.open()) {
+    console.log("Kinect ready and working");
+    kinect.openDepthReader();
+
+    let writing = false;
+
+    // Set up an event listener to receive depth frame data
+    kinect.on("depthFrame", (depthFrame) => {
+      if (!writing) {
+        writing = true;
+
+        const width = 512; // Kinect depth frame width
+        const height = 424; // Kinect depth frame height
+
+        // Convert the Buffer to a 2D array
+        const depthArray = Array.from(
+          { length: Math.floor(height * 1.6) },
+          (_, y) =>
+            Array.from({ length: width }, (_, x) => {
+              const originalY = Math.floor(y / 1.6); // Map new y to original y
+              return depthFrame[originalY * width + x] * 25;
+            })
+        );
+        // Write the output to a file, overwriting any existing content
+        fs.writeFileSync("output.txt", JSON.stringify(depthArray));
+
+        // Schedule the next write after a 1-second delay
+        setTimeout(() => {
+          writing = false;
+        }, 50);
+      }
+    });
+
+    // Keep the program running to receive depth frame data
+    while (true) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
-    array.push(row);
   }
-  return array;
-}
+};
 
-setInterval(() => {
-  const array = generate2DArray();
-  const message = JSON.stringify(array);
-  fs.writeFile("output.txt", message, (err) => {
-    if (err) {
-      console.error("Error writing to file", err);
-    } else {
-      console.log("Data written to output.txt");
-    }
-  });
-}, 1000);
-
-console.log("Data generation and writing to file is running every 1 seconds.");
+main();
