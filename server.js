@@ -64,7 +64,7 @@ const main = async (useRandom) => {
         // Schedule the next write after a 1-second delay
         setTimeout(() => {
           writing = false;
-        }, 500);
+        }, 100);
       }
     });
 
