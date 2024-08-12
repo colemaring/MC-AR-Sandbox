@@ -21,6 +21,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -34,7 +43,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class SpigotPluginBlank extends JavaPlugin implements Listener {
 
-    private static final String FILE_PATH = "C:\\Users\\colem\\OneDrive\\Desktop\\mc_test\\output.txt";
+    private static final String FILE_PATH = "C:\\Users\\colem\\Desktop\\mcserver\\output.txt";
     private static int[][] array2D;
     private static String biome = "mountains";
     private static int waterlevel = -1;
@@ -43,27 +52,24 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     private static double heightMultipler = 1; // for later use
     private static World world;
     private static int scale = 150;
-    private static boolean fastrender = true;
 	private static double isRealTime = 1.0;
-
+	private int[][] previousArray2D;
+	private Map<Position, colChange> changes = new ConcurrentHashMap<>();
+	private boolean firstRead = true;
 
     // runs when the plugin is enabled after the server is started
     @Override
     public void onEnable() {
+    	previousArray2D = new int[90][171];
     	getServer().getPluginManager().registerEvents(this, this);
     	getCommand("waterlevel").setExecutor(this);
     	getCommand("autoupdate").setExecutor(this);
     	getCommand("timer").setExecutor(this);
     	getCommand("default").setExecutor(this);
     	getCommand("scale").setExecutor(this);
-    	getCommand("fastrender").setExecutor(this);
     	world = Bukkit.getWorlds().get(0);
     	loadVariables();
-    	readFileAndSetBlocks();
-    	
-    	
-    	
-    	
+    	startReadingFile();
     }
     
     // runs on server / plugin stop
@@ -77,6 +83,88 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         saveVariables();
     }
     
+    public void startReadingFile() {
+        Gson gson = new Gson();
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+            try {
+                String content = new String(Files.readAllBytes(Paths.get(FILE_PATH)));
+                array2D = gson.fromJson(content, int[][].class);
+                if (scale != -1)
+                    scaleMatrix(array2D, 150);
+
+                if (firstRead) {
+                    previousArray2D = array2D.clone(); // initialize previousArray2D with array2D values
+                    firstRead = false;
+                }
+                
+
+                // Create the list of block changes
+                for (int x = 0; x < array2D.length; x++) {
+                    for (int z = 0; z < array2D[0].length; z++) {
+                        if (previousArray2D[x][z] != array2D[x][z]) {
+                        	Position position = new Position(x, z);
+                            changes.put(position, new colChange(x, z, array2D[x][z]));
+                            // System.out.println("change found");
+                        }
+                    }
+                }
+
+                // Update previousArray2D
+                previousArray2D = array2D.clone();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }, 0, 20); // 1 tick = 50ms
+    }
+    
+    public class Position {
+        private int x;
+        private int z;
+
+        public Position(int x, int z) {
+            this.x = x;
+            this.z = z;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Position position = (Position) o;
+            return x == position.x && z == position.z;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, z);
+        }
+    }
+
+    public class colChange {
+        private int x;
+        private int z;
+        private int value;
+
+        public colChange(int x, int z, int value) {
+            this.x = x;
+            this.z = z;
+            this.value = value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            colChange colChange = (colChange) o;
+            return x == colChange.x && z == colChange.z && value == colChange.value;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, z, value);
+        }
+    }
     // WIP
     // changes the scale of the 2d array
     // think of this as converting a high resolution image to a lower resolution one,
@@ -84,11 +172,11 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     	// newLength is the length, in blocks, that arr will be converted to fit
     	int[][] newArr = new int[(int) (newLength)][(arr.length * newLength)/arr[0].length];
     	
-    	System.out.println("size: " + newLength  + " " + (arr.length * newLength)/arr[0].length);
+//    	System.out.println("size: " + newLength  + " " + (arr.length * newLength)/arr[0].length);
     	
     	double xIncrement = (double)arr.length / newLength;
     	double zIncrement = (double)arr[0].length / ((arr.length * newLength)/(double)arr[0].length);
-    	System.out.println("xinc " + xIncrement + " yinc " + zIncrement);
+//    	System.out.println("xinc " + xIncrement + " yinc " + zIncrement);
     	
     	for (int x = 0; x < newArr.length; x++) {
     		for (int z = 0; z < newArr[0].length; z++) {
@@ -105,9 +193,6 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     	
     	
     	array2D = trimmed;
-    	
-    	System.out.println(newArr[0][0] + " " +  newArr[0][1] + " " + newArr[0][2] + " " +  newArr[0][3]);
-    	System.out.println(newArr[1][0] + " " +  newArr[2][0] + " " + newArr[3][0] + " " +  newArr[4][0]);	
     }
     
     // prevent water from flowing
@@ -138,7 +223,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     		// scheduler to repeatedly run terrain update task
             Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
                 public void run() {
-                    readFileAndSetBlocks();
+                    updateBlocks();
                 }
             }, 0, (long) (timer * 20 * isRealTime)); // 1 sec = 20 ticks
         }
@@ -154,7 +239,6 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         else
         	player.sendMessage(ChatColor.WHITE + "Timer set to " + timer); 
         player.sendMessage(ChatColor.WHITE + "Biome set to " + biome);
-        player.sendMessage(ChatColor.WHITE + "Fastrender set to " + fastrender);
         player.sendMessage(ChatColor.GOLD + "Type /help for a list of available commands.");
         
         // give op player items for changing terrain and biome
@@ -199,22 +283,23 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     }
     
     // reads the Kinect DepthFrame output file on seperate thread
-    public void readFileAndSetBlocks() {
-        Gson gson = new Gson();
-        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-            try {
-                String content = new String(Files.readAllBytes(Paths.get(FILE_PATH)));
-                array2D = gson.fromJson(content, int[][].class);
-                if (scale != -1)
-                	scaleMatrix(array2D, 150);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            
-            // wait until above process is done to call setBlocks()
-           Bukkit.getScheduler().runTask(this, this::setBlocks);
-        });
-    }
+//    public void readFileAndupdateBlocks() {
+//        Gson gson = new Gson();
+//        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+//            try {
+//                String content = new String(Files.readAllBytes(Paths.get(FILE_PATH)));
+//                array2D = gson.fromJson(content, int[][].class);
+//                if (scale != -1)
+//                	scaleMatrix(array2D, 150);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            
+//            // wait until above process is done to call updateBlocks()
+//           Bukkit.getScheduler().runTask(this, this::updateBlocks);
+//        });
+//    }
+    
     
     // listener for player commands
     @Override
@@ -249,7 +334,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         		// scheduler to repeatedly run terrain update task
                 Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
                     public void run() {
-                        readFileAndSetBlocks();
+                        updateBlocks();
                     }
                 }, 0, (long) (timer * 20 * isRealTime)); // 1 sec = 20 ticks
         	}
@@ -282,7 +367,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
                 Bukkit.getScheduler().cancelTasks(this);
                 Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
                     public void run() {
-                    	readFileAndSetBlocks();
+                    	updateBlocks();
                     }
                 }, 0, (long) (timer * 20 * isRealTime));
             }
@@ -302,7 +387,6 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         	timer = 10;
         	biome = "mountains";
         	scale = 150; 
-        	fastrender = false;
         	
             sender.sendMessage("Reset settings to default values");
             
@@ -320,26 +404,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             
             return true;
         }
-        else if (command.getName().equalsIgnoreCase("fastrender"))
-        {
-        	if (args.length != 1) {
-                sender.sendMessage("Usage: /fastrender on or off");
-                return false;
-            }
-        	String state = args[0];
-        	if (state.equals("on"))
-        	{
-        		sender.sendMessage("Enabled faster rendering");
-        		fastrender = true;
-        	}
-        	else	
-        	{
-        		sender.sendMessage("Disabled faster rendering");
-        		fastrender = false;
-        	}
-            
-            return true;
-        }
+        
         
         
         return false;
@@ -351,31 +416,37 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     	Player player = event.getPlayer();
         if (event.getItem() != null && event.getItem().getType() == Material.BLAZE_ROD && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Update Terrain") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             player.sendMessage(ChatColor.GREEN + "Updating terrain..");
-            readFileAndSetBlocks();
+            updateBlocks();
+            
         }
         if (event.getItem() != null && event.getItem().getType() == Material.GRASS_BLOCK && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Mountain Biome") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             biome = "mountains";
             player.sendMessage(ChatColor.GREEN + "Updating biome to normal mountains..");
+            resetBlocks();
             setBlocks();
         }
         if (event.getItem() != null && event.getItem().getType() == Material.SNOW_BLOCK && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Snowy Biome") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             biome = "snowy";
             player.sendMessage(ChatColor.GREEN + "Updating biome to snowy mountains..");
+            resetBlocks();
             setBlocks();
         }
         if (event.getItem() != null && event.getItem().getType() == Material.RED_SAND && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Mesa Biome") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             biome = "mesa";
             player.sendMessage(ChatColor.GREEN + "Updating biome to mesa..");
+            resetBlocks();
             setBlocks();
         }
         if (event.getItem() != null && event.getItem().getType() == Material.BLUE_ICE && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Icy Biome") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             biome = "icy";
             player.sendMessage(ChatColor.GREEN + "Updating biome to frozen ocean..");
+            resetBlocks();
             setBlocks();
         }
         if (event.getItem() != null && event.getItem().getType() == Material.SAND && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Desert Biome") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             biome = "desert";
             player.sendMessage(ChatColor.GREEN + "Updating biome to desert..");
+            resetBlocks();
             setBlocks();
         }
         
@@ -423,33 +494,16 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     
     // replace blocks with air
     private void resetBlocks() {
-    	if (fastrender)
-    	{
-    		 for (int x = 0; x < 100; x++) {
-    	            for (int y = 0; y < world.getMaxHeight(); y++) {
-    	                for (int z = 0; z < 200; z++) {
-    	                    world.getBlockAt(x, y, z).setType(Material.AIR);
-    	                }
-    	            }
-    	        }
-    		 return;
-    	}
-    	int xScan = 0; 
-    	int zScan = 0;
+//    	System.out.println("reupdateBlocks called");
+    	
+//    	int xScan = 0; 
+//    	int zScan = 0;
     	// check blocks that need to be replaced
     	// necessary because scale is dynamic
-    	while (world.getBlockAt(xScan, 1, 0).getType() != Material.AIR)
-    	{
-    		xScan++;
-    	}
-    	while (world.getBlockAt(0, 1, zScan).getType() != Material.AIR)
-    	{
-    		zScan++;
-    	}
     	
-        for (int x = 0; x < xScan; x++) {
+        for (int x = 0; x < 90; x++) {
             for (int y = 0; y < world.getMaxHeight(); y++) {
-                for (int z = 0; z < zScan; z++) {
+                for (int z = 0; z < 171; z++) {
                     world.getBlockAt(x, y, z).setType(Material.AIR);
                 }
             }
@@ -629,40 +683,92 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         else
         	setWater(waterlevel);
     }
+    
+    void setBlocks()
+    {
+    // for each block in the specified data range, chose that block's material and set it
+      for (int x = 0; x < array2D.length; x++) {
+          for (int z = 0; z < array2D[x].length; z++) {
+          	Block block;
+          	for (int i = 0; i < 40 - Math.abs((int)(heightMultipler * array2D[x][z] * 0.05-110)); i++) {
+          	    block = world.getBlockAt(x, i, z);
+          	    setBiomeBlock(block, i, biome);
+          	}
+          }
+      }
+//      touchUpBiome(biome);
+    }
 
     // replace terrain with new data
-    void setBlocks() {
+    void updateBlocks() {
         if (array2D == null) return;
             
-        // delete old blocks
-        resetBlocks();
+//        // delete old blocks
+//        reupdateBlocks();
         
-        if (fastrender)
-        {
-        	for (int x = 0; x < array2D.length; x++) {
-                for (int z = 0; z < array2D[x].length; z++) {
-                	Block block;
-                	int i = 40 - Math.abs((int)(heightMultipler * array2D[x][z] * 0.05-110));
-                	block = world.getBlockAt(x, i, z);
-                	setBiomeBlock(block, i, biome);
-                }
-            }
-        	touchUpBiome(biome);
-        	return;
-        }
+//        System.out.println("updateBlocks called");
+//        
+//        for (colChange change : changes.values()) {
+//            System.out.println("x: " + change.x + ", z: " + change.z + ", value: " + (40 - Math.abs((int)(heightMultipler * change.value * 0.05-110))));
+//        }
+//        
+        for (colChange change : changes.values()) {
+        	int y = (40 - Math.abs((int)(heightMultipler * change.value * 0.05-110)));
         
-        // for each block in the specified data range, chose that block's material and set it
-        for (int x = 0; x < array2D.length; x++) {
-            for (int z = 0; z < array2D[x].length; z++) {
-            	Block block;
-            	for (int i = 0; i < 40 - Math.abs((int)(heightMultipler * array2D[x][z] * 0.05-110)); i++) {
-            	    block = world.getBlockAt(x, i, z);
-            	    setBiomeBlock(block, i, biome);
+            Block block = world.getBlockAt(change.x, y, change.z);
+//            System.out.println(block.getType().equals(Material.AIR));
+            if (block.getType().equals(Material.AIR)) {
+            	int scany = y;
+            	while (block.getType().equals(Material.AIR))
+            	{
+            		 block = world.getBlockAt(change.x, scany, change.z);
+            		 scany -= 1;
+            	}
+            	for (int y1 = scany; y1 <= y; y1++)
+            	{
+        		 //world.getBlockAt(change.x, y1, change.z).setType(Material.DIAMOND_BLOCK);
+        		 // System.out.println("changing block at x:" + change.x + " z:" + change.z + " y:" +y1 + " to blocks");
+        		 setBiomeBlock(world.getBlockAt(change.x, y1, change.z), y1, biome);
+            	
             	}
             }
+            else
+            {
+            	while (!block.getType().equals(Material.AIR))
+            	{
+            		int scany = y;
+                	while (!block.getType().equals(Material.AIR))
+                	{
+                		 block = world.getBlockAt(change.x, scany, change.z);
+                		 scany += 1;
+                	}
+                	for (int y1 = scany; y1 >= y; y1--)
+                	{
+                		// world.getBlockAt(change.x, y1, change.z).setType(Material.AIR);
+                		System.out.println("changing block at x:" + change.x + " z:" + change.z + " y:" +y1 + " to air");
+                	}
+            	}
+            }
+            
+            
+   
+        // for each block in the specified data range, chose that block's material and set it
+//        for (int x = 0; x < array2D.length; x++) {
+//            for (int z = 0; z < array2D[x].length; z++) {
+//            	Block block;
+//            	for (int i = 0; i < 40 - Math.abs((int)(heightMultipler * array2D[x][z] * 0.05-110)); i++) {
+//            	    block = world.getBlockAt(x, i, z);
+//            	    setBiomeBlock(block, i, biome);
+//            	}
+//            }
+//        }
+//        touchUpBiome(biome);
         }
-        touchUpBiome(biome);
+        changes.clear();
     }
+
+ 
+
  	
     // save variables to config.yml in plugin data folder
     public void saveVariables() {
@@ -677,7 +783,6 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 	    config.set("timer", timer);
 	    config.set("biome", biome);
 	    config.set("scale", scale);
-	    config.set("fastrender", fastrender);
 	    try {
 	        config.save(configFile);
 	    } catch (IOException e) {
@@ -705,7 +810,6 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 	    timer = config.getInt("timer"); 
 	    biome = config.getString("biome"); 
 	    scale = config.getInt("scale"); 
-	    fastrender = config.getBoolean("fastrender");
 	}
  
 }
