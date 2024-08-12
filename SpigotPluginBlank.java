@@ -725,9 +725,9 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         
             Block block = world.getBlockAt(change.x, y, change.z);
 //            System.out.println(block.getType().equals(Material.AIR));
-            if (block.getType().equals(Material.AIR)) {
+            if (block.getType().equals(Material.AIR) || block.getType().equals(Material.WATER)) {
             	int scany = y;
-            	while (block.getType().equals(Material.AIR))
+            	while (block.getType().equals(Material.AIR) || block.getType().equals(Material.WATER))
             	{
             		 block = world.getBlockAt(change.x, scany, change.z);
             		 scany -= 1;
@@ -770,8 +770,10 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 //            	}
 //            }
 //        }
-//        touchUpBiome(biome);
+//        
         }
+        touchUpBiome(biome);
+//        setWater(waterlevel);
         changes.clear();
     }
 
