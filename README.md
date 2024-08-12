@@ -1,5 +1,5 @@
 # MC-AR-Sandbox
-A Minecraft terrain visualizer for augmented reality sandboxes using Xbox Kinect
+A real-time Minecraft terrain visualizer for augmented reality sandboxes using Xbox Kinect
 
 # Installation
 npm init && npm i <br>
@@ -9,7 +9,8 @@ run launch.bar <br><br>
 
 # Usage
 The blaze rod (gold stick) is used to manually update the terrain. This is useful if autoupdate is off and you want to update the terrain. <br>
-The other blocks in the inventory represet different biomes that you can choose from. When you select a biome, all subsequent terrain updates will reflect that chosen biome. You can go back by selecting a differnt biome <br><br>
+The other blocks in the inventory represet different biomes that you can choose from. When you select a biome, all subsequent terrain updates will reflect that chosen biome. You can go back by selecting a different biome <br>
+If you destroy a bunch of terrain, left click a biome block to update the terrain back to normal. <br>
 
 # Commands
 /waterlevel <y level> - allows you to choose the water level of the world. eg. /waterlevel 10 <br>
@@ -22,7 +23,10 @@ All settings persist across server start and stop. You can reset the setting wit
 The default settings are as follows: <br>
 waterlevel = 10 <br> 
 autoupdate = false <br> 
-timer = 10 <br> 
+timer = 1 <br> 
 biome = "mountains" <br> 
-scale = 150  <br> 
-fastrender = false <br> 
+
+# Development
+This program uses the Kinect SDK to take depth data from an Xbox Kinect Sensor. That data is then parsed and scaled down to be rendered real-time in a minecraft server. <br><br>
+
+I am using the DepthFrame class from the Kinect SDK, morso the Node version of the sdk: https://github.com/wouterverweirder/kinect2, and writing this data to a txt file many times per second. (Not the most elegant solution). This output file is then read asynchronously in the plugin java file on a seperate thread from the Bukkit thread. The Bukkit API is what I am using to place, remove, and change blocks in the minecraft world. Bukkit API operations like setting and removing blocks are very expensive, so many optimizations were made to reduce the amount of blocks changes. My solution is to keep track of values that have changed from the last DepthFrame object. I stored those changes in a ConcurrentHashMap and iterated through the columns that have changes and only touched the blocks that need to be modified.
