@@ -43,7 +43,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class SpigotPluginBlank extends JavaPlugin implements Listener {
 
-    private static final String FILE_PATH = "C:\\Users\\colem\\OneDrive\\Desktop\\mcserver\\output.txt";
+    private static final String FILE_PATH = "C:\\Users\\colem\\Desktop\\mcserver\\output.txt";
     private static int[][] array2D;
     private static String biome = "mountains";
     private static int waterlevel = -1;
@@ -56,6 +56,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 	private int[][] previousArray2D;
 	private Map<Position, colChange> changes = new ConcurrentHashMap<>();
 	private boolean firstRead = true;
+	private int updateTaskId = -1;	
 
     // runs when the plugin is enabled after the server is started
     @Override
@@ -221,14 +222,17 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         
         if (autoupdate == true)
         {
-        	Bukkit.getScheduler().cancelTasks(this);
+        	// Cancel the existing update task if it exists
+            if (updateTaskId != -1) {
+                Bukkit.getScheduler().cancelTask(updateTaskId);
+            }
             
-    		// scheduler to repeatedly run terrain update task
-            Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
+            // scheduler to repeatedly run terrain update task
+            updateTaskId = Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
                 public void run() {
                     updateBlocks();
                 }
-            }, 0, (long) (timer * 20 * isRealTime)); // 1 sec = 20 ticks
+            }, 0, (long) (timer * 20 * isRealTime)).getTaskId(); // 1 sec = 20 ticks
         }
         
         // player join message added too much clutter
@@ -327,20 +331,24 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
                 sender.sendMessage("Usage: /autoupdate on or off");
                 return false;
             }
-        	String state = args[0];
-        	if (state.equals("on"))
-        	{
-        		sender.sendMessage("Enabled auto terrain updating");
-        		autoupdate = true;
-        		Bukkit.getScheduler().cancelTasks(this);
+            String state = args[0];
+            if (state.equals("on"))
+            {
+                sender.sendMessage("Enabled auto terrain updating");
+                autoupdate = true;
                 
-        		// scheduler to repeatedly run terrain update task
-                Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
+                // Cancel the existing update task if it exists
+                if (updateTaskId != -1) {
+                    Bukkit.getScheduler().cancelTask(updateTaskId);
+                }
+                
+                // scheduler to repeatedly run terrain update task
+                updateTaskId = Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
                     public void run() {
                         updateBlocks();
                     }
-                }, 0, (long) (timer * 20 * isRealTime)); // 1 sec = 20 ticks
-        	}
+                }, 0, (long) (timer * 20 * isRealTime)).getTaskId(); // 1 sec = 20 ticks
+            }
         	else	
         	{
         		sender.sendMessage("Disabled auto terrain updating");
@@ -367,12 +375,17 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             
             // cancel existing task so we can create a new one of a different timer value
             if (autoupdate) {
-                Bukkit.getScheduler().cancelTasks(this);
-                Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
+            	// Cancel the existing update task if it exists
+                if (updateTaskId != -1) {
+                    Bukkit.getScheduler().cancelTask(updateTaskId);
+                }
+                
+                // scheduler to repeatedly run terrain update task
+                updateTaskId = Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
                     public void run() {
-                    	updateBlocks();
+                        updateBlocks();
                     }
-                }, 0, (long) (timer * 20 * isRealTime));
+                }, 0, (long) (timer * 20 * isRealTime)).getTaskId(); // 1 sec = 20 ticks
             }
             
             if (timer == 0)
@@ -727,7 +740,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             		 block = world.getBlockAt(change.x, scany, change.z);
             		 scany -= 1;
             	}
-            	for (int y1 = scany; y1 <= y; y1++)
+            	for (int y1 = scany; y1 < y; y1++)
             	{
         		 //world.getBlockAt(change.x, y1, change.z).setType(Material.DIAMOND_BLOCK);
         		 //System.out.println("changing block at x:" + change.x + " z:" + change.z + " y:" +y1 + " to blocks");
@@ -745,7 +758,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
                 		 block = world.getBlockAt(change.x, scany, change.z);
                 		 scany += 1;
                 	}
-                	for (int y1 = scany; y1 >= y; y1--)
+                	for (int y1 = scany; y1 > y; y1--)
                 	{
                 		world.getBlockAt(change.x, y1, change.z).setType(Material.AIR);
                 		//System.out.println("changing block at x:" + change.x + " z:" + change.z + " y:" +y1 + " to air");
