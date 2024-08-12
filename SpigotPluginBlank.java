@@ -43,7 +43,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class SpigotPluginBlank extends JavaPlugin implements Listener {
 
-    private static final String FILE_PATH = "C:\\Users\\colem\\Desktop\\mcserver\\output.txt";
+    private static final String FILE_PATH = "C:\\Users\\colem\\OneDrive\\Desktop\\mcserver\\output.txt";
     private static int[][] array2D;
     private static String biome = "mountains";
     private static int waterlevel = -1;
@@ -97,14 +97,15 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
                     firstRead = false;
                 }
                 
-
+                //System.out.println("reading file");
                 // Create the list of block changes
+                
                 for (int x = 0; x < array2D.length; x++) {
                     for (int z = 0; z < array2D[0].length; z++) {
                         if (previousArray2D[x][z] != array2D[x][z]) {
                         	Position position = new Position(x, z);
                             changes.put(position, new colChange(x, z, array2D[x][z]));
-                            // System.out.println("change found");
+                            //System.out.println("change found");
                         }
                     }
                 }
@@ -115,8 +116,10 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }, 0, 20); // 1 tick = 50ms
+        }, 0, 10); // 1 tick = 50ms
     }
+    
+    
     
     public class Position {
         private int x;
@@ -690,7 +693,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
       for (int x = 0; x < array2D.length; x++) {
           for (int z = 0; z < array2D[x].length; z++) {
           	Block block;
-          	for (int i = 0; i < 40 - Math.abs((int)(heightMultipler * array2D[x][z] * 0.05-110)); i++) {
+          	for (int i = 0; i < 25+ Math.abs((int)(heightMultipler * array2D[x][z] * 0.05-130)); i++) {
           	    block = world.getBlockAt(x, i, z);
           	    setBiomeBlock(block, i, biome);
           	}
@@ -713,7 +716,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
 //        }
 //        
         for (colChange change : changes.values()) {
-        	int y = (40 - Math.abs((int)(heightMultipler * change.value * 0.05-110)));
+        	int y = 25 + ( Math.abs((int)(heightMultipler * change.value * 0.05-130)));
         
             Block block = world.getBlockAt(change.x, y, change.z);
 //            System.out.println(block.getType().equals(Material.AIR));
@@ -727,7 +730,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             	for (int y1 = scany; y1 <= y; y1++)
             	{
         		 //world.getBlockAt(change.x, y1, change.z).setType(Material.DIAMOND_BLOCK);
-        		 // System.out.println("changing block at x:" + change.x + " z:" + change.z + " y:" +y1 + " to blocks");
+        		 //System.out.println("changing block at x:" + change.x + " z:" + change.z + " y:" +y1 + " to blocks");
         		 setBiomeBlock(world.getBlockAt(change.x, y1, change.z), y1, biome);
             	
             	}
@@ -744,8 +747,8 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
                 	}
                 	for (int y1 = scany; y1 >= y; y1--)
                 	{
-                		// world.getBlockAt(change.x, y1, change.z).setType(Material.AIR);
-                		System.out.println("changing block at x:" + change.x + " z:" + change.z + " y:" +y1 + " to air");
+                		world.getBlockAt(change.x, y1, change.z).setType(Material.AIR);
+                		//System.out.println("changing block at x:" + change.x + " z:" + change.z + " y:" +y1 + " to air");
                 	}
             	}
             }
