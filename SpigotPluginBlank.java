@@ -48,11 +48,10 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     private static String biome = "mountains";
     private static int waterlevel = -1;
     private static boolean autoupdate = false;
-    private static int timer = 10;
+    private static int timer = 1000;
     private static double heightMultipler = 1; // for later use
     private static World world;
     private static int scale = 150;
-	private static double isRealTime = 1.0;
 	private int[][] previousArray2D;
 	private Map<Position, colChange> changes = new ConcurrentHashMap<>();
 	private boolean firstRead = true;
@@ -61,7 +60,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     // runs when the plugin is enabled after the server is started
     @Override
     public void onEnable() {
-    	previousArray2D = new int[90][171];
+    	previousArray2D = new int[150][285];
     	getServer().getPluginManager().registerEvents(this, this);
     	getCommand("waterlevel").setExecutor(this);
     	getCommand("autoupdate").setExecutor(this);
@@ -91,7 +90,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
                 String content = new String(Files.readAllBytes(Paths.get(FILE_PATH)));
                 array2D = gson.fromJson(content, int[][].class);
                 if (scale != -1)
-                    scaleMatrix(array2D, 150);
+                    scaleMatrix(array2D, 264);
 
                 if (firstRead) {
                     previousArray2D = array2D.clone(); // initialize previousArray2D with array2D values
@@ -188,7 +187,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         	}
     	}
     	
-    	int[][] trimmed = new int[90][171];
+    	int[][] trimmed = new int[150][285];
     	for (int x = 0; x < trimmed.length; x++) {
     		for (int z = 0; z < trimmed[0].length; z++) {
     			trimmed[x][z] = newArr[x+20][z+3];
@@ -232,7 +231,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
                 public void run() {
                     updateBlocks();
                 }
-            }, 0, (long) (timer * 20 * isRealTime)).getTaskId(); // 1 sec = 20 ticks
+            }, 0, (long) (((double)timer / 1000) * 20)).getTaskId(); // 1 sec = 20 ticks
         }
         
         // player join message added too much clutter
@@ -347,13 +346,13 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
                     public void run() {
                         updateBlocks();
                     }
-                }, 0, (long) (timer * 20 * isRealTime)).getTaskId(); // 1 sec = 20 ticks
+                }, 0, (long) (((double)timer / 1000) * 20)).getTaskId(); // 1 sec = 20 ticks
             }
         	else	
         	{
         		sender.sendMessage("Disabled auto terrain updating");
         		autoupdate = false;
-        		Bukkit.getScheduler().cancelTasks(this);
+        		Bukkit.getScheduler().cancelTask(updateTaskId);
         	}
             
             return true;
@@ -363,15 +362,11 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         {
 
             if (args.length != 1) {
-                sender.sendMessage("Usage: /timer <seconds>");
+                sender.sendMessage("Usage: /timer <ms>");
                 return false;
             }
             timer = Integer.parseInt(args[0]);
             
-        	if (timer == 0)
-        		isRealTime = 0.75;
-        	else
-        		isRealTime = 1;
             
             // cancel existing task so we can create a new one of a different timer value
             if (autoupdate) {
@@ -385,13 +380,11 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
                     public void run() {
                         updateBlocks();
                     }
-                }, 0, (long) (timer * 20 * isRealTime)).getTaskId(); // 1 sec = 20 ticks
+                }, 0, (long) (((double)timer / 1000) * 20)).getTaskId(); // 1 sec = 20 ticks
             }
             
-            if (timer == 0)
-            	sender.sendMessage("Changed timer to real-time");
             
-            sender.sendMessage("Changed timer to " + timer + " seconds");
+            sender.sendMessage("Changed timer to " + timer + " ms");
             
             return true;
         }
@@ -400,7 +393,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         	// "default" values can be changed as seen fit
         	waterlevel = 10;
         	autoupdate = false;
-        	timer = 10;
+        	timer = 1000;
         	biome = "mountains";
         	scale = 150; 
         	
@@ -482,8 +475,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
             player.sendMessage(ChatColor.WHITE + "Left click with a block to change the biome");
             player.sendMessage(ChatColor.WHITE + "/waterlevel <y level> - sets the water level");
             player.sendMessage(ChatColor.WHITE + "/autoupdate <on or off> - toggle the auto update feature");
-            player.sendMessage(ChatColor.WHITE + "/timer <seconds> - set a timer in seconds for autoupdate");
-            player.sendMessage(ChatColor.WHITE + "/timer 0 will attempt to render in real time");
+            player.sendMessage(ChatColor.WHITE + "/timer <ms> - set a timer in ms for autoupdate");
             player.sendMessage(ChatColor.WHITE + "/scale <length> - length in blocks of wanted x dimension");
             player.sendMessage(ChatColor.WHITE + "/default - restores settings to default values");
             player.spigot().sendMessage(new ComponentBuilder("check ")
@@ -517,9 +509,9 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     	// check blocks that need to be replaced
     	// necessary because scale is dynamic
     	
-        for (int x = 0; x < 90; x++) {
+        for (int x = 0; x < 150; x++) {
             for (int y = 0; y < world.getMaxHeight(); y++) {
-                for (int z = 0; z < 171; z++) {
+                for (int z = 0; z < 285; z++) {
                     world.getBlockAt(x, y, z).setType(Material.AIR);
                 }
             }
