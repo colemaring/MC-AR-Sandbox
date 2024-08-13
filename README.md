@@ -1,5 +1,6 @@
 # MC-AR-Sandbox
-A real-time Minecraft terrain visualizer for augmented reality sandboxes using Xbox Kinect
+A real-time Minecraft terrain visualizer for augmented reality sandboxes using Xbox Kinect <br>
+![20240813_125105](https://github.com/user-attachments/assets/b58efc13-9972-41f2-a6db-a4d3abae5a1a)
 
 # Installation
 npm init && npm i <br>
