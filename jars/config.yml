@@ -1,0 +1,6 @@
+waterlevel: 30
+autoupdate: true
+timer: 1000
+biome: mountains
+scale: 0
+fastrender: false
