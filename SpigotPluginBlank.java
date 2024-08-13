@@ -43,7 +43,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class SpigotPluginBlank extends JavaPlugin implements Listener {
 
-    private static final String FILE_PATH = "C:\\Users\\colem\\Desktop\\mcserver\\output.txt";
+    private static final String FILE_PATH = "C:\\Users\\colem\\OneDrive\\Desktop\\mcserver\\output.txt";
     private static int[][] array2D;
     private static String biome = "mountains";
     private static int waterlevel = -1;
@@ -190,7 +190,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     	int[][] trimmed = new int[150][285];
     	for (int x = 0; x < trimmed.length; x++) {
     		for (int z = 0; z < trimmed[0].length; z++) {
-    			trimmed[x][z] = newArr[x+20][z+3];
+    			trimmed[x][z] = newArr[x+47][z+20];
         	}
     	}
     	
@@ -620,7 +620,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         {
         	 //scan for where to place red sand 
 	        for (int a = 0; a < array2D.length; a++) {
-	            for (int b = 0; b < 15; b++) {
+	            for (int b = 0; b < 20; b++) {
 	            	for (int c = 0; c < array2D[0].length; c++) {
 	            		if ((world.getBlockAt(a, b, c).getType() == Material.ORANGE_TERRACOTTA) && (world.getBlockAt(a, b + 1, c ).getType() == Material.AIR))
 	            		{
@@ -634,7 +634,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         {
         	 //scan for where to place red sand 
 	        for (int a = 0; a < array2D.length; a++) {
-	            for (int b = 5; b < 30; b++) {
+	            for (int b = 10; b < 45; b++) {
 	            	for (int c = 0; c < array2D[0].length; c++) {
 	            		if (world.getBlockAt(a, b, c ).getType() == Material.SANDSTONE && world.getBlockAt(a, b + 1, c ).getType() == Material.AIR)
 	            		{
@@ -650,7 +650,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         {
         	 //scan for where to place red sand 
 	        for (int a = 0; a < array2D.length; a++) {
-	            for (int b = 18; b < 25; b++) {
+	            for (int b = 27; b < 45; b++) {
 	            	for (int c = 0; c < array2D[0].length; c++) {
 	            		if ((world.getBlockAt(a, b, c).getType() == Material.STONE) && (world.getBlockAt(a, b + 1, c ).getType() == Material.AIR))
 	            		{
@@ -665,7 +665,7 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
         {
         	 //scan for where to place red sand 
 	        for (int a = 0; a < array2D.length; a++) {
-	            for (int b = 5; b < 35; b++) {
+	            for (int b = 10; b < 45; b++) {
 	            	for (int c = 0; c < array2D[0].length; c++) {
 	            		if ((world.getBlockAt(a, b, c).getType() == Material.STONE) && (world.getBlockAt(a, b + 1, c ).getType() == Material.AIR))
 	            		{
