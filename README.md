@@ -39,7 +39,8 @@ Example with smoothing 10 and the following color space and level distance of 25
 cmap = plt.get_cmap('gist_rainbow')
 levels = np.linspace(2300, 2575, 25)
 colors = plt.cm.viridis(np.linspace(0, 1, len(levels)))
-``` <br>
+```
+<br>
 ![image](https://github.com/user-attachments/assets/6df0f985-8911-4ad4-a94b-05c6f641a71e)
 <br>
 Example with smoothing 1<br>
