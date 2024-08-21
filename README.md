@@ -31,3 +31,18 @@ biome = "mountains" <br>
 This program uses the Kinect SDK to take depth data from an Xbox Kinect Sensor. That data is then parsed and scaled down to be rendered real-time in a minecraft server. <br><br>
 
 I am using the DepthFrame class from the Kinect SDK, morso the Node version of the sdk: https://github.com/wouterverweirder/kinect2, and writing this data to a txt file many times per second. (Not the most elegant solution). This output file is then read asynchronously in the plugin java file on a seperate thread from the Bukkit thread. The Bukkit API is what I am using to place, remove, and change blocks in the minecraft world. Bukkit API operations like setting and removing blocks are very expensive, so many optimizations were made to reduce the amount of blocks changes. My solution is to keep track of values that have changed from the last DepthFrame object. I stored those changes in a ConcurrentHashMap and iterated through the columns that have changes and only touched the blocks that need to be modified.
+
+topoprojeciton.py is very straightforward. I am reading in that same output.txt file every x ms and displaying the data using matplotlib. The value of the height will determine the color of that point. I'm using a median filter to smooth out the edges of the different topographical levels. This smoothing value can be adjusted at the top of the file. The projector will be projecting the plot displayed by this program. The amount of topographical levels, the distance between each level, and the color of that level can all be changed. <br><br>
+
+Example with smoothing 10 and the following color space and level distance of 25mm: <br>
+```python
+cmap = plt.get_cmap('gist_rainbow')
+levels = np.linspace(2300, 2575, 25)
+colors = plt.cm.viridis(np.linspace(0, 1, len(levels)))
+``` <br>
+![image](https://github.com/user-attachments/assets/6df0f985-8911-4ad4-a94b-05c6f641a71e)
+<br>
+Example with smoothing 1<br>
+![image](https://github.com/user-attachments/assets/d051908b-e35e-4a3a-b9ec-27b9201285ef)
+
+
