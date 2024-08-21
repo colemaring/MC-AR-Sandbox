@@ -2,12 +2,17 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+from scipy.ndimage import median_filter
+
+aspect_ratio = 0.5 # adjust to match sandbox
+smoothing = 10 # adjust to smooth noisy edges
 
 plt.rcParams['toolbar'] = 'None' # removes default toolbar
 plt.ion()
 
 fig, ax = plt.subplots(figsize=(8, 6))
-fig.canvas.manager.set_window_title("Topographic Projection")
+fig.patch.set_facecolor('black')
+fig.canvas.manager.set_window_title("Topographic Projection: q to quit")
 
 plt.toolbar = None
 
@@ -28,9 +33,10 @@ while True:
                 break
 
             depth_array = np.rot90(depth_array, -1)
+            depth_array = median_filter(depth_array, size=smoothing)
 
             ax.clear()
-            ax.imshow(depth_array, cmap=cmap, interpolation='nearest', vmin=levels[0], vmax=levels[-1])
+            ax.imshow(depth_array, cmap=cmap, interpolation='bilinear', vmin=levels[0], vmax=levels[-1], aspect=aspect_ratio)
 
             contours = ax.contourf(depth_array.T, levels=levels, colors=colors)
             ax.set_xlim(18, 450)
