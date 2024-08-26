@@ -18,7 +18,7 @@ plt.toolbar = None
 
 # fig.canvas.manager.window.wm_overrideredirect(True) # removes windows controls
 cmap = plt.get_cmap('gist_rainbow')
-levels = np.linspace(2300, 2575, 25)
+levels = np.linspace(2300, 2625, 25)
 colors = plt.cm.viridis(np.linspace(0, 1, len(levels)))
 
 fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
@@ -34,13 +34,15 @@ while True:
 
             depth_array = np.rot90(depth_array, -1)
             depth_array = median_filter(depth_array, size=smoothing)
+            depth_array = np.fliplr(depth_array)
+            # depth_array = np.flipud(depth_array)
 
             ax.clear()
             ax.imshow(depth_array, cmap=cmap, interpolation='bilinear', vmin=levels[0], vmax=levels[-1], aspect=aspect_ratio)
 
             contours = ax.contourf(depth_array.T, levels=levels, colors=colors)
-            ax.set_xlim(18, 450)
-            ax.set_ylim(200, 600)
+            ax.set_xlim(16, 456)
+            ax.set_ylim(74, 482)
 
             ax.set_xticks([])
             ax.set_yticks([])
