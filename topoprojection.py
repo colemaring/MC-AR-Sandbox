@@ -1,22 +1,27 @@
+import matplotlib
+matplotlib.use('Qt5Agg')
+
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 from scipy.ndimage import median_filter
+from PyQt5.QtWidgets import QApplication
 
-aspect_ratio = 0.5 # adjust to match sandbox
-smoothing = 10 # adjust to smooth noisy edges
+app = QApplication([])
 
-plt.rcParams['toolbar'] = 'None' # removes default toolbar
+aspect_ratio = 0.5  # adjust to match sandbox
+smoothing = 10  # adjust to smooth noisy edges
+
+plt.rcParams['toolbar'] = 'None'  # removes default toolbar
 plt.ion()
 
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plt.subplots()
 fig.patch.set_facecolor('black')
 fig.canvas.manager.set_window_title("Topographic Projection: q to quit")
 
-plt.toolbar = None
+qt_window = fig.canvas.manager.window
+qt_window.setGeometry(0, 1080, 3840, 2160)  # x, y, width, height
 
-# fig.canvas.manager.window.wm_overrideredirect(True) # removes windows controls
 cmap = plt.get_cmap('gist_rainbow')
 levels = np.linspace(2300, 2625, 25)
 colors = plt.cm.viridis(np.linspace(0, 1, len(levels)))
@@ -35,7 +40,6 @@ while True:
             depth_array = np.rot90(depth_array, -1)
             depth_array = median_filter(depth_array, size=smoothing)
             depth_array = np.fliplr(depth_array)
-            # depth_array = np.flipud(depth_array)
 
             ax.clear()
             ax.imshow(depth_array, cmap=cmap, interpolation='bilinear', vmin=levels[0], vmax=levels[-1], aspect=aspect_ratio)
