@@ -1,4 +1,5 @@
 @echo off
-start /min "" "runserver.bat"
-start /min "" node server.js
-start /min "" python topoprojection.py
+start /b /min "" cmd /c "runserver.bat"
+start /b /min "" cmd /c "node server.js"
+start /b /min "" cmd /c "python topoprojection.py"
+exit /b 0
