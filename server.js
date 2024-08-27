@@ -59,7 +59,6 @@ const main = async (useRandom) => {
         );
         // Write the output to a file, overwriting any existing content
         fs.writeFileSync("output.txt", JSON.stringify(depthArray));
-	console.log("writing to output.txt");
 
         // Schedule the next write after a 1-second delay
         setTimeout(() => {
