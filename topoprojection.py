@@ -21,6 +21,7 @@ fig.canvas.manager.set_window_title("Topographic Projection: q to quit")
 
 qt_window = fig.canvas.manager.window
 qt_window.setGeometry(0, 1080, 3840, 2160)  # x, y, width, height
+qt_window.showFullScreen()
 
 cmap = plt.get_cmap('gist_rainbow')
 levels = np.linspace(2300, 2625, 25)
