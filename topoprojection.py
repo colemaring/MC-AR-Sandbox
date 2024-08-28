@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.ndimage import median_filter
 from PyQt5.QtWidgets import QApplication
+from PyQt5 import QtCore
 
 app = QApplication([])
 
@@ -21,9 +22,11 @@ fig.canvas.manager.set_window_title("Topographic Projection: q to quit")
 
 qt_window = fig.canvas.manager.window
 qt_window.setGeometry(0, 1080, 3840, 2160)  # x, y, width, height
+t_window.setWindowFlags(QtCore.Qt.WindowFlags(QtCore.Qt.Tool))
 qt_window.showFullScreen()
 
 cmap = plt.get_cmap('gist_rainbow')
+
 levels = np.linspace(2300, 2625, 25)
 colors = plt.cm.viridis(np.linspace(0, 1, len(levels)))
 
