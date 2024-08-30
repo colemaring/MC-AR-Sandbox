@@ -1,10 +1,7 @@
 # MC-AR-Sandbox
 A real-time Minecraft terrain visualizer for augmented reality sandboxes using Xbox Kinect <br>
 ![20240828_101312](https://github.com/user-attachments/assets/b9f4e164-4c18-49c0-8d6c-39b1a20dfc3b) <br>
-video: https://github.com/user-attachments/assets/06a7c21f-28a9-4ba3-a369-c1245e543f62 <br>
-
-
-
+video: https://github.com/user-attachments/assets/ce1f2003-3ed6-4056-a1da-17e1319ca550 <br>
 
 # TODO:
 stretch y dim to better fix sandbox <br>
