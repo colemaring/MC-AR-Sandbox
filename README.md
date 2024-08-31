@@ -3,19 +3,20 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
 ![20240828_101312](https://github.com/user-attachments/assets/b9f4e164-4c18-49c0-8d6c-39b1a20dfc3b) <br>
 video: https://github.com/user-attachments/assets/ce1f2003-3ed6-4056-a1da-17e1319ca550 <br>
 
-# TODO:
-stretch y dim to better fix sandbox <br>
-
 # Installation
-npm init && npm i <br>
-Download buildtools https://www.spigotmc.org/wiki/buildtools/ to compile the spigot 1.21 server jar <br>
-Put the plugin jar in the Plugins folder <br>
-run launch.bar <br><br>
+git clone https://github.com/colemaring/MC-AR-Sandbox.git or download and extract zip <br>
+Run npm init && npm i <br>
+Download buildtools https://www.spigotmc.org/wiki/buildtools/ to compile the spigot server jar <br>
+place the server jar in the MC-AR-Sandbox folder <br>
+Run the spigot server jar once to initialize the server and accept the eula <br>
+Move SpigotBlankPlugin.jar into the plugins folder <br>
+Run launch.bat <br>
+Join the minecraft server using localhost <br>
 
 # Usage
 The blaze rod (gold stick) is used to manually update the terrain. This is useful if autoupdate is off and you want to update the terrain. <br>
 The other blocks in the inventory represet different biomes that you can choose from. When you select a biome, all subsequent terrain updates will reflect that chosen biome. You can go back by selecting a different biome <br>
-If you destroy a bunch of terrain, left click a biome block to update the terrain back to normal. <br>
+If the terrain is bugged or doesnt match the sandbox at all, left click a biome block to update the terrain back to normal. <br>
 
 # Commands
 /waterlevel <y level> - allows you to choose the water level of the world. eg. /waterlevel 10 <br>
@@ -31,6 +32,9 @@ autoupdate = false <br>
 timer = 1 <br> 
 biome = "mountains" <br> 
 
+# Configuration / Tuning 
+In topoprojection.py, experiment with the aspect_ratio and smoothing values to match the projection to the sand <br>
+
 # Development
 This program uses the Kinect SDK to take depth data from an Xbox Kinect Sensor. That data is then parsed and scaled down to be rendered real-time in a minecraft server. <br><br>
 
@@ -39,15 +43,14 @@ I am using the DepthFrame class from the Kinect SDK, morso the Node version of t
 topoprojeciton.py is very straightforward. I am reading in that same output.txt file every x ms and displaying the data using matplotlib. The value of the height will determine the color of that point. I'm using a median filter to smooth out the edges of the different topographical levels. This smoothing value can be adjusted at the top of the file. The projector will be projecting the plot displayed by this program. The amount of topographical levels, the distance between each level, and the color of that level can all be changed. <br><br>
 
 Example with smoothing 10 and the following color space and level distance of 25mm: <br>
-```python
-cmap = plt.get_cmap('gist_rainbow')
-levels = np.linspace(2300, 2575, 25)
-colors = plt.cm.viridis(np.linspace(0, 1, len(levels)))
-```
+cmap = plt.get_cmap('gist_rainbow')  <br>
+levels = np.linspace(2300, 2575, 25)  <br>
+colors = plt.cm.viridis(np.linspace(0, 1, len(levels)))  <br>
+
 <br>
-![image](https://github.com/user-attachments/assets/6df0f985-8911-4ad4-a94b-05c6f641a71e)
+![image1](https://github.com/user-attachments/assets/6df0f985-8911-4ad4-a94b-05c6f641a71e)
 <br>
-Example with smoothing 1<br>
-![image](https://github.com/user-attachments/assets/d051908b-e35e-4a3a-b9ec-27b9201285ef)
+Example with smoothing 1 <br>
+![image2](https://github.com/user-attachments/assets/d051908b-e35e-4a3a-b9ec-27b9201285ef)
 
 
