@@ -70,6 +70,10 @@ public class SpigotPluginBlank extends JavaPlugin implements Listener {
     	world = Bukkit.getWorlds().get(0);
     	loadVariables();
     	startReadingFile();
+	    
+    	// haven't tested these two lines 
+    	resetBlocks();
+        setBlocks();
     }
     
     // runs on server / plugin stop
