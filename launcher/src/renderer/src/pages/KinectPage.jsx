@@ -1,7 +1,7 @@
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 
-function HomePage() {
+function KinectPage() {
   return (
     <div className="pageContainer">
       <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
@@ -12,9 +12,12 @@ function HomePage() {
           className="logTextBox" // Apply the CSS class
         />
       </Form.Group>
-      <Button className="launchButton buttonDropshadow">LAUNCH</Button>
+      <div>
+        <Button>back</Button>
+        <Button>save</Button>
+      </div>
     </div>
   )
 }
 
-export default HomePage
+export default KinectPage

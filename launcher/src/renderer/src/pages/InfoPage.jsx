@@ -39,7 +39,6 @@ function InfoPage() {
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
-
       <h3 className="mt-5">In-Game Commands</h3>
       <Accordion>
         <Accordion.Item eventKey="0">
@@ -65,6 +64,19 @@ function InfoPage() {
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
+      <a
+        href="#"
+        onClick={(e) => {
+          e.preventDefault()
+          if (window.customElectron?.openExternal) {
+            window.customElectron.openExternal('https://github.com/colemaring/MC-AR-Sandbox')
+          } else {
+            console.error('Electron API not available')
+          }
+        }}
+      >
+        Github
+      </a>
     </div>
   )
 }

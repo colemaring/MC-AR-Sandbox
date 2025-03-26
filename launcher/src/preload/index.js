@@ -1,4 +1,4 @@
-import { contextBridge } from 'electron'
+import { contextBridge, shell } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
@@ -9,12 +9,23 @@ const api = {}
 // just add to the DOM global.
 if (process.contextIsolated) {
   try {
-    contextBridge.exposeInMainWorld('electron', electronAPI)
+    // Expose Electron's default API only if not already set
+    if (!window.electron) {
+      contextBridge.exposeInMainWorld('electron', electronAPI)
+    }
     contextBridge.exposeInMainWorld('api', api)
+
+    // handles opening external links from renderer process
+    contextBridge.exposeInMainWorld('customElectron', {
+      openExternal: (url) => shell.openExternal(url)
+    })
   } catch (error) {
     console.error(error)
   }
 } else {
   window.electron = electronAPI
   window.api = api
+  window.customElectron = {
+    openExternal: (url) => shell.openExternal(url)
+  }
 }

@@ -3,9 +3,9 @@
 .navContainer {
   display: flex;          
   justify-content: center; 
-  align-items: center;    
+  align-items: center;   
+  margin-top: 1.5rem;
 }
-
 
 .navButtons img {
   width: 1.2rem;
@@ -17,7 +17,6 @@
   border-color: rgb(230, 230, 230) !important;
   color: rgb(0, 0, 0) !important;
   margin-right: 1rem;
-  margin-top: 2rem;
   padding: 0.2rem 1rem !important;
   box-shadow:  0 0 1rem rgba(0, 0, 0, 0.07) !important;
 }
@@ -26,10 +25,82 @@
   background-color: rgb(209, 209, 209) !important;
 }
 
+.navButtons.active {
+  background-color:  rgb(199, 199, 199) !important;
+  box-shadow:  0 0 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
 .navButtons:last-child {
   margin-right: 0;
 }
 
+/* .settingsContainer {
+  border: 2px solid rgb(180, 180, 180);
+  margin: 1rem;
+  border-radius: 10px;
+} */
+
+.settingsButton
+{
+  background-color: rgb(230, 230, 230) !important;
+  border-color: rgb(230, 230, 230) !important;
+  color: rgb(0, 0, 0) !important;
+  margin-right: 1rem;
+  padding: 0.2rem 1rem !important;
+  box-shadow:  0 0 1rem rgba(0, 0, 0, 0.07) !important;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  background-color: rgb(59, 125, 141);
+}
+
+input[type="range"]::-moz-range-thumb {
+  background-color: rgb(59, 125, 141);
+}
+
+input[type="range"]::-ms-thumb {
+  background-color: rgb(59, 125, 141);
+}
+
+.custom-switch .form-check-input:checked {
+  background-color: rgb(59, 125, 141) !important;
+  border-color: rgb(59, 125, 141) !important;
+}
+
+
+.settingsButton.hover{
+  background-color: rgb(209, 209, 209) !important;
+}
+
+.saveButton{
+  background-color: rgb(59, 125, 141) !important;
+  border-color:rgb(59, 125, 141) !important;
+  box-shadow:  0 0 1rem rgba(0, 0, 0, 0.25) !important;
+}
+
+.settingsOption
+{
+  background-color: rgb(230, 230, 230) !important;
+  border-color: rgb(230, 230, 230) !important;
+  color: rgb(0, 0, 0) !important;
+  margin-right: 1rem;
+  padding: 0.2rem 1rem !important;
+  box-shadow:  0 0 1rem rgba(0, 0, 0, 0.07) !important;
+}
+
+.logTextBox {
+  background-color: #f0f0f0; /* Change to your desired background color */
+  color: #333; /* Optional: Change the text color for better readability */
+  border: 1px solid #ccc; /* Optional: Add a border for visual clarity */
+}
+
+.logTextBox:focus {
+  outline: none; /* Remove the default focus outline */
+  box-shadow: none; /* Remove any default box-shadow */
+  border-color: #ccc !important; /* Keep the original border color */
+  background-color: #f0f0f0 !important; /* Keep the original background color */
+  color: #333 !important; /* Keep the original text color */
+}
 
 @font-face {
   font-family: 'Ubuntu';

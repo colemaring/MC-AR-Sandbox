@@ -2,16 +2,21 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import Dropdown from 'react-bootstrap/Dropdown'
 import settingsIcon from '@renderer/assets/icons/settings_icon.png'
+import externalIcon from '@renderer/assets/icons/external_icon.png'
 import saveIcon from '@renderer/assets/icons/save_icon.png'
+import { useNavigate } from 'react-router-dom'
 
 function SettingsPage() {
+  const navigate = useNavigate()
   return (
     <div className="pageContainer">
       <h3>Kinect Settings</h3>
-      <Button>
-        <img style={{ width: '1.2rem', height: '1.2rem' }} src={settingsIcon} alt="Settings" /> Crop
-        Kinect View
-      </Button>
+      <div>
+        <Button className="settingsButton" onClick={() => navigate('/kinect')}>
+          <img style={{ width: '1.3rem', height: '1.3rem' }} src={externalIcon} alt="Settings" />{' '}
+          Crop Kinect View
+        </Button>
+      </div>
 
       <div className="mt-3">
         <span>Kinect to Surface Distance</span>
@@ -28,21 +33,26 @@ function SettingsPage() {
           type="switch"
           id="custom-switch"
           label=""
+          className="custom-switch"
           style={{ display: 'inline-block', marginLeft: '10px' }}
         />
       </div>
+      <hr />
 
-      <h3 className="mt-3">Topographic Projection Settings</h3>
+      <h3 className="mt-2">Topographic Projection Settings</h3>
       <div className="mt-1">
         <span>Display on Launch</span>
         <Form.Check
           type="switch"
           id="custom-switch"
           label=""
+          className="custom-switch"
           style={{ display: 'inline-block', marginLeft: '10px' }}
         />
         <Dropdown style={{ display: 'inline-block', marginLeft: '10px' }}>
-          <Dropdown.Toggle size="sm">Options</Dropdown.Toggle>
+          <Dropdown.Toggle className="settingsOption" size="sm">
+            Assign Monitor
+          </Dropdown.Toggle>
 
           <Dropdown.Menu>monitor 1..</Dropdown.Menu>
         </Dropdown>
@@ -60,30 +70,43 @@ function SettingsPage() {
       <div className="mt-1">
         <span>Color Mode</span>
         <Dropdown style={{ display: 'inline-block', marginLeft: '10px' }}>
-          <Dropdown.Toggle size="sm">Options</Dropdown.Toggle>
+          <Dropdown.Toggle className="settingsOption" size="sm">
+            Options
+          </Dropdown.Toggle>
 
-          <Dropdown.Menu>monitor 1..</Dropdown.Menu>
+          <Dropdown.Menu>
+            <Dropdown.Item>setting 1</Dropdown.Item>
+            <Dropdown.Item>setting 2</Dropdown.Item>
+            <Dropdown.Item>setting 3</Dropdown.Item>
+          </Dropdown.Menu>
         </Dropdown>
       </div>
+      <hr />
 
-      <h3 className="mt-3">Minecraft Renderer Settings</h3>
+      <h3 className="mt-2">Minecraft Renderer Settings</h3>
       <div className="mt-1">
         <span>Display on Launch</span>
         <Form.Check
           type="switch"
           id="custom-switch"
           label=""
+          className="custom-switch"
           style={{ display: 'inline-block', marginLeft: '10px' }}
         />
         <Dropdown style={{ display: 'inline-block', marginLeft: '10px' }}>
-          <Dropdown.Toggle size="sm">Options</Dropdown.Toggle>
+          <Dropdown.Toggle className="settingsOption" size="sm">
+            Assign Monitor
+          </Dropdown.Toggle>
 
           <Dropdown.Menu>monitor 1..</Dropdown.Menu>
         </Dropdown>
       </div>
-      <Button className="mt-3" style={{ bottom: '3rem' }}>
-        <img style={{ width: '1.2rem', height: '1.2rem' }} src={saveIcon} alt="Save" /> Save
-      </Button>
+      <hr />
+      <div>
+        <Button className="mt-1 saveButton">
+          <img style={{ width: '1.2rem', height: '1.2rem' }} src={saveIcon} alt="Save" /> Save
+        </Button>
+      </div>
     </div>
   )
 }
