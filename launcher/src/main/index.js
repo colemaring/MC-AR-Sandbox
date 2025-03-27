@@ -1,11 +1,13 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-//import icon from '../../resources/icon.png?asset'
+const custom_icon = join(__dirname, '../../resources/icon.png')
+import config_handler from './config_handler'
 
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
+    icon: custom_icon,
     width: 900,
     height: 670,
     show: false,

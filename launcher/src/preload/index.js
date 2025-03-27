@@ -1,4 +1,4 @@
-import { contextBridge, shell } from 'electron'
+import { contextBridge, shell, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
@@ -14,6 +14,12 @@ if (process.contextIsolated) {
       contextBridge.exposeInMainWorld('electron', electronAPI)
     }
     contextBridge.exposeInMainWorld('api', api)
+
+    // Handles config file read and write
+    contextBridge.exposeInMainWorld('electronAPI', {
+      readConfig: () => ipcRenderer.invoke('readConfig'),
+      writeConfig: (config) => ipcRenderer.invoke('writeConfig', config)
+    })
 
     // handles opening external links from renderer process
     contextBridge.exposeInMainWorld('customElectron', {
