@@ -1,10 +1,9 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react'
-
-// Create the context
+import { useLogMessages } from './LogMessageContext'
 export const SettingsConfigContext = createContext()
 
-// Create the provider component
 export const SettingsConfigProvider = ({ children }) => {
+  const { addLogMessage } = useLogMessages() // call to add message to log context state
   // Kinect settings
   const [x1, setX1] = useState(0)
   const [y1, setY1] = useState(0)
@@ -40,9 +39,10 @@ export const SettingsConfigProvider = ({ children }) => {
         setColorMode(config?.topographic_color_mode || 'Default')
         setDisplayOnLaunchMinecraft(config?.minecraft_display_on_launch || false)
         setDisplayMinecraft(config?.minecraft_display_assignment || 'Display 2')
+        addLogMessage('Configuration loaded successfully', 'success')
       } catch (error) {
         console.error('Failed to load config:', error)
-        // Handle error appropriately (e.g., display an error message)
+        addLogMessage(`Failed to load config`, 'error')
       }
     }
 
@@ -66,11 +66,17 @@ export const SettingsConfigProvider = ({ children }) => {
       const result = await window.electronAPI.writeConfig(config)
       if (result?.success) {
         console.log('Config written successfully to file')
+        addLogMessage('Settings saved successfully', 'success')
+        return true
       } else {
         console.error('Failed to write config to file:', result?.error)
+        addLogMessage(`Failed to save settings: ${result?.error || 'Unknown error'}`, 'error')
+        return false
       }
     } catch (error) {
       console.error('Failed to write config to file:', error)
+      addLogMessage(`Failed to save settings: ${error.message}`, 'error')
+      return false
     }
   }, [
     x1,

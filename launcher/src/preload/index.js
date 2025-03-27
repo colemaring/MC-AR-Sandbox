@@ -18,7 +18,11 @@ if (process.contextIsolated) {
     // Handles config file read and write
     contextBridge.exposeInMainWorld('electronAPI', {
       readConfig: () => ipcRenderer.invoke('readConfig'),
-      writeConfig: (config) => ipcRenderer.invoke('writeConfig', config)
+      writeConfig: (config) => ipcRenderer.invoke('writeConfig', config),
+      onKinectDepthData: (callback) =>
+        ipcRenderer.on('kinect-depth-data', (_, data) => callback(data)),
+      logMessage: (callback) =>
+        ipcRenderer.on('logMessage', (_, statusData) => callback(statusData))
     })
 
     // handles opening external links from renderer process

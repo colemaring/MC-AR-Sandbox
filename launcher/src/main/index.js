@@ -3,10 +3,21 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 const custom_icon = join(__dirname, '../../resources/icon.png')
 import config_handler from './config_handler'
+import { startKinectProcess } from './kinect'
+
+let kinectProcess
+let mainWindow
+
+export function sendLogMessage(text, type = 'normal') {
+  const windowToUse = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed())
+  if (windowToUse) {
+    windowToUse.webContents.send('logMessage', { text, type })
+  }
+}
 
 function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     icon: custom_icon,
     width: 900,
     height: 670,
@@ -21,6 +32,12 @@ function createWindow() {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    // Send initial logs after the window is ready and showing
+    sendLogMessage('Application started', 'success')
+  })
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    kinectProcess = startKinectProcess(mainWindow)
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -35,12 +52,6 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
-
-  // Listen for the event to open the Kinect window
-  ipcMain.on('open-kinect-window', () => {
-    console.log('Opening Kinect window')
-    createKinectWindow() // Call the function to create the Kinect window
-  })
 }
 
 // This method will be called when Electron has finished
@@ -57,10 +68,6 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-  // ipcMain.send('node.js reeady')
-
   createWindow()
 
   app.on('activate', function () {
@@ -76,6 +83,13 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
+  }
+})
+
+app.on('will-quit', () => {
+  sendLogMessage('Application shutting down...', 'normal')
+  if (kinectProcess) {
+    kinectProcess.kill() // Clean up the process when the app quits
   }
 })
 

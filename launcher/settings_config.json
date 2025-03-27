@@ -1,15 +1,15 @@
 {
   "kinect_view_crop": {
-    "x1": 182,
-    "y1": 183,
-    "x2": 503,
-    "y2": 347
+    "x1": 35,
+    "y1": 42,
+    "x2": 472,
+    "y2": 80
   },
-  "kinect_surface_distance_cm": 121,
+  "kinect_surface_distance_cm": 124,
   "test_mode": false,
   "topographic_display_on_launch": true,
   "topographic_display_assignment": "Display 2",
-  "topographic_smoothing": 50,
+  "topographic_smoothing": 19,
   "topographic_color_mode": "Rainbow",
   "minecraft_display_on_launch": true,
   "minecraft_display_assignment": "Display 1"
