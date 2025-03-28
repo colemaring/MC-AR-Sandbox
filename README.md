@@ -6,13 +6,11 @@ video: https://github.com/user-attachments/assets/ce1f2003-3ed6-4056-a1da-17e131
 # First-Time Setup
 download the release <br>
 download the dependencies <br>
-create spigot 1.21.5 jar from buildtools and place into /launcher/server dir <br>
 configure settings <br><br>
 
 Dependencies: <br>
 Java 21+ <br>
 PrismLauncher <br>
-BuildTools <br>
 Kinect SDK?? <br>
 
 # Usage
