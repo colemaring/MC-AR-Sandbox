@@ -34,6 +34,8 @@ function SettingsPage() {
     setDisplayOnLaunchMinecraft,
     displayMinecraft,
     setDisplayMinecraft,
+    prismlauncherPath,
+    setPrismlauncherPath,
     writeToConfig
   } = useContext(SettingsConfigContext)
 
@@ -83,7 +85,7 @@ function SettingsPage() {
 
       <h3 className="mt-2">Topographic Projection Settings</h3>
       <div className="mt-1">
-        <span>Display on Launch</span>
+        <span>Fullscreen on Launch</span>
         <Form.Check
           type="switch"
           id="topographic-launch-switch"
@@ -139,7 +141,7 @@ function SettingsPage() {
 
       <h3 className="mt-2">Minecraft Renderer Settings</h3>
       <div className="mt-1">
-        <span>Display on Launch</span>
+        <span>Fullscreen on Launch</span>
         <Form.Check
           type="switch"
           id="minecraft-launch-switch"
@@ -162,6 +164,17 @@ function SettingsPage() {
             <Dropdown.Item eventKey="Display 2">Display 2</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
+      </div>
+      <div className="mt-1">
+        <span>PrismLauncher Filepath</span>
+        <Form.Control
+          type="text"
+          size="sm"
+          placeholder="C:\Users\colem\AppData\Local\Programs\PrismLauncher\prismlauncher.exe"
+          value={prismlauncherPath}
+          onChange={(e) => setPrismlauncherPath(e.target.value)}
+          style={{ width: '400px', display: 'inline-block', marginLeft: '10px' }}
+        />
       </div>
       <hr />
       <div>

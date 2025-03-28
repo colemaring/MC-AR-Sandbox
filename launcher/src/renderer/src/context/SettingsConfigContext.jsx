@@ -21,6 +21,9 @@ export const SettingsConfigProvider = ({ children }) => {
   // Minecraft settings
   const [displayOnLaunchMinecraft, setDisplayOnLaunchMinecraft] = useState(false)
   const [displayMinecraft, setDisplayMinecraft] = useState('Display 2')
+  const [prismlauncherPath, setPrismlauncherPath] = useState(
+    'C:\\Users\\colem\\AppData\\Local\\Programs\\PrismLauncher\\prismlauncher.exe'
+  )
 
   useEffect(() => {
     const loadConfig = async () => {
@@ -39,6 +42,10 @@ export const SettingsConfigProvider = ({ children }) => {
         setColorMode(config?.topographic_color_mode || 'Default')
         setDisplayOnLaunchMinecraft(config?.minecraft_display_on_launch || false)
         setDisplayMinecraft(config?.minecraft_display_assignment || 'Display 2')
+        setPrismlauncherPath(
+          config?.minecraft_prismlauncher_path ||
+            'C:\\Users\\colem\\AppData\\Local\\Programs\\PrismLauncher\\prismlauncher.exe'
+        )
         addLogMessage('Configuration loaded successfully', 'success')
       } catch (error) {
         console.error('Failed to load config:', error)
@@ -59,7 +66,8 @@ export const SettingsConfigProvider = ({ children }) => {
       topographic_smoothing: smoothing,
       topographic_color_mode: colorMode,
       minecraft_display_on_launch: displayOnLaunchMinecraft,
-      minecraft_display_assignment: displayMinecraft
+      minecraft_display_assignment: displayMinecraft,
+      minecraft_prismlauncher_path: prismlauncherPath
     }
 
     try {
@@ -90,7 +98,8 @@ export const SettingsConfigProvider = ({ children }) => {
     smoothing,
     colorMode,
     displayOnLaunchMinecraft,
-    displayMinecraft
+    displayMinecraft,
+    prismlauncherPath
   ])
 
   return (
@@ -108,6 +117,7 @@ export const SettingsConfigProvider = ({ children }) => {
         colorMode,
         displayOnLaunchMinecraft,
         displayMinecraft,
+        prismlauncherPath,
         setX1,
         setY1,
         setX2,
@@ -120,6 +130,7 @@ export const SettingsConfigProvider = ({ children }) => {
         setColorMode,
         setDisplayOnLaunchMinecraft,
         setDisplayMinecraft,
+        setPrismlauncherPath,
         writeToConfig // call when you want to write state to config
       }}
     >

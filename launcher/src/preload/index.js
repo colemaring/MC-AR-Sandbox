@@ -15,7 +15,6 @@ if (process.contextIsolated) {
     }
     contextBridge.exposeInMainWorld('api', api)
 
-    // Handles config file read and write
     contextBridge.exposeInMainWorld('electronAPI', {
       readConfig: () => ipcRenderer.invoke('readConfig'),
       writeConfig: (config) => ipcRenderer.invoke('writeConfig', config),

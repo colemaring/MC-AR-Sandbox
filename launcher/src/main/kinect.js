@@ -9,7 +9,7 @@ export function startKinectProcess(mainWindow) {
   kinectProcess.on('message', (message) => {
     if (message.type === 'depthData') {
       if (flag == false) {
-        sendLogMessage('Receiving data from kinect', 'success')
+        sendLogMessage('Kinect is ready!', 'success')
         // PROGRAM SHOULD NOT CONTINUE UNTIL FLAG HAS BEEN SET TO TRUE
         // eg. dont trigger mc server launch
         flag = true
