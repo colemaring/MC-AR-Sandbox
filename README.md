@@ -3,15 +3,17 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
 ![20240828_101312](https://github.com/user-attachments/assets/b9f4e164-4c18-49c0-8d6c-39b1a20dfc3b) <br>
 video: https://github.com/user-attachments/assets/ce1f2003-3ed6-4056-a1da-17e1319ca550 <br>
 
-# Installation
-git clone https://github.com/colemaring/MC-AR-Sandbox.git or download and extract zip <br>
-Run npm init && npm i <br>
-Download buildtools https://www.spigotmc.org/wiki/buildtools/ to compile the spigot server jar <br>
-place the server jar in the MC-AR-Sandbox folder <br>
-Run the spigot server jar once to initialize the server and accept the eula <br>
-Move SpigotBlankPlugin.jar into the plugins folder <br>
-Run launch.bat <br>
-Join the minecraft server using localhost <br>
+# First-Time Setup
+download the release <br>
+download the dependencies <br>
+create spigot 1.21.5 jar from buildtools and place into /launcher/server dir <br>
+configure settings <br><br>
+
+Dependencies: <br>
+Java 21+ <br>
+PrismLauncher <br>
+BuildTools <br>
+Kinect SDK?? <br>
 
 # Usage
 The blaze rod (gold stick) is used to manually update the terrain. This is useful if autoupdate is off and you want to update the terrain. <br>
