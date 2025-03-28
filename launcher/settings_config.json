@@ -1,16 +1,17 @@
 {
   "kinect_view_crop": {
-    "x1": 35,
-    "y1": 42,
-    "x2": 472,
-    "y2": 80
+    "x1": 69,
+    "y1": 135,
+    "x2": 462,
+    "y2": 294
   },
-  "kinect_surface_distance_cm": 124,
+  "kinect_surface_distance_cm": 121,
   "test_mode": false,
   "topographic_display_on_launch": true,
   "topographic_display_assignment": "Display 2",
   "topographic_smoothing": 19,
   "topographic_color_mode": "Rainbow",
   "minecraft_display_on_launch": true,
-  "minecraft_display_assignment": "Display 1"
+  "minecraft_display_assignment": "Display 1",
+  "minecraft_prismlauncher_path": "C:\\Users\\colem\\AppData\\Local\\Programs\\PrismLauncher\\prismlauncher.exe"
 }
