@@ -9,6 +9,7 @@ const { exec } = require('child_process')
 import { terminateAllProcesses } from './terminate_processes'
 import { checkDependencies } from './check_dependencies'
 
+
 let kinectProcess
 let mainWindow
 let isQuitting = false

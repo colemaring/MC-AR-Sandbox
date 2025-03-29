@@ -2,6 +2,7 @@ import { exec } from 'child_process'
 import fs from 'fs'
 import path from 'path'
 import { sendLogMessage } from './index' // Assuming this is your main file
+import { checkAndGetServerJar } from './get_server_jar'
 
 /**
  * Checks for Java 21+ and PrismLauncher existence.
@@ -23,6 +24,15 @@ export async function checkDependencies() {
   } else {
     sendLogMessage(prismLauncherCheck.message, 'error')
   }
+
+  checkAndGetServerJar().then((success) => {
+    if (success) {
+      console.log('Server JAR is ready to use')
+      // Proceed with other initialization
+    } else {
+      console.error('Failed to ensure server JAR exists')
+    }
+  })
 }
 
 /**
