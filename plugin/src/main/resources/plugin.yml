@@ -1,0 +1,29 @@
+name: KinectSandbox
+main: KinectSandbox
+version: 0.0.1-SNAPSHOT
+api-version: 1.21
+commands:
+  waterlevel:
+    description: changes the water level
+    usage: /waterlevel <level>
+    arguments:
+      level:
+        type: integer
+        description: the new water level
+  autoupdate:
+    description: enable or disable terrain auto updating
+    usage: /autoupdate <state>
+    arguments:
+      state:
+        type: string
+        description: the new state (on/off)
+  timer:
+    description: set timer for auto update
+    usage: /timer <seconds>
+    arguments:
+      seconds:
+        type: integer
+        description: time in seconds
+  default:
+    description: restores settings to default values
+    usage: /default
