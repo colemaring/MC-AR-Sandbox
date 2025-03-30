@@ -23,7 +23,7 @@ export async function terminateAllProcesses(kinectProcess) {
   // Force kill all Java processes using taskkill on Windows
   if (process.platform === 'win32') {
     console.log('Force killing all Java processes...')
-    // I think this is necessary
+    // I'm unsure of how to kill a specific java process, so for now I'll kill all
     try {
       exec('taskkill /F /IM java.exe /T', (error) => {
         if (error) {

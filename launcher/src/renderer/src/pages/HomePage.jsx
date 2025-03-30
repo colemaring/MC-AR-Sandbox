@@ -47,7 +47,7 @@ function HomePage() {
         onClick={handleLaunchClick}
         disabled={launchButtonDisabled}
       >
-        {launchButtonDisabled ? 'Launching...' : 'LAUNCH'}
+        {launchButtonDisabled ? 'Launching...' : 'Launch Minecraft & Projection'}
       </Button>
     </div>
   )

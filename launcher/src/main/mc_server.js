@@ -1,4 +1,4 @@
-const { spawn } = require('child_process')
+const { spawn, exec } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 import { sendLogMessage } from './index'
@@ -15,6 +15,38 @@ const SERVER_JAR = 'spigot-1.21.5.jar' // Your server JAR filename
 const MIN_RAM = '1G' // Minimum RAM allocation
 const MAX_RAM = '4G' // Maximum RAM allocation
 
+async function killExistingMinecraftServer() {
+  return new Promise((resolve) => {
+    if (process.platform === 'win32') {
+      console.log('Killing Java processes')
+      sendLogMessage('Killing Java processes', 'normal')
+
+      // Kill all Java processes forcefully
+      exec('taskkill /F /IM java.exe', (killError) => {
+        if (killError) {
+          // If error is none found that's good
+          if (killError.message.includes('not found')) {
+            console.log('No Java processes found to kill')
+            sendLogMessage('No Java processes found to kill', 'success')
+            resolve(true)
+            // Othewise error is probably a bad thing and log it
+          } else {
+            console.error(`Error killing Java processes: ${killError}`)
+            sendLogMessage('Failed to kill Java processes', 'error')
+            resolve(false)
+          }
+          // If no kill error, then there must have been a java process and it was killed
+        } else {
+          console.log('Java processes were found and killed')
+          sendLogMessage('Java processes were found and killed', 'warning')
+          // Wait a moment to make sure processes are fully terminated
+          setTimeout(() => resolve(true), 1000)
+        }
+      })
+    }
+  })
+}
+
 /**
  * Start the Minecraft server
  * @returns {Promise<boolean>} True if server started successfully
@@ -26,6 +58,9 @@ export async function startMinecraftServer() {
   }
 
   try {
+    // First kill any existing Minecraft server processes
+    const killResult = await killExistingMinecraftServer()
+
     // Check if server jar exists
     const jarPath = path.join(SERVER_DIR, SERVER_JAR)
     if (!fs.existsSync(jarPath)) {

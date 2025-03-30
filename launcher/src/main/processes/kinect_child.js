@@ -1,11 +1,23 @@
 const { ipcMain } = require('electron')
 const Kinect2 = require('kinect2')
 const kinect = new Kinect2()
+const WebSocket = require('ws') // Import the ws library
 
-// Add throttling variables
-// Update can be slow as data is only being used to see what regions need to be cropped
-let lastSentTimestamp = 0
-const THROTTLE_INTERVAL = 3000
+// Add throttling variables only for parent process
+let lastParentSendTimestamp = 0
+const PARENT_THROTTLE_INTERVAL = 3000 // Throttle for parent process
+
+// WebSocket server setup
+const wss = new WebSocket.Server({ port: 8080 }) // Choose a port
+console.log('WebSocket server started on port 8080')
+
+wss.on('connection', (ws) => {
+  console.log('Client connected to WebSocket')
+
+  ws.on('close', () => {
+    console.log('Client disconnected from WebSocket')
+  })
+})
 
 const main = async () => {
   if (kinect.open()) {
@@ -14,16 +26,6 @@ const main = async () => {
 
     kinect.on('depthFrame', (depthFrame) => {
       const currentTime = Date.now()
-
-      // This logic will need to be changed because the data going to the mc plugin will need to be UNTHROTTLED but data
-      // to the parent process will need THROTTLED.
-
-      // Only send data at specified intervals
-      if (currentTime - lastSentTimestamp < THROTTLE_INTERVAL) {
-        return
-      }
-
-      lastSentTimestamp = currentTime
 
       const width = 512
       const height = 424
@@ -37,8 +39,19 @@ const main = async () => {
         depthArray.push(row)
       }
 
-      // Send data to the parent process
-      process.send({ type: 'depthData', data: depthArray })
+      // Always send unthrottled data to WebSocket clients
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({ type: 'depthData', data: depthArray }))
+        }
+      })
+
+      // Send throttled data to parent process
+      if (currentTime - lastParentSendTimestamp >= PARENT_THROTTLE_INTERVAL) {
+        lastParentSendTimestamp = currentTime
+        // Send data to the parent process
+        process.send({ type: 'depthData', data: depthArray })
+      }
     })
   } else {
     console.log('Failed to open Kinect in child process')

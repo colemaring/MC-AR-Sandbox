@@ -21,6 +21,23 @@ export function sendLogMessage(text, type = 'normal') {
   }
 }
 
+process.on('SIGINT', async () => {
+  if (isQuitting) return // Prevent multiple calls
+
+  isQuitting = true
+  console.log('Received SIGINT (Ctrl+C), terminating all processes...')
+
+  try {
+    await terminateAllProcesses()
+    console.log('Cleanup complete, exiting application')
+  } catch (error) {
+    console.error('Error during cleanup:', error)
+  } finally {
+    // Force exit after cleanup
+    process.exit(0)
+  }
+})
+
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
