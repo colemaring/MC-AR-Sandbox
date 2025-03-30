@@ -100,14 +100,13 @@ input[type="range"]::-ms-thumb {
   background-color: #f0f0f0; /* Change to your desired background color */
   color: #333; /* Optional: Change the text color for better readability */
   border: 1px solid #ccc; /* Optional: Add a border for visual clarity */
-}
-
-.logTextBox:focus {
-  outline: none; /* Remove the default focus outline */
-  box-shadow: none; /* Remove any default box-shadow */
-  border-color: #ccc !important; /* Keep the original border color */
-  background-color: #f0f0f0 !important; /* Keep the original background color */
-  color: #333 !important; /* Keep the original text color */
+  border-radius: 5px;
+  height: 74.5vh; /* Adjust as needed */
+  overflow-y: auto;
+  white-space: pre-line; /* Preserve line breaks */
+  font-family: monospace; /* Optional: Use a monospace font */
+  padding: 5px;
+  text-align: left;
 }
 
 @font-face {
@@ -137,7 +136,7 @@ body {
 }
 
 .pageContainer{
-  margin-top: 2rem;
+  margin-top: 1rem;
   margin-left: 1rem;
   margin-right: 1rem;
   margin-bottom: 1rem;

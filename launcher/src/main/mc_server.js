@@ -5,6 +5,8 @@ import { sendLogMessage } from './index'
 
 let serverProcess = null
 let serverRunning = false
+let serverReady = false // Add a flag to track server readiness
+let startingInterval // Variable to hold the interval ID
 
 // Configure Java settings here
 const JAVA_PATH = 'java' // Use 'java' to use system's default Java or specify full path
@@ -19,7 +21,7 @@ const MAX_RAM = '4G' // Maximum RAM allocation
  */
 export async function startMinecraftServer() {
   if (serverRunning) {
-    sendLogMessage('Minecraft server is already running', 'normal')
+    sendLogMessage('Minecraft server is already running', 'warning')
     return true
   }
 
@@ -49,7 +51,20 @@ export async function startMinecraftServer() {
 
     // Set server as running
     serverRunning = true
+    serverReady = false // Reset the serverReady flag
     sendLogMessage('Minecraft server starting...', 'normal')
+
+    // Function to send "Minecraft server starting..." message
+    const sendStartingMessage = () => {
+      if (!serverReady) {
+        sendLogMessage('Minecraft server starting...', 'normal')
+      } else {
+        clearInterval(startingInterval) // Stop the interval if server is ready
+      }
+    }
+
+    // Set interval to send message every 3 seconds
+    startingInterval = setInterval(sendStartingMessage, 3000)
 
     // Handle server output
     serverProcess.stdout.on('data', (data) => {
@@ -61,6 +76,8 @@ export async function startMinecraftServer() {
       // Detect server ready message
       if (output.includes('Done') && output.includes('For help, type "help"')) {
         sendLogMessage('Minecraft server is ready!', 'success')
+        serverReady = true // Set the serverReady flag
+        clearInterval(startingInterval) // Stop the interval when server is ready
       }
 
       // You can parse and send specific messages to the renderer
@@ -77,6 +94,8 @@ export async function startMinecraftServer() {
     // Handle server exit
     serverProcess.on('exit', (code, signal) => {
       serverRunning = false
+      serverReady = false // Reset the serverReady flag
+      clearInterval(startingInterval) // Clear the interval when server exits
 
       if (code === 0) {
         sendLogMessage('Minecraft server stopped gracefully', 'normal')
@@ -90,6 +109,8 @@ export async function startMinecraftServer() {
     // Handle unexpected errors
     serverProcess.on('error', (err) => {
       serverRunning = false
+      serverReady = false // Reset the serverReady flag
+      clearInterval(startingInterval) // Clear the interval on error
       sendLogMessage(`Failed to start Minecraft server: ${err.message}`, 'error')
       serverProcess = null
       return false
@@ -99,6 +120,7 @@ export async function startMinecraftServer() {
   } catch (error) {
     sendLogMessage(`Error starting Minecraft server: ${error.message}`, 'error')
     serverRunning = false
+    serverReady = false // Reset the serverReady flag
     return false
   }
 }

@@ -2,7 +2,7 @@ import { exec } from 'child_process'
 import fs from 'fs'
 import path from 'path'
 import { sendLogMessage } from './index' // Assuming this is your main file
-import { checkAndGetServerJar } from './get_server_jar'
+import { checkAndGetServerJar } from './build_server_jar'
 
 /**
  * Checks for Java 21+ and PrismLauncher existence.

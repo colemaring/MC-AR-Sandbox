@@ -32,13 +32,36 @@ export const LogMessageProvider = ({ children }) => {
     window.electronAPI.logMessage(handleLogMessage)
   }, [])
 
+  const getFormattedLogs = () => {
+    return logMessages
+      .map((log) => {
+        let color = 'black' // Default color
+        switch (log.type) {
+          case 'success':
+            color = 'green'
+            break
+          case 'normal':
+            color = 'black'
+            break
+          case 'warning':
+            color = 'orange'
+            break
+          case 'error':
+            color = 'red'
+            break
+          default:
+            color = 'black'
+        }
+        return `<span style="color: ${color}">[${log.timestamp}] ${log.message}</span>`
+      })
+      .join('<br/>') // Use <br/> for HTML line breaks
+  }
+
   const contextValue = {
     logMessages,
     addLogMessage,
     // Formatted logs as a string for the textarea
-    getFormattedLogs: () => {
-      return logMessages.map((log) => `[${log.timestamp}] ${log.message}`).join('\n')
-    }
+    getFormattedLogs: getFormattedLogs
   }
 
   return <LogMessageContext.Provider value={contextValue}>{children}</LogMessageContext.Provider>

@@ -8,7 +8,7 @@ import { startMinecraftServer } from './mc_server'
 const { exec } = require('child_process')
 import { terminateAllProcesses } from './terminate_processes'
 import { checkDependencies } from './check_dependencies'
-
+import { launchPrismLauncher } from './launch'
 
 let kinectProcess
 let mainWindow
@@ -25,8 +25,8 @@ function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     icon: custom_icon,
-    width: 900,
-    height: 670,
+    width: 800,
+    height: 685,
     show: false,
     autoHideMenuBar: true,
     // ...(process.platform === 'linux' ? { icon } : {}),
@@ -50,7 +50,7 @@ function createWindow() {
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
     // Send initial logs after the window is ready and showing
-    sendLogMessage('Application started', 'success')
+    sendLogMessage('Application started', 'normal')
   })
 
   mainWindow.webContents.on('did-finish-load', async () => {
@@ -63,6 +63,15 @@ function createWindow() {
     } else {
       sendLogMessage('Failed to start Minecraft server on application ready', 'error')
     }
+
+    ipcMain.on('launch-prism', async (event, instanceName) => {
+      const launched = await launchPrismLauncher(instanceName)
+      if (launched) {
+        sendLogMessage(`PrismLauncher launch requested for ${instanceName}`, 'normal')
+      } else {
+        sendLogMessage(`PrismLauncher launch failed for ${instanceName}`, 'error')
+      }
+    })
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {

@@ -7,7 +7,12 @@ function HomePage() {
   const { logMessages, getFormattedLogs } = useLogMessages()
   const textareaRef = useRef(null)
 
-  // Auto-scroll to the bottom when new logs are added
+  const handleLaunchClick = () => {
+    // In your renderer process
+    window.electronAPI.ipcRenderer.send('launch-prism', '1.21.5')
+    console.log('Launch button clicked')
+  }
+
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.scrollTop = textareaRef.current.scrollHeight
@@ -18,16 +23,15 @@ function HomePage() {
   return (
     <div className="pageContainer">
       <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-        <Form.Control
-          as="textarea"
-          rows={14}
-          readOnly
+        <div
           className="logTextBox"
-          value={getFormattedLogs()}
           ref={textareaRef}
+          dangerouslySetInnerHTML={{ __html: getFormattedLogs() }}
         />
       </Form.Group>
-      <Button className="launchButton buttonDropshadow">LAUNCH</Button>
+      <Button className="launchButton buttonDropshadow" onClick={handleLaunchClick}>
+        LAUNCH
+      </Button>
     </div>
   )
 }
