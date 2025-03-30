@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import { useLogMessages } from '../context/LogMessageContext'
@@ -6,12 +6,7 @@ import { useLogMessages } from '../context/LogMessageContext'
 function HomePage() {
   const { logMessages, getFormattedLogs } = useLogMessages()
   const textareaRef = useRef(null)
-
-  const handleLaunchClick = () => {
-    // In your renderer process
-    window.electronAPI.ipcRenderer.send('launch-prism', '1.21.5')
-    console.log('Launch button clicked')
-  }
+  const [launchButtonDisabled, setLaunchButtonDisabled] = useState(false) // Initialize to true
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -19,6 +14,24 @@ function HomePage() {
     }
     console.log('Log messages updated:', logMessages)
   }, [logMessages])
+
+  const handleLaunchClick = () => {
+    // In your renderer process
+    setLaunchButtonDisabled(true) // Disable the button when clicked
+    window.electronAPI.ipcRenderer.send('launch-prism', '1.21.5')
+  }
+
+  useEffect(() => {
+    const handleMinecraftReady = () => {
+      setLaunchButtonDisabled(false) // Enable the button when Minecraft is ready
+    }
+
+    window.electronAPI.onMinecraftReady(handleMinecraftReady)
+
+    return () => {
+      window.electronAPI.onMinecraftReady(handleMinecraftReady)
+    }
+  }, [])
 
   return (
     <div className="pageContainer">
@@ -29,8 +42,12 @@ function HomePage() {
           dangerouslySetInnerHTML={{ __html: getFormattedLogs() }}
         />
       </Form.Group>
-      <Button className="launchButton buttonDropshadow" onClick={handleLaunchClick}>
-        LAUNCH
+      <Button
+        className="launchButton buttonDropshadow"
+        onClick={handleLaunchClick}
+        disabled={launchButtonDisabled}
+      >
+        {launchButtonDisabled ? 'Launching...' : 'LAUNCH'}
       </Button>
     </div>
   )

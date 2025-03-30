@@ -15,8 +15,9 @@ if (process.contextIsolated) {
         electron.ipcRenderer.on('kinect-depth-data', (_, data) => callback(data)),
       logMessage: (callback) =>
         electron.ipcRenderer.on('logMessage', (_, statusData) => callback(statusData)),
+
+      onMinecraftReady: (callback) => electron.ipcRenderer.on('minecraft-ready', callback),
       ipcRenderer: {
-        // Add this
         send: (channel, data) => electron.ipcRenderer.send(channel, data)
       }
     })

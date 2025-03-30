@@ -2,13 +2,15 @@ import { exec, spawn } from 'child_process'
 import fs from 'fs'
 import path from 'path'
 import { sendLogMessage } from './index' // Assuming this is your main file
+import { ipcMain } from 'electron' // Import ipcMain
 
 /**
  * Launches PrismLauncher with the specified instance.
  * @param {string} instanceName - The name of the PrismLauncher instance to launch.
  * @returns {Promise<boolean>} - True if PrismLauncher was launched successfully, false otherwise.
  */
-export async function launchPrismLauncher(instanceName) {
+export async function launchPrismLauncher(instanceName, mainWindow) {
+  // Add mainWindow parameter
   try {
     // 1. Read the config file
     const configPath = path.join(__dirname, '../../settings_config.json')
@@ -36,6 +38,7 @@ export async function launchPrismLauncher(instanceName) {
         'Minecraft is already running. Please close it before launching again.',
         'warning'
       )
+      mainWindow.webContents.send('minecraft-ready', true) // Immediately un-grey the button
       return false
     }
 
@@ -52,12 +55,42 @@ export async function launchPrismLauncher(instanceName) {
         return
       }
       if (stderr) {
-        sendLogMessage(`PrismLauncher stderr: ${stderr}`, 'warning')
+        //sendLogMessage(`PrismLauncher stderr: ${stderr}`, 'warning')
         console.warn(`PrismLauncher stderr: ${stderr}`)
       }
-      sendLogMessage(`PrismLauncher stdout: ${stdout}`, 'normal')
+      //sendLogMessage(`PrismLauncher stdout: ${stdout}`, 'normal')
       console.log(`PrismLauncher stdout: ${stdout}`)
     })
+
+    // 7. Start checking for Minecraft
+    let minecraftCheckInterval = setInterval(async () => {
+      if (process.platform === 'win32') {
+        exec(
+          'tasklist /FI "imagename eq javaw.exe" /FI "windowtitle eq Minecraft*"',
+          (error, stdout, stderr) => {
+            if (error) {
+              sendLogMessage(`Error checking for Minecraft process: ${error.message}`, 'error')
+              console.error(`Error checking for Minecraft process: ${error}`)
+              clearInterval(minecraftCheckInterval) // Stop checking on error
+              return
+            }
+
+            const isRunning =
+              stdout.toLowerCase().includes('javaw.exe') &&
+              !stdout.toLowerCase().includes('info: no tasks')
+            if (isRunning) {
+              sendLogMessage('Minecraft is ready!', 'success')
+              mainWindow.webContents.send('minecraft-ready', true) // Send IPC event
+              clearInterval(minecraftCheckInterval) // Stop checking
+            }
+          }
+        )
+      } else {
+        // Implement macOS/Linux check here if needed
+        clearInterval(minecraftCheckInterval) // Stop checking if not Windows
+        sendLogMessage('Minecraft ready check is only implemented on Windows.', 'warning')
+      }
+    }, 2000)
 
     return true // Assume success (non-blocking)
   } catch (error) {
@@ -75,29 +108,23 @@ async function checkIfMinecraftIsRunning() {
   return new Promise((resolve) => {
     if (process.platform === 'win32') {
       // Windows-specific code
-      exec('tasklist /v /fo csv', (error, stdout, stderr) => {
-        if (error) {
-          sendLogMessage(`Error checking for Minecraft process: ${error.message}`, 'error')
-          console.error(`Error checking for Minecraft process: ${error}`)
-          resolve(false)
-          return
-        }
-
-        const lines = stdout.split('\n')
-        for (const line of lines) {
-          if (
-            line.toLowerCase().includes('minecraft') &&
-            line.toLowerCase().includes('javaw.exe')
-          ) {
-            // Minecraft is running
-            resolve(true)
+      exec(
+        'tasklist /FI "imagename eq javaw.exe" /FI "windowtitle eq Minecraft*"',
+        (error, stdout, stderr) => {
+          if (error) {
+            sendLogMessage(`Error checking for Minecraft process: ${error.message}`, 'error')
+            console.error(`Error checking for Minecraft process: ${error}`)
+            resolve(false)
             return
           }
-        }
 
-        // Minecraft is not running
-        resolve(false)
-      })
+          // If any output is returned, it means a Minecraft process is running
+          const isRunning =
+            stdout.toLowerCase().includes('javaw.exe') &&
+            !stdout.toLowerCase().includes('info: no tasks')
+          resolve(isRunning)
+        }
+      )
     } else {
       // macOS and Linux (less accurate, but better than nothing)
       exec('ps -ax | grep java', (error, stdout, stderr) => {

@@ -65,7 +65,7 @@ function createWindow() {
     }
 
     ipcMain.on('launch-prism', async (event, instanceName) => {
-      const launched = await launchPrismLauncher(instanceName)
+      const launched = await launchPrismLauncher(instanceName, mainWindow)
       if (launched) {
         sendLogMessage(`PrismLauncher launch requested for ${instanceName}`, 'normal')
       } else {
