@@ -61,11 +61,12 @@ public class WebsocketsHandler {
                             for (int j = 0; j < cols; j++)
                                 depthData[i][j] = row.get(j).getAsInt();                            
                         }
-
+                        
+                        
                         terrainGenerator.updateTerrain(depthData);
                         
                     } catch (Exception e) {
-                        plugin.getLogger().warning("Error processing WebSocket message: " + e.getMessage());
+                        plugin.getLogger().warning(e.getMessage());
                     }
                 }
 

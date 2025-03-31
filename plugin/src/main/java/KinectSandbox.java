@@ -22,7 +22,10 @@ public class KinectSandbox extends JavaPlugin implements Listener {
         // Connect to Websocker server, passing in instance of KinectSandbox (plugin)
         // wsHandler instance handles passing data to terrainGenerator instance
         wsHandler = new WebsocketsHandler(this, terrainGenerator);
+        // need some kind of mechanism to handle the block placement on load and disable
+        //terrainGenerator.tgHelper.resetBlocks();
         wsHandler.connectToWebSocket();
+        
         
         // If launcher is accidently closed this is nice to have
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
