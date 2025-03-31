@@ -16,10 +16,13 @@ public class WebsocketsHandler {
     private Gson gson = new Gson();
     private boolean connected = false;
     private KinectSandbox plugin;
+    private TerrainGenerator terrainGenerator;
+    
 
     // Constructor with reference to plugin instance
-    public WebsocketsHandler(KinectSandbox plugin) {
+    public WebsocketsHandler(KinectSandbox plugin, TerrainGenerator terrainGenerator) {
         this.plugin = plugin;
+        this.terrainGenerator = terrainGenerator;
     }
 
     public void connectToWebSocket() {
@@ -38,27 +41,28 @@ public class WebsocketsHandler {
                     });
                 }
 
+                // As messages come in, convert to int[][] and send to terrainGenerator.updateTerrain(int[][])
                 @Override
                 public void onMessage(String message) {
                     try {
-                        // Parse the message
+                    	 // Parse the message
                         JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
                         JsonArray depthArray = jsonObject.getAsJsonArray("data");
-                        
-                        // Get 10 values from middle-ish for testing
-                        StringBuilder depthDataMessage = new StringBuilder(ChatColor.AQUA + "Received Kinect depth data: \n");
-                        JsonArray row = depthArray.get(200).getAsJsonArray();
-                        StringBuilder test = new StringBuilder();
-                        for (int j = 250; j < 260; j++)
-                        	test.append(row.get(j).getAsInt()).append(" ");
-                        depthDataMessage.append(test.toString() + "\n");
 
-                        // Needs to be on main server thread since using Bukkit API?
-                        Bukkit.getScheduler().runTask(plugin, () -> {
-                            for (Player p : Bukkit.getOnlinePlayers()) {
-                                p.sendMessage(depthDataMessage.toString());
-                            }
-                        });
+                        // Convert JsonArray into int[][]
+                        int rows = depthArray.size();  // Number of rows
+                        int cols = depthArray.get(0).getAsJsonArray().size();  // Number of columns (assuming all rows have the same number of elements)
+
+                        int[][] depthData = new int[rows][cols];
+
+                        // Populate the int[][] array with the values from the JsonArray
+                        for (int i = 0; i < rows; i++) {
+                            JsonArray row = depthArray.get(i).getAsJsonArray();
+                            for (int j = 0; j < cols; j++)
+                                depthData[i][j] = row.get(j).getAsInt();                            
+                        }
+
+                        terrainGenerator.updateTerrain(depthData);
                         
                     } catch (Exception e) {
                         plugin.getLogger().warning("Error processing WebSocket message: " + e.getMessage());
