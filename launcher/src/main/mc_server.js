@@ -72,6 +72,7 @@ export async function startMinecraftServer() {
     const javaArgs = [
       `-Xms${MIN_RAM}`, // Minimum RAM allocation
       `-Xmx${MAX_RAM}`, // Maximum RAM allocation
+      '-DIReallyKnowWhatIAmDoingISwear', // Remove update message
       '-jar',
       SERVER_JAR,
       'nogui' // Run without GUI
