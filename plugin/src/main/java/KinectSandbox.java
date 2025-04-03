@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.IOException;
+
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,11 +13,22 @@ public class KinectSandbox extends JavaPlugin implements Listener {
 	public int rawKinectWidth = 512;
 	public int rawKinectMaxDepth = 255;
     public World world;
+    public KinectSettings settings;
     private WebsocketsHandler wsHandler;
     TerrainGenerator terrainGenerator = new TerrainGenerator(this);
-    
+    private String prevSettingsHash = "";
     @Override
     public void onEnable() {
+    	// Read settings_config.json for values
+    	String path = "";
+		try {
+			path = new File("../settings_config.json").getCanonicalPath();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		settings = new KinectSettings(new File(path));
+		getLogger().info("" + settings.x1 + " " + settings.x2+ " " + settings.y1 + " " +settings.y2 + " " + settings.kinectDistance);
         // Register event listeners
         Bukkit.getPluginManager().registerEvents(this, this);
         world = Bukkit.getWorlds().get(0);
@@ -23,7 +37,15 @@ public class KinectSandbox extends JavaPlugin implements Listener {
         // wsHandler instance handles passing data to terrainGenerator instance
         wsHandler = new WebsocketsHandler(this, terrainGenerator);
         // need some kind of mechanism to handle the block placement on load and disable
-        //terrainGenerator.tgHelper.resetBlocks();
+		getLogger().info(prevSettingsHash + " prev");
+		
+		if (!prevSettingsHash.equals(settings.settingsHash))
+		{	
+			getLogger().info("Settings changed, resetting blocks");
+			terrainGenerator.tgHelper.resetBlocks();
+			prevSettingsHash = settings.settingsHash;
+		}
+        terrainGenerator.tgHelper.resetBlocks();
         wsHandler.connectToWebSocket();
         
         
@@ -44,4 +66,6 @@ public class KinectSandbox extends JavaPlugin implements Listener {
         }
         getLogger().info("Plugin disabled.");
     }
+
+
 }

@@ -23,11 +23,17 @@ if ($mcWindow) {
     Start-Sleep -Milliseconds 10
 }
 
-# Unpause Minecraft
-# [System.Windows.Forms.SendKeys]::SendWait("{ESC}")
-# Start-Sleep -Milliseconds 10
-
-# Open chat and enter command
+# Open chat and paste command
 [System.Windows.Forms.SendKeys]::SendWait("t")  # Open chat
-Start-Sleep -Milliseconds 200
-[System.Windows.Forms.SendKeys]::SendWait("/plugman reload KinectSandbox{ENTER}")
+Start-Sleep -Milliseconds 100
+
+# Copy the command to the clipboard
+[System.Windows.Forms.Clipboard]::SetText("/plugman reload KinectSandbox")
+Start-Sleep -Milliseconds 10
+
+# Paste the command (CTRL+V)
+[System.Windows.Forms.SendKeys]::SendWait("^(v)")
+Start-Sleep -Milliseconds 10
+
+# Send Enter to execute the command
+[System.Windows.Forms.SendKeys]::SendWait("{ENTER}")

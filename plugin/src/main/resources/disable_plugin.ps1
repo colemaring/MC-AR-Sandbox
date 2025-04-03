@@ -19,9 +19,17 @@ if ($mcWindow) {
 [System.Windows.Forms.SendKeys]::SendWait("{ESC}")
 Start-Sleep -Milliseconds 10
 
-# Open chat and enter command
+# Open chat and paste command
 [System.Windows.Forms.SendKeys]::SendWait("t")  # Open chat
-Start-Sleep -Milliseconds 10
-[System.Windows.Forms.SendKeys]::SendWait("/plugman disable KinectSandbox{ENTER}")
-Start-Sleep -Milliseconds 200
+Start-Sleep -Milliseconds 100
 
+# Copy the command to the clipboard
+[System.Windows.Forms.Clipboard]::SetText("/plugman disable KinectSandbox")
+Start-Sleep -Milliseconds 10
+
+# Paste the command (CTRL+V)
+[System.Windows.Forms.SendKeys]::SendWait("^(v)")
+Start-Sleep -Milliseconds 100
+
+# Send Enter to execute the command
+[System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
