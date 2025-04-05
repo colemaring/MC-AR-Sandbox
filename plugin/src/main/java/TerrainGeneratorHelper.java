@@ -53,9 +53,9 @@ public class TerrainGeneratorHelper {
 	// set all blocks to air in the region that depth encompasses
 	public void resetBlocks() {
 		plugin.getLogger().info("resetting blocks");
-        for (int x = 0; x < 200; x++) {
+        for (int x = 0; x < 400; x++) {
             for (int y = -150; y < 200; y++) {
-                for (int z = 0; z < 200; z++) {
+                for (int z = 0; z < 400; z++) {
                 	plugin.world.getBlockAt(x, y, z).setType(Material.AIR);
                 }
             }
