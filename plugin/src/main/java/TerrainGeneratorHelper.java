@@ -3,7 +3,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 public class TerrainGeneratorHelper {
 	private KinectSandbox plugin;
@@ -52,7 +54,9 @@ public class TerrainGeneratorHelper {
 	
 	// set all blocks to air in the region that depth encompasses
 	public void resetBlocks() {
-		plugin.getLogger().info("resetting blocks");
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			player.sendMessage("loading terrain...");
+		}
         for (int x = 0; x < 400; x++) {
             for (int y = -150; y < 200; y++) {
                 for (int z = 0; z < 400; z++) {

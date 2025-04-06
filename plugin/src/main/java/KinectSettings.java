@@ -1,10 +1,18 @@
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class KinectSettings {
     public int x1;
@@ -12,6 +20,7 @@ public class KinectSettings {
     public int y1;
     public int y2;
     public int kinectDistance;
+    public int elevationMultiplier;
     public String settingsHash;
     private final File settingsFile;
     private final AtomicReference<KinectSettings> settingsReference;
@@ -38,7 +47,8 @@ public class KinectSettings {
             this.x2 = crop.get("x2").getAsInt();
             this.y2 = crop.get("y2").getAsInt();
             this.kinectDistance = root.get("kinect_surface_distance_cm").getAsInt();
-            this.settingsHash = this.x1+""+this.x2+""+this.y1+""+this.y2+""+this.kinectDistance;
+            this.elevationMultiplier = root.get("minecraft_elevation").getAsInt();
+            this.settingsHash = this.x1+""+this.x2+""+this.y1+""+this.y2+""+this.kinectDistance+""+elevationMultiplier;
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to read settings from file: " + settingsFile.getAbsolutePath());
@@ -61,6 +71,10 @@ public class KinectSettings {
                             if (modifiedFile.equals(settingsFile.toPath().getFileName())) {
                                 // File has changed, reload settings
                                 loadSettings();
+                                for (Player player : Bukkit.getOnlinePlayers()) {
+                                    player.sendMessage(ChatColor.GREEN + "Loading new changes...");
+                                }
+
                                 // Update the reference to the latest settings
                                 settingsReference.set(this);
                             }

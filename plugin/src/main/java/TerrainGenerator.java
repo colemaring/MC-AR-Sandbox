@@ -34,7 +34,7 @@ public class TerrainGenerator {
 		newDepth = tgHelper.meanPool(newDepth, meanPoolSize); 
 		newDepth = tgHelper.meanFilter(newDepth, smoothingSize); 
 		newDepth = tgHelper.mirrorXYAxis(newDepth);
-		newDepth = tgHelper.convertToCoordinates(newDepth, worldHeightScalar, plugin.settings.kinectDistance/kinectDistanceScalar); 
+		newDepth = tgHelper.convertToCoordinates(newDepth, plugin.settings.elevationMultiplier/100.0, plugin.settings.kinectDistance/kinectDistanceScalar); 
 		
 		if (!prevSettingsHash.equals(plugin.settings.settingsHash))
     	    prevDepth = new int[newDepth.length][newDepth[0].length];
