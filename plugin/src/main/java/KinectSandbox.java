@@ -20,6 +20,7 @@ public class KinectSandbox extends JavaPlugin implements Listener {
     public static String biome = "grass";
     public KinectSettings settings;
     private WebsocketsHandler wsHandler;
+    public boolean waterEnabled = false;
     TerrainGenerator terrainGenerator = new TerrainGenerator(this);
     private String prevSettingsHash = "";
     @Override

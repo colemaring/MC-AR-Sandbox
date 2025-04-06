@@ -18,6 +18,8 @@ public class TerrainGenerator implements Listener{
     private final double worldHeightScalar = 0.2;
     private final int kinectDistanceScalar = 4; // need to tune to find good scalars 
     private String prevSettingsHash;
+    private String prevBiome;
+    private boolean prevWaterEnabled;
     private volatile boolean resetCalled = false;
     // Constructor with reference to plugin instance
     public TerrainGenerator(KinectSandbox plugin) {
@@ -50,7 +52,10 @@ public class TerrainGenerator implements Listener{
 		newDepth = tgHelper.convertToCoordinates(newDepth, plugin.settings.elevationMultiplier/100.0, plugin.settings.kinectDistance/kinectDistanceScalar); 
 		
 		if (!prevSettingsHash.equals(plugin.settings.settingsHash))
-    	    prevDepth = new int[newDepth.length][newDepth[0].length];
+		{
+			 prevDepth = new int[newDepth.length][newDepth[0].length];
+		}
+    	   
 	
 		// find the difference array
 		// diffDepth[i][k][0] = y coord of top block in range to modify
@@ -62,10 +67,14 @@ public class TerrainGenerator implements Listener{
         new BukkitRunnable() {
             @Override
             public void run() {
-            	// exists for threading issues where run statement from previous update call is still processing while next call is initiated.
-            	if (!prevSettingsHash.equals(plugin.settings.settingsHash))
+            	
+				// exists for threading issues where run statement from previous update call is still processing while next call is initiated.
+            	// conditions for which to re-render all terrain
+            	if (!prevSettingsHash.equals(plugin.settings.settingsHash) || !prevBiome.equals(plugin.biome) || prevWaterEnabled != plugin.waterEnabled)
             	{
             	    prevSettingsHash = plugin.settings.settingsHash;
+            	    prevBiome = plugin.biome;
+            	    prevWaterEnabled = plugin.waterEnabled;
             	    prevDepth = new int[plugin.settings.y2 - plugin.settings.y1 + 1][plugin.settings.x2 - plugin.settings.x1 + 1];
             	    tgHelper.resetBlocks();
             	    // read by main thread bukkit api to check if current updateTerrain called needs to cancel current block placements

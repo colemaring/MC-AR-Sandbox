@@ -7,6 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import net.md_5.bungee.api.ChatColor;
+
 public class TerrainGeneratorHelper {
 	private KinectSandbox plugin;
 	
@@ -54,8 +56,9 @@ public class TerrainGeneratorHelper {
 	
 	// set all blocks to air in the region that depth encompasses
 	public void resetBlocks() {
+		
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			player.sendMessage("loading terrain...");
+			player.sendMessage(ChatColor.GREEN + "Loading new terrain..");
 		}
         for (int x = 0; x < 400; x++) {
             for (int y = -150; y < 200; y++) {
@@ -205,7 +208,46 @@ public class TerrainGeneratorHelper {
 				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
 			}
 			int waterLevel = 6;
-			placeWater(i, waterLevel, j);
+			if (plugin.waterEnabled)
+				placeWater(i, waterLevel, j);
+		}
+		if (biome.equals("snow"))
+		{	
+			if (adding)
+			{
+				if (k > 20)
+					plugin.world.getBlockAt(i, k, j).setType(Material.SNOW_BLOCK);
+				else if (k > 10)
+					plugin.world.getBlockAt(i, k, j).setType(Material.ICE);
+				else
+					plugin.world.getBlockAt(i, k, j).setType(Material.BLUE_ICE);
+			}
+			else
+			{
+				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
+			}
+			int waterLevel = 10;
+			if (plugin.waterEnabled)
+				placeWater(i, waterLevel, j);
+		}
+		if (biome.equals("sand"))
+		{	
+			if (adding)
+			{
+				if (k > 20)
+					plugin.world.getBlockAt(i, k, j).setType(Material.SAND);
+				else if (k > 10)
+					plugin.world.getBlockAt(i, k, j).setType(Material.SANDSTONE);
+				else
+					plugin.world.getBlockAt(i, k, j).setType(Material.STONE);
+			}
+			else
+			{
+				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
+			}
+			int waterLevel = 0;
+			if (plugin.waterEnabled)
+				placeWater(i, waterLevel, j);
 		}
 	}
 	
