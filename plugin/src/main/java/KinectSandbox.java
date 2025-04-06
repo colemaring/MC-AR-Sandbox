@@ -17,12 +17,14 @@ public class KinectSandbox extends JavaPlugin implements Listener {
 	public int rawKinectWidth = 512;
 	public int rawKinectMaxDepth = 255;
     public World world;
+    public static String biome = "grass";
     public KinectSettings settings;
     private WebsocketsHandler wsHandler;
     TerrainGenerator terrainGenerator = new TerrainGenerator(this);
     private String prevSettingsHash = "";
     @Override
     public void onEnable() {
+    	Bukkit.getPluginManager().registerEvents(terrainGenerator, this);
     	// Read settings_config.json for values
     	String path = "";
 		try {

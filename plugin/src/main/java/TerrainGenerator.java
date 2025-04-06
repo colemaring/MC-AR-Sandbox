@@ -4,9 +4,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class TerrainGenerator {
+public class TerrainGenerator implements Listener{
     private KinectSandbox plugin;
     public TerrainGeneratorHelper tgHelper;
     private int[][] prevDepth;
@@ -22,6 +25,16 @@ public class TerrainGenerator {
         this.tgHelper= new TerrainGeneratorHelper(plugin);
         this.prevDepth = new int[plugin.rawKinectHeight][plugin.rawKinectWidth];
         this.prevSettingsHash = "";
+    }
+    
+    // Disable water flow
+    @EventHandler
+    public void onBlockFromTo(BlockFromToEvent event) {
+        Material type = event.getBlock().getType();
+
+        if (type == Material.WATER || type == Material.LAVA) {
+            event.setCancelled(true);
+        }
     }
     
 	public void updateTerrain(int[][] currDepth)
@@ -81,12 +94,14 @@ public class TerrainGenerator {
             			// adding blocks in range upper to lower
             			if (addOrRemove == 0)
             				for (int k = lowerRange; k < upperRange; k++)
-            					plugin.world.getBlockAt(i, k, j).setType(Material.GRASS_BLOCK);
+            					tgHelper.placeAsBiome(i, k, j, KinectSandbox.biome, true);
+            					
             			
             			// removing blocks in range upper to lower
             			else if (addOrRemove == 1)
             				for (int k = lowerRange; k < upperRange; k++)
-            					plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
+            					tgHelper.placeAsBiome(i, k, j, KinectSandbox.biome, false);
+            					
             		}
             	}
             }

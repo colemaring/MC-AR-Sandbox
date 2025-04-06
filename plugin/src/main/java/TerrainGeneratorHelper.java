@@ -186,4 +186,35 @@ public class TerrainGeneratorHelper {
 	    }
 	    return mirroredArray;
 	}
+	
+	public void placeAsBiome(int i, int k, int j, String biome, boolean adding)
+	{
+		if (biome.equals("grass"))
+		{	
+			if (adding)
+			{
+				if (k > 20)
+					plugin.world.getBlockAt(i, k, j).setType(Material.SNOW_BLOCK);
+				else if (k > 10)
+					plugin.world.getBlockAt(i, k, j).setType(Material.STONE);
+				else
+					plugin.world.getBlockAt(i, k, j).setType(Material.GRASS_BLOCK);
+			}
+			else
+			{
+				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
+			}
+			int waterLevel = 6;
+			placeWater(i, waterLevel, j);
+		}
+	}
+	
+	// scan y coordinate and below for air, replace with water
+	// not efficient, use the difference array somehow
+	public void placeWater(int i, int waterLevel, int j)
+	{
+		for (int x = 0; x < waterLevel; x++)
+			if (plugin.world.getBlockAt(i, x, j).getType().equals(Material.AIR))
+				plugin.world.getBlockAt(i, x, j).setType(Material.WATER);
+	}
 }

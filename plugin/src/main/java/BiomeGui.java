@@ -28,7 +28,7 @@ public class BiomeGui {
 			    new ItemStack(Material.GRASS_BLOCK),
 			    1,
 			    click -> {
-			        // set biome to normal
+			    	KinectSandbox.biome = "grass";
 			    	return true;
 			    },
 			    "§aBiome name here",
@@ -38,7 +38,7 @@ public class BiomeGui {
 			    new ItemStack(Material.SAND),
 			    1,
 			    click -> {
-			        // set biome to normal
+			    	KinectSandbox.biome = "sand";
 			    	return true;
 			    },
 			    "§aBiome name here",
@@ -48,7 +48,7 @@ public class BiomeGui {
 			    new ItemStack(Material.SNOW_BLOCK),
 			    1,
 			    click -> {
-			        // set biome to normal
+			    	KinectSandbox.biome = "snow";
 			    	return true;
 			    },
 			    "§aBiome name here",
