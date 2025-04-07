@@ -29,9 +29,16 @@ public class InventoryHelper implements Listener{
     public void onPlayerInteract(PlayerInteractEvent event) {
     	Player player = event.getPlayer();
         if (event.getItem() != null && event.getItem().getType() == Material.NETHER_STAR && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Game Selector Menu") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK))
+        {
         	gameGui.show(player);
+       		event.setCancelled(true); // prevent breaking a block
+        }
         if (event.getItem() != null && event.getItem().getType() == Material.COMPASS && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Biome Selector Menu") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK))
+        {
         	biomeGui.show(player);
+        	event.setCancelled(true);
+        }
+        	
 	}
 	 
 	 @EventHandler
@@ -40,20 +47,6 @@ public class InventoryHelper implements Listener{
 	 {
 		 giveInventory();
 	 }
-	 
-	 @EventHandler
-    public void onBlockBreak(BlockBreakEvent event) {
-        Player p = event.getPlayer();
-        if (!p.isOp())
-            event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onBlockPlace(BlockPlaceEvent event) {
-        Player p = event.getPlayer();
-        if (!p.isOp())
-            event.setCancelled(true);
-    }
     
     public void giveInventory()
     {

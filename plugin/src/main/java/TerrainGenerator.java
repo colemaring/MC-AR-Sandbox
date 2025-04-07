@@ -15,7 +15,6 @@ public class TerrainGenerator implements Listener{
     private int[][] prevDepth;
     private final int meanPoolSize = 2; // adjusts size of world
     private final int smoothingSize = 2; // adjusts smoothing
-    private final double worldHeightScalar = 0.2;
     private final int kinectDistanceScalar = 4; // need to tune to find good scalars 
     private String prevSettingsHash;
     private String prevBiome;

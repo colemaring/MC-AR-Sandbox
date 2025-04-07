@@ -35,14 +35,17 @@ public class KinectSandbox extends JavaPlugin implements Listener {
 			e.printStackTrace();
 		}
 		
-		// Create inventory and assign listeners for it
+		// Create inventory
 		InventoryHelper ih = new InventoryHelper(this);
-		Bukkit.getPluginManager().registerEvents(ih, this);
+		MiscHandlers mh = new MiscHandlers(this);
+		// Center op players on join
 		
 		settings = new KinectSettings(new File(path));
 		
         // Register event listeners
         Bukkit.getPluginManager().registerEvents(this, this);
+        Bukkit.getPluginManager().registerEvents(ih, this);
+        Bukkit.getPluginManager().registerEvents(mh, this);
         world = Bukkit.getWorlds().get(0);
         
         // Connect to Websocker server, passing in instance of KinectSandbox (plugin)
