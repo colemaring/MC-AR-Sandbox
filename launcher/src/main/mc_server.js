@@ -18,8 +18,8 @@ const MAX_RAM = '4G' // Maximum RAM allocation
 async function killExistingMinecraftServer() {
   return new Promise((resolve) => {
     if (process.platform === 'win32') {
-      console.log('Killing Java processes')
-      sendLogMessage('Killing Java processes', 'normal')
+      console.log('Checking for running Java processes')
+      sendLogMessage('Checking for running Java processes', 'normal')
 
       // Kill all Java processes forcefully
       exec('taskkill /F /IM java.exe', (killError) => {
@@ -168,3 +168,5 @@ export function isServerRunning() {
 export function getServerDirectory() {
   return SERVER_DIR
 }
+
+export { serverProcess }

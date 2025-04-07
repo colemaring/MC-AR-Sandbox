@@ -20,14 +20,14 @@ function SettingsPage() {
     setY2,
     distance,
     setDistance,
-    testMode,
-    setTestMode,
     displayOnLaunchTopographic,
     setDisplayOnLaunchTopographic,
     displayTopographic,
     setDisplayTopographic,
     smoothing,
     setSmoothing,
+    elevation,
+    setElevation,
     colorMode,
     setColorMode,
     displayOnLaunchMinecraft,
@@ -70,15 +70,14 @@ function SettingsPage() {
         />
       </div>
       <div className="mt-1">
-        <span>Test Mode</span>
-        <Form.Check
-          type="switch"
-          id="test-mode-switch"
-          label=""
-          className="custom-switch"
-          checked={testMode}
-          onChange={(e) => setTestMode(e.target.checked)}
-          style={{ display: 'inline-block', marginLeft: '10px' }}
+        <span>Elevation Multipler</span>
+        <Form.Range
+          min={0}
+          max={100}
+          step={1}
+          value={elevation}
+          onChange={(e) => setElevation(Number(e.target.value))}
+          style={{ width: '10rem', display: 'inline-block', marginLeft: '1rem' }}
         />
       </div>
       <hr />

@@ -2,11 +2,13 @@ import React, { useState, useEffect, useRef } from 'react'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import { useLogMessages } from '../context/LogMessageContext'
+import InputGroup from 'react-bootstrap/InputGroup'
 
 function HomePage() {
   const { logMessages, getFormattedLogs } = useLogMessages()
   const textareaRef = useRef(null)
   const [launchButtonDisabled, setLaunchButtonDisabled] = useState(false) // Initialize to true
+  const [inputText, setInputText] = useState('')
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -19,6 +21,20 @@ function HomePage() {
     // In your renderer process
     setLaunchButtonDisabled(true) // Disable the button when clicked
     window.electronAPI.ipcRenderer.send('launch-prism', '1.21.5')
+  }
+
+  const handleInputChange = (e) => {
+    setInputText(e.target.value)
+  }
+
+  const handleSendCommand = () => {
+    if (inputText.trim() === '') return // Don't send empty commands
+
+    // Send IPC message with the command text
+    window.electronAPI.ipcRenderer.send('serverCommand', inputText)
+
+    // Clear the input after sending
+    setInputText('')
   }
 
   useEffect(() => {
@@ -42,6 +58,22 @@ function HomePage() {
           dangerouslySetInnerHTML={{ __html: getFormattedLogs() }}
         />
       </Form.Group>
+      <InputGroup className="mb-3">
+        <Form.Control
+          type="text"
+          placeholder="Send command to Minecraft server"
+          value={inputText}
+          onChange={handleInputChange}
+        />
+        <Button
+          style={{
+            backgroundColor: 'rgb(59, 125, 141)'
+          }}
+          onClick={handleSendCommand}
+        >
+          Send
+        </Button>
+      </InputGroup>
       <Button
         className="launchButton buttonDropshadow"
         onClick={handleLaunchClick}

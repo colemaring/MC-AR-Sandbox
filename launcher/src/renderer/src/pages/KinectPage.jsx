@@ -105,8 +105,18 @@ function KinectPage() {
     const handleMouseMove = (e) => {
       if (!draggingHandle || !containerRef.current) return
       const { left, top } = containerRef.current.getBoundingClientRect()
-      const mouseX = e.clientX - left
-      const mouseY = e.clientY - top
+
+      // Get the bounds of the container
+      const containerWidth = containerRef.current.offsetWidth
+      const containerHeight = containerRef.current.offsetHeight
+
+      // Calculate mouse position relative to container
+      let mouseX = e.clientX - left
+      let mouseY = e.clientY - top
+
+      // Constrain mouse position to container bounds
+      mouseX = Math.max(0, Math.min(mouseX, containerWidth - 1))
+      mouseY = Math.max(0, Math.min(mouseY, containerHeight - 1))
 
       switch (draggingHandle) {
         case 'tl': // top left

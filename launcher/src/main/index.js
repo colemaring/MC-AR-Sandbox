@@ -9,6 +9,8 @@ const { exec } = require('child_process')
 import { terminateAllProcesses } from './terminate_processes'
 import { checkDependencies } from './check_dependencies'
 import { launchPrismLauncher } from './launch'
+import { serverProcess } from './mc_server'
+import { Rcon } from 'rcon-client'
 
 let kinectProcess
 let mainWindow
@@ -18,6 +20,27 @@ export function sendLogMessage(text, type = 'normal') {
   const windowToUse = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed())
   if (windowToUse) {
     windowToUse.webContents.send('logMessage', { text, type })
+  }
+}
+
+async function sendRconCommand(command) {
+  try {
+    // Create a new connection for each command (simple but reliable approach)
+    const rcon = new Rcon({
+      host: 'localhost',
+      port: '25575',
+      password: 'doesntmatter',
+      timeout: 5000
+    })
+
+    await rcon.connect()
+    const response = await rcon.send(command)
+    await rcon.end()
+
+    return { success: true, response }
+  } catch (error) {
+    console.error('RCON error:', error)
+    return { success: false, error: error.message }
   }
 }
 
@@ -87,6 +110,25 @@ function createWindow() {
         sendLogMessage(`PrismLauncher launch requested for ${instanceName}`, 'normal')
       } else {
         sendLogMessage(`PrismLauncher launch failed for ${instanceName}`, 'error')
+      }
+    })
+    ipcMain.on('serverCommand', async (event, command) => {
+      console.log(`Attempting to send RCON command: ${command}`)
+
+      const result = await sendRconCommand(command)
+
+      if (result.success) {
+        console.log(`Command sent successfully: ${command}`)
+        console.log(`Response: ${result.response}`)
+        sendLogMessage(`Command sent: ${command}`, 'normal')
+
+        // Only show response if it's not empty
+        if (result.response && result.response.trim() !== '') {
+          sendLogMessage(`Server response: ${result.response}`, 'success')
+        }
+      } else {
+        console.error(`Failed to send command: ${result.error}`)
+        sendLogMessage(`Failed to send command: ${result.error}`, 'error')
       }
     })
   })

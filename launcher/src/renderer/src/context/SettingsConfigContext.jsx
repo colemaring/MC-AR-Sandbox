@@ -10,7 +10,7 @@ export const SettingsConfigProvider = ({ children }) => {
   const [x2, setX2] = useState(0)
   const [y2, setY2] = useState(0)
   const [distance, setDistance] = useState(0)
-  const [testMode, setTestMode] = useState(false)
+  const [elevation, setElevation] = useState(40)
 
   // Topographic settings
   const [displayOnLaunchTopographic, setDisplayOnLaunchTopographic] = useState(false)
@@ -35,10 +35,10 @@ export const SettingsConfigProvider = ({ children }) => {
         setX2(config?.kinect_view_crop?.x2 || 0)
         setY2(config?.kinect_view_crop?.y2 || 0)
         setDistance(config?.kinect_surface_distance_cm || 0)
-        setTestMode(config?.test_mode || false)
         setDisplayOnLaunchTopographic(config?.topographic_display_on_launch || false)
         setDisplayTopographic(config?.topographic_display_assignment || 'Display 1')
         setSmoothing(config?.topographic_smoothing || 40)
+        setElevation(config?.minecraft_elevation || 40)
         setColorMode(config?.topographic_color_mode || 'Default')
         setDisplayOnLaunchMinecraft(config?.minecraft_display_on_launch || false)
         setDisplayMinecraft(config?.minecraft_display_assignment || 'Display 2')
@@ -60,7 +60,7 @@ export const SettingsConfigProvider = ({ children }) => {
     const config = {
       kinect_view_crop: { x1, y1, x2, y2 },
       kinect_surface_distance_cm: distance,
-      test_mode: testMode,
+      minecraft_elevation: elevation,
       topographic_display_on_launch: displayOnLaunchTopographic,
       topographic_display_assignment: displayTopographic,
       topographic_smoothing: smoothing,
@@ -92,10 +92,10 @@ export const SettingsConfigProvider = ({ children }) => {
     x2,
     y2,
     distance,
-    testMode,
     displayOnLaunchTopographic,
     displayTopographic,
     smoothing,
+    elevation,
     colorMode,
     displayOnLaunchMinecraft,
     displayMinecraft,
@@ -110,10 +110,11 @@ export const SettingsConfigProvider = ({ children }) => {
         x2,
         y2,
         distance,
-        testMode,
         displayOnLaunchTopographic,
         displayTopographic,
         smoothing,
+        elevation,
+        setElevation,
         colorMode,
         displayOnLaunchMinecraft,
         displayMinecraft,
@@ -123,7 +124,6 @@ export const SettingsConfigProvider = ({ children }) => {
         setX2,
         setY2,
         setDistance,
-        setTestMode,
         setDisplayOnLaunchTopographic,
         setDisplayTopographic,
         setSmoothing,
