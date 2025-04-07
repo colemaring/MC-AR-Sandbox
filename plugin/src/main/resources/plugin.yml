@@ -1,5 +1,5 @@
 name: KinectSandbox
-main: KinectSandbox
+main: Main.KinectSandbox
 version: 0.0.1-SNAPSHOT
 api-version: 1.21
 commands:
