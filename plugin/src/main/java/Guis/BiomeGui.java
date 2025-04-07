@@ -67,6 +67,7 @@ public class BiomeGui {
 			    new ItemStack(Material.GRASS_BLOCK),
 			    1,
 			    click -> {
+			    	Bukkit.getWorld("world").setTime(1000L);
 			    	KinectSandbox.biome = "grass";
 			    	for (Player player : Bukkit.getOnlinePlayers()) {
 						player.sendMessage(ChatColor.GREEN + "Changing biome to grass..");
@@ -132,6 +133,7 @@ public class BiomeGui {
 			    new ItemStack(Material.NETHERRACK),
 			    1,
 			    click -> {
+			    	
 			    	KinectSandbox.biome = "nether";
 			    	for (Player player : Bukkit.getOnlinePlayers()) {
 						player.sendMessage(ChatColor.GREEN + "Changing biome to nether..");
@@ -158,7 +160,7 @@ public class BiomeGui {
 		    ItemStack oreItem = new ItemStack(oreBlocks[currentOreIndex[0]]);
 
 		    return new StaticGuiElement('g', oreItem, 1, click -> {
-
+		    	Bukkit.getWorld("world").setTime(1000L);
 		        KinectSandbox.biome = "rainbow";
 		        for (Player player : Bukkit.getOnlinePlayers()) {
 		            player.sendMessage(ChatColor.GREEN + "Changing biome to placeholder..");

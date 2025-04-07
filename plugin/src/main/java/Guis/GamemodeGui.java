@@ -7,6 +7,13 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import Gamemodes.Aquaduct;
+import Gamemodes.DigRouletteEasy;
+import Gamemodes.DigRouletteHard;
+import Gamemodes.OreHunt;
+import Gamemodes.OreHunt2p;
+import Gamemodes.VolcanoSimulator;
+import Gamemodes.ZombieRush;
 import Main.KinectSandbox;
 import de.themoep.inventorygui.GuiStateElement;
 import de.themoep.inventorygui.InventoryGui;
@@ -51,10 +58,7 @@ public class GamemodeGui {
 			    diamondPickaxe,
 			    1,
 			    click -> {
-			        for (Player player : Bukkit.getOnlinePlayers()) {
-			            player.sendMessage(ChatColor.GREEN + "Changing gamemode to find_ore..");
-			            player.sendMessage("Game will start in 5,4,3,2,1 <- change to title countdown");
-			        }
+			    	OreHunt.startCountdown(plugin);
 			        return true;
 			    },
 			    "§aOre Hunt",
@@ -69,7 +73,7 @@ public class GamemodeGui {
 			));
 
 		
-		ItemStack goldenPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
+		ItemStack goldenPickaxe = new ItemStack(Material.GOLDEN_PICKAXE);
 		meta = goldenPickaxe.getItemMeta();
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		goldenPickaxe.setItemMeta(meta);
@@ -78,11 +82,7 @@ public class GamemodeGui {
 				goldenPickaxe,
 			    1,
 			    click -> {
-			    	
-			    	for (Player player : Bukkit.getOnlinePlayers()) {
-						player.sendMessage(ChatColor.GREEN + "Changing gamemode to find_ore..");
-						player.sendMessage("Game will start in 5,4,3,2,1 <- change to title countdown");
-					}
+			    	OreHunt2p.startCountdown(plugin);
 			    	return true;
 			    },
 			    "§aOre Hunt (2 Player)",
@@ -99,11 +99,7 @@ public class GamemodeGui {
 			    new ItemStack(Material.ZOMBIE_HEAD),
 			    1,
 			    click -> {
-			    	
-			    	for (Player player : Bukkit.getOnlinePlayers()) {
-						player.sendMessage(ChatColor.GREEN + "Changing gamemode to zombie race..");
-						player.sendMessage("Game will start in 5,4,3,2,1 <- change to title countdown");
-					}
+			    	ZombieRush.startCountdown(plugin);
 			    	return true;
 			    },
 			    "§aZombie Rush",
@@ -121,11 +117,7 @@ public class GamemodeGui {
 			    new ItemStack(Material.OBSIDIAN),
 			    1,
 			    click -> {
-			    	
-			    	for (Player player : Bukkit.getOnlinePlayers()) {
-						player.sendMessage(ChatColor.GREEN + "Changing gamemode to zombie race..");
-						player.sendMessage("Game will start in 5,4,3,2,1 <- change to title countdown");
-					}
+			    	VolcanoSimulator.startCountdown(plugin);
 			    	return true;
 			    },
 			    "§aVolcano Simulator",
@@ -139,11 +131,7 @@ public class GamemodeGui {
 			    new ItemStack(Material.WATER_BUCKET),
 			    1,
 			    click -> {
-			    	
-			    	for (Player player : Bukkit.getOnlinePlayers()) {
-						player.sendMessage(ChatColor.GREEN + "Changing gamemode to zombie race..");
-						player.sendMessage("Game will start in 5,4,3,2,1 <- change to title countdown");
-					}
+			    	Aquaduct.startCountdown(plugin);
 			    	return true;
 			    },
 			    "§aAquaduct",
@@ -156,11 +144,7 @@ public class GamemodeGui {
 			    new ItemStack(Material.TNT),
 			    1,
 			    click -> {
-			    	
-			    	for (Player player : Bukkit.getOnlinePlayers()) {
-						player.sendMessage(ChatColor.GREEN + "Changing gamemode to zombie race..");
-						player.sendMessage("Game will start in 5,4,3,2,1 <- change to title countdown");
-					}
+			    	DigRouletteEasy.startCountdown(plugin);
 			    	return true;
 			    },
 			    "§aDig Roulette (easy)",
@@ -179,11 +163,7 @@ public class GamemodeGui {
 				tnt,
 			    1,
 			    click -> {
-			    	
-			    	for (Player player : Bukkit.getOnlinePlayers()) {
-						player.sendMessage(ChatColor.GREEN + "Changing gamemode to zombie race..");
-						player.sendMessage("Game will start in 5,4,3,2,1 <- change to title countdown");
-					}
+			    	DigRouletteHard.startCountdown(plugin);
 			    	return true;
 			    },
 			    "§aDig Roulette (hard)",

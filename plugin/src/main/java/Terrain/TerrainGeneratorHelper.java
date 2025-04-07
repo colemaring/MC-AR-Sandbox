@@ -214,7 +214,7 @@ public class TerrainGeneratorHelper {
 			
 			int waterLevel = 6;
 			if (plugin.waterEnabled)
-				placeWater(i, waterLevel, j);
+				placeLiquid(i, waterLevel, j, "water");
 		}
 		if (biome.equals("snow"))
 		{	
@@ -232,7 +232,7 @@ public class TerrainGeneratorHelper {
 			
 			int waterLevel = 10;
 			if (plugin.waterEnabled)
-				placeWater(i, waterLevel, j);
+				placeLiquid(i, waterLevel, j, "water");
 		}
 		if (biome.equals("sand"))
 		{	
@@ -248,6 +248,58 @@ public class TerrainGeneratorHelper {
 			else
 				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
 		}
+		if (biome.equals("mesa"))
+		{	
+			if (adding)
+			{
+				if (k > 20)
+					plugin.world.getBlockAt(i, k, j).setType(Material.RED_TERRACOTTA);
+				else if (k > 19)
+					plugin.world.getBlockAt(i, k, j).setType(Material.WHITE_TERRACOTTA);
+				else if (k > 15)
+					plugin.world.getBlockAt(i, k, j).setType(Material.RED_TERRACOTTA);
+				else if (k > 14)
+					plugin.world.getBlockAt(i, k, j).setType(Material.GRAY_TERRACOTTA);
+				else if (k > 10)
+					plugin.world.getBlockAt(i, k, j).setType(Material.ORANGE_TERRACOTTA);
+				else
+					plugin.world.getBlockAt(i, k, j).setType(Material.RED_SAND);
+			}
+			else
+				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
+		}
+		if (biome.equals("stone"))
+		{	
+			if (adding)
+			{
+				if (k > 20)
+					plugin.world.getBlockAt(i, k, j).setType(Material.STONE);
+				else if (k > 10)
+					plugin.world.getBlockAt(i, k, j).setType(Material.STONE);
+				else
+					plugin.world.getBlockAt(i, k, j).setType(Material.GRASS_BLOCK);
+			}
+			else
+				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
+		}
+		if (biome.equals("nether"))
+		{	
+			if (adding)
+			{
+				if (k > 20)
+					plugin.world.getBlockAt(i, k, j).setType(Material.NETHERRACK);
+				else if (k > 10)
+					plugin.world.getBlockAt(i, k, j).setType(Material.BASALT);
+				else
+					plugin.world.getBlockAt(i, k, j).setType(Material.SOUL_SAND);
+			}
+			else
+				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
+			
+			int lavaLevel = 14;
+			if (plugin.waterEnabled)
+				placeLiquid(i, lavaLevel, j, "lava");
+		}
 		if (biome.equals("rainbow"))
 		{	
 			Material[] oreBlocks = {Material.NETHERITE_BLOCK, Material.DIAMOND_BLOCK, Material.REDSTONE_BLOCK, Material.GOLD_BLOCK, Material.IRON_BLOCK, Material.EMERALD_BLOCK, Material.LAPIS_BLOCK};
@@ -260,12 +312,58 @@ public class TerrainGeneratorHelper {
 		}
 	}
 	
+	// add random veins, blocks, or etc to make biomes look more natural
+	// not the most optimal way to do this, as im re-scanning through all blocks
+	// only expensive part is replacing blocks so it should be fine
+	public void touchUpBiome(String biome)
+	{
+		if (biome.equals("grass"))
+		{
+			
+		}
+		else if (biome.equals("sand"))
+		{
+			
+		}
+		else if (biome.equals("snow"))
+		{
+			
+		}
+		else if (biome.equals("mesa"))
+		{
+			
+		}
+		else if (biome.equals("stone"))
+		{
+			
+		}
+		else if (biome.equals("nether"))
+		{
+			
+		}
+		else if (biome.equals("rainbow"))
+		{
+			
+		}
+	}
+	
 	// scan y coordinate and below for air, replace with water
 	// not efficient, use the difference array somehow
-	public void placeWater(int i, int waterLevel, int j)
+	public void placeLiquid(int i, int level, int j, String type)
 	{
-		for (int x = 0; x < waterLevel; x++)
-			if (plugin.world.getBlockAt(i, x, j).getType().equals(Material.AIR))
-				plugin.world.getBlockAt(i, x, j).setType(Material.WATER);
+		if (type.equals("water"))
+		{
+			for (int x = 0; x < level; x++)
+				if (plugin.world.getBlockAt(i, x, j).getType().equals(Material.AIR))
+					plugin.world.getBlockAt(i, x, j).setType(Material.WATER);
+		}
+		else
+		{
+			for (int x = 0; x < level; x++)
+				if (plugin.world.getBlockAt(i, x, j).getType().equals(Material.AIR))
+					plugin.world.getBlockAt(i, x, j).setType(Material.LAVA);
+		}
+			
+		
 	}
 }

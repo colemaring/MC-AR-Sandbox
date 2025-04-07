@@ -31,16 +31,6 @@ public class TerrainGenerator implements Listener{
         this.prevSettingsHash = "";
     }
     
-    // Disable water flow
-    @EventHandler
-    public void onBlockFromTo(BlockFromToEvent event) {
-        Material type = event.getBlock().getType();
-
-        if (type == Material.WATER || type == Material.LAVA) {
-            event.setCancelled(true);
-        }
-    }
-    
 	public void updateTerrain(int[][] currDepth)
 	{		
 		if (prevDepth == null)
@@ -82,6 +72,10 @@ public class TerrainGenerator implements Listener{
             	    // read by main thread bukkit api to check if current updateTerrain called needs to cancel current block placements
             	    resetCalled = true;
             	}
+            	if (KinectSandbox.biome.equals("nether"))
+            		Bukkit.getWorld("world").setTime(20000L);
+            	else
+            		Bukkit.getWorld("world").setTime(1000L);
 
             	for (int i = 0; i < diffDepth.length; i++)
             	{
@@ -112,6 +106,9 @@ public class TerrainGenerator implements Listener{
             			else if (addOrRemove == 1)
             				for (int k = lowerRange; k < upperRange; k++)
             					tgHelper.placeAsBiome(i, k, j, KinectSandbox.biome, false);
+            			
+            			// add random veins, blocks, or etc to make biomes look more natural
+            			tgHelper.touchUpBiome(KinectSandbox.biome);
             					
             		}
             	}

@@ -1,11 +1,14 @@
 package Misc;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -19,8 +22,27 @@ public class MiscHandlers implements Listener{
 		this.plugin = plugin;
 	}
 	
-	// RE-WRITE THIS 
-	// using values from terrainGeneratorHelper probably
+    // Disable water & lava flow
+	// lava flow not being stopped?
+    @EventHandler
+    public void onBlockFromTo(BlockFromToEvent event) {
+        Material type = event.getBlock().getType();
+
+        if (type == Material.WATER || type == Material.LAVA)
+            event.setCancelled(true);
+    }
+    
+    // Disable blocks from falling
+    @EventHandler
+    public void onBlockPhysics(BlockPhysicsEvent event) {
+        Material type = event.getBlock().getType();
+
+        if (type == Material.SAND || type == Material.RED_SAND) {
+            event.setCancelled(true);
+        }
+    }
+
+
 	// TP players to middle of world when joining
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {

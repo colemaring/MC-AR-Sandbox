@@ -6,10 +6,10 @@ import org.bukkit.entity.Player;
 import Main.KinectSandbox;
 import net.md_5.bungee.api.ChatColor;
 
-public class OreHunt {
+public class DigRouletteEasy {
 
 	public static void startCountdown(KinectSandbox plugin) {
-        GamemodeHelper.countdown("Ore Hunt", 5, plugin, () -> {
+        GamemodeHelper.countdown("Dig Roulette (easy)", 5, plugin, () -> {
             // Runs after countdown finishes
         	startOreHunt(plugin);
         });
@@ -17,6 +17,6 @@ public class OreHunt {
 	
 	public static void startOreHunt(KinectSandbox plugin)
 	{
-		Bukkit.broadcastMessage(ChatColor.GOLD + "Ore Hunt has begun, 30 second remain!");
+		Bukkit.broadcastMessage(ChatColor.GOLD + "Dig Roulette (easy) has begun, 30 second remain!");
 	}
 }
