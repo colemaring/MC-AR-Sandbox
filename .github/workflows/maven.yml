@@ -36,5 +36,5 @@ jobs:
       
       - name: Copy JAR to plugins directory
         working-directory: plugin
-        run: cp target/KinectSandbox-0.0.1-SNAPSHOT.jar launcher/server/plugins/KinectSandbox.jar
+        run: cp target/KinectSandbox-0.0.1-SNAPSHOT.jar ../launcher/server/plugins/KinectSandbox.jar
 
