@@ -127,6 +127,13 @@ body {
   font-family: 'Ubuntu', sans-serif !important;  /* Apply the font to the body */
 }
 
+.centerRange {
+  display: flex; /* Enable flexbox for alignment */
+  align-items: center; /* Vertically align items in the center */
+  justify-content: center;
+}
+
+
 .launchButton
 {
   padding: 1rem 2rem;

@@ -46,7 +46,7 @@ const main = async () => {
         }
       })
 
-      // Send throttled data to parent process
+      // Send throttled data to parent process (for crop kinect view)
       if (currentTime - lastParentSendTimestamp >= PARENT_THROTTLE_INTERVAL) {
         lastParentSendTimestamp = currentTime
         // Send data to the parent process

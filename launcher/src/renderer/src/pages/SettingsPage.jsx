@@ -30,12 +30,16 @@ function SettingsPage() {
     setElevation,
     colorMode,
     setColorMode,
-    displayOnLaunchMinecraft,
-    setDisplayOnLaunchMinecraft,
     displayMinecraft,
     setDisplayMinecraft,
     prismlauncherPath,
     setPrismlauncherPath,
+    autoLaunchMinecraft,
+    setAutoLaunchMinecraft,
+    autoLaunchProjector,
+    setAutoLaunchProjector,
+    captureSpeed,
+    setCaptureSpeed,
     writeToConfig
   } = useContext(SettingsConfigContext)
 
@@ -69,17 +73,18 @@ function SettingsPage() {
           style={{ width: '100px', display: 'inline-block', marginLeft: '10px' }}
         />
       </div>
-      <div className="mt-1">
-        <span>Elevation Multipler</span>
+      <div className="mt-1 centerRange">
+        <span>Capture Speed</span>
         <Form.Range
-          min={0}
-          max={100}
+          min={1}
+          max={10}
           step={1}
-          value={elevation}
-          onChange={(e) => setElevation(Number(e.target.value))}
+          value={captureSpeed}
+          onChange={(e) => setCaptureSpeed(Number(e.target.value))}
           style={{ width: '10rem', display: 'inline-block', marginLeft: '1rem' }}
         />
       </div>
+
       <hr />
 
       <h3 className="mt-2">Topographic Projection Settings</h3>
@@ -94,21 +99,36 @@ function SettingsPage() {
           onChange={(e) => setDisplayOnLaunchTopographic(e.target.checked)}
           style={{ display: 'inline-block', marginLeft: '10px' }}
         />
-        <Dropdown
+        <span>Auto Launch</span>
+        <Form.Check
+          type="switch"
+          id="projection-auto-launch-switch"
+          label=""
+          className="custom-switch"
+          checked={autoLaunchProjector}
+          onChange={(e) => setAutoLaunchProjector(e.target.checked)}
           style={{ display: 'inline-block', marginLeft: '10px' }}
-          onSelect={(key) => setDisplayTopographic(key)}
-        >
-          <Dropdown.Toggle className="settingsOption" size="sm">
-            {displayTopographic}
-          </Dropdown.Toggle>
+        />
+        <br></br>
+        <div className="mt-2">
+          <span>Show on: </span>
 
-          <Dropdown.Menu>
-            <Dropdown.Item eventKey="Display 1">Display 1</Dropdown.Item>
-            <Dropdown.Item eventKey="Display 2">Display 2</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
+          <Dropdown
+            style={{ display: 'inline-block', marginLeft: '10px' }}
+            onSelect={(key) => setDisplayTopographic(key)}
+          >
+            <Dropdown.Toggle className="settingsOption" size="sm">
+              {displayTopographic}
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+              <Dropdown.Item eventKey="Display 1">Display 1</Dropdown.Item>
+              <Dropdown.Item eventKey="Display 2">Display 2</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
       </div>
-      <div className="mt-1">
+      <div className="mt-1 centerRange">
         <span>Smoothing</span>
         <Form.Range
           min={0}
@@ -138,31 +158,47 @@ function SettingsPage() {
       </div>
       <hr />
 
-      <h3 className="mt-2">Minecraft Renderer Settings</h3>
+      <h3 className="mt-2">Minecraft Settings</h3>
       <div className="mt-1">
-        <span>Fullscreen on Launch</span>
+        <span>Auto Launch</span>
         <Form.Check
           type="switch"
-          id="minecraft-launch-switch"
+          id="minecraft-auto-launch-switch"
           label=""
           className="custom-switch"
-          checked={displayOnLaunchMinecraft}
-          onChange={(e) => setDisplayOnLaunchMinecraft(e.target.checked)}
+          checked={autoLaunchMinecraft}
+          onChange={(e) => setAutoLaunchMinecraft(e.target.checked)}
           style={{ display: 'inline-block', marginLeft: '10px' }}
         />
-        <Dropdown
-          style={{ display: 'inline-block', marginLeft: '10px' }}
-          onSelect={(key) => setDisplayMinecraft(key)}
-        >
-          <Dropdown.Toggle className="settingsOption" size="sm">
-            {displayMinecraft}
-          </Dropdown.Toggle>
+        <br></br>
+        <div className="mt-2">
+          <span>Show on: </span>
+          <Dropdown
+            style={{ display: 'inline-block', marginLeft: '10px' }}
+            onSelect={(key) => setDisplayMinecraft(key)}
+          >
+            <Dropdown.Toggle className="settingsOption" size="sm">
+              {displayMinecraft}
+            </Dropdown.Toggle>
 
-          <Dropdown.Menu>
-            <Dropdown.Item eventKey="Display 1">Display 1</Dropdown.Item>
-            <Dropdown.Item eventKey="Display 2">Display 2</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
+            <Dropdown.Menu>
+              <Dropdown.Item eventKey="Display 1">Display 1</Dropdown.Item>
+              <Dropdown.Item eventKey="Display 2">Display 2</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+
+        <div className="mt-1 centerRange">
+          <span>Elevation Multipler</span>
+          <Form.Range
+            min={0}
+            max={100}
+            step={1}
+            value={elevation}
+            onChange={(e) => setElevation(Number(e.target.value))}
+            style={{ width: '10rem', display: 'inline-block', marginLeft: '1rem' }}
+          />
+        </div>
       </div>
       <div className="mt-1">
         <span>PrismLauncher Filepath</span>

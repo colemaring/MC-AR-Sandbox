@@ -28,7 +28,7 @@ export async function launchPrismLauncher(instanceName, mainWindow) {
     // 3. Check if the PrismLauncher executable exists
     if (!fs.existsSync(prismLauncherPath)) {
       sendLogMessage(`PrismLauncher not found at ${prismLauncherPath}`, 'error')
-      mainWindow.webContents.send("minecraft-ready", true);
+      mainWindow.webContents.send('minecraft-ready', true)
       return false
     }
 

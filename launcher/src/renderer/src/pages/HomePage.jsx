@@ -27,6 +27,13 @@ function HomePage() {
     setInputText(e.target.value)
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault() // Prevent form submission
+      handleSendCommand()
+    }
+  }
+
   const handleSendCommand = () => {
     if (inputText.trim() === '') return // Don't send empty commands
 
@@ -64,6 +71,7 @@ function HomePage() {
           placeholder="Send command to Minecraft server"
           value={inputText}
           onChange={handleInputChange}
+          onKeyDown={handleKeyPress} // listen for enter
         />
         <Button
           style={{

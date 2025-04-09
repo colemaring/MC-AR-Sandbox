@@ -3,7 +3,7 @@ const fs = require('fs')
 const path = require('path')
 const configPath = path.join(__dirname, '../../settings_config.json')
 
-async function readConfig() {
+export async function readConfig() {
   try {
     const data = fs.readFileSync(configPath, 'utf8')
     console.log('Config read successfully')

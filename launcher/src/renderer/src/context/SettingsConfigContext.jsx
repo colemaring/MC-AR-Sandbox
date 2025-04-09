@@ -10,20 +10,22 @@ export const SettingsConfigProvider = ({ children }) => {
   const [x2, setX2] = useState(0)
   const [y2, setY2] = useState(0)
   const [distance, setDistance] = useState(0)
-  const [elevation, setElevation] = useState(40)
+  const [captureSpeed, setCaptureSpeed] = useState(50)
 
   // Topographic settings
   const [displayOnLaunchTopographic, setDisplayOnLaunchTopographic] = useState(false)
   const [displayTopographic, setDisplayTopographic] = useState('Display 1')
   const [smoothing, setSmoothing] = useState(40)
   const [colorMode, setColorMode] = useState('Default')
+  const [autoLaunchProjector, setAutoLaunchProjector] = useState(false)
 
   // Minecraft settings
-  const [displayOnLaunchMinecraft, setDisplayOnLaunchMinecraft] = useState(false)
   const [displayMinecraft, setDisplayMinecraft] = useState('Display 2')
   const [prismlauncherPath, setPrismlauncherPath] = useState(
     'C:\\Users\\colem\\AppData\\Local\\Programs\\PrismLauncher\\prismlauncher.exe'
   )
+  const [autoLaunchMinecraft, setAutoLaunchMinecraft] = useState(false)
+  const [elevation, setElevation] = useState(40)
 
   useEffect(() => {
     const loadConfig = async () => {
@@ -35,13 +37,15 @@ export const SettingsConfigProvider = ({ children }) => {
         setX2(config?.kinect_view_crop?.x2 || 0)
         setY2(config?.kinect_view_crop?.y2 || 0)
         setDistance(config?.kinect_surface_distance_cm || 0)
+        setCaptureSpeed(config?.kinect_capture_speed || 50)
         setDisplayOnLaunchTopographic(config?.topographic_display_on_launch || false)
         setDisplayTopographic(config?.topographic_display_assignment || 'Display 1')
         setSmoothing(config?.topographic_smoothing || 40)
-        setElevation(config?.minecraft_elevation || 40)
         setColorMode(config?.topographic_color_mode || 'Default')
-        setDisplayOnLaunchMinecraft(config?.minecraft_display_on_launch || false)
+        setAutoLaunchProjector(config?.topographic_auto_launch_projector || false)
+        setElevation(config?.minecraft_elevation || 40)
         setDisplayMinecraft(config?.minecraft_display_assignment || 'Display 2')
+        setAutoLaunchMinecraft(config?.minecraft_auto_launch || false)
         setPrismlauncherPath(
           config?.minecraft_prismlauncher_path ||
             'C:\\Users\\colem\\AppData\\Local\\Programs\\PrismLauncher\\prismlauncher.exe'
@@ -60,13 +64,15 @@ export const SettingsConfigProvider = ({ children }) => {
     const config = {
       kinect_view_crop: { x1, y1, x2, y2 },
       kinect_surface_distance_cm: distance,
-      minecraft_elevation: elevation,
+      kinect_capture_speed: captureSpeed,
       topographic_display_on_launch: displayOnLaunchTopographic,
       topographic_display_assignment: displayTopographic,
       topographic_smoothing: smoothing,
       topographic_color_mode: colorMode,
-      minecraft_display_on_launch: displayOnLaunchMinecraft,
+      topographic_auto_launch_projector: autoLaunchProjector,
+      minecraft_elevation: elevation,
       minecraft_display_assignment: displayMinecraft,
+      minecraft_auto_launch: autoLaunchMinecraft,
       minecraft_prismlauncher_path: prismlauncherPath
     }
 
@@ -97,9 +103,11 @@ export const SettingsConfigProvider = ({ children }) => {
     smoothing,
     elevation,
     colorMode,
-    displayOnLaunchMinecraft,
     displayMinecraft,
-    prismlauncherPath
+    prismlauncherPath,
+    autoLaunchMinecraft,
+    autoLaunchProjector,
+    captureSpeed
   ])
 
   return (
@@ -116,7 +124,6 @@ export const SettingsConfigProvider = ({ children }) => {
         elevation,
         setElevation,
         colorMode,
-        displayOnLaunchMinecraft,
         displayMinecraft,
         prismlauncherPath,
         setX1,
@@ -128,9 +135,14 @@ export const SettingsConfigProvider = ({ children }) => {
         setDisplayTopographic,
         setSmoothing,
         setColorMode,
-        setDisplayOnLaunchMinecraft,
         setDisplayMinecraft,
         setPrismlauncherPath,
+        autoLaunchMinecraft,
+        setAutoLaunchMinecraft,
+        autoLaunchProjector,
+        setAutoLaunchProjector,
+        captureSpeed,
+        setCaptureSpeed,
         writeToConfig // call when you want to write state to config
       }}
     >
