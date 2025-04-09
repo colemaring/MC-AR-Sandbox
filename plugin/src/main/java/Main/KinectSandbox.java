@@ -1,18 +1,15 @@
 package Main;
 import java.io.File;
-import Guis.InventoryHelper;
 import java.io.IOException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import Guis.InventoryHelper;
 import Misc.MiscHandlers;
 import Terrain.TerrainGenerator;
-import de.themoep.inventorygui.InventoryGui;
-
-import org.bukkit.event.Listener;
 
 // ctrl + ] to build
 
@@ -25,10 +22,15 @@ public class KinectSandbox extends JavaPlugin implements Listener {
     public KinectSettings settings;
     private WebsocketsHandler wsHandler;
     public boolean waterEnabled = false;
-    TerrainGenerator terrainGenerator = new TerrainGenerator(this);
+    public TerrainGenerator terrainGenerator = new TerrainGenerator();
     private String prevSettingsHash = "";
+    private static KinectSandbox instance;
+    
     @Override
     public void onEnable() {
+    	instance = this;
+    	TerrainGenerator.prevDepth = new int[KinectSandbox.getInstance().rawKinectHeight][KinectSandbox.getInstance().rawKinectWidth];
+    	MiscHandlers.killEntities();
     	Bukkit.getPluginManager().registerEvents(terrainGenerator, this);
     	// Read settings_config.json for values
     	String path = "";
@@ -40,8 +42,8 @@ public class KinectSandbox extends JavaPlugin implements Listener {
 		}
 		
 		// Create inventory
-		InventoryHelper ih = new InventoryHelper(this);
-		MiscHandlers mh = new MiscHandlers(this);
+		InventoryHelper ih = new InventoryHelper();
+		MiscHandlers mh = new MiscHandlers();
 		// Center op players on join
 		
 		settings = new KinectSettings(new File(path));
@@ -54,19 +56,9 @@ public class KinectSandbox extends JavaPlugin implements Listener {
         
         // Connect to Websocker server, passing in instance of KinectSandbox
         // wsHandler instance handles passing data to terrainGenerator instance
-        wsHandler = new WebsocketsHandler(this, terrainGenerator);
-        // need some kind of mechanism to handle the block placement on load and disable
-		getLogger().info(prevSettingsHash + " prev");
-		
-		if (!prevSettingsHash.equals(settings.settingsHash))
-		{	
-			getLogger().info("Settings changed, resetting blocks");
-			terrainGenerator.tgHelper.resetBlocks();
-			prevSettingsHash = settings.settingsHash;
-		}
+        wsHandler = new WebsocketsHandler(terrainGenerator);
         terrainGenerator.tgHelper.resetBlocks();
         wsHandler.connectToWebSocket();
-        
         
         
         // If launcher is accidently closed this is nice to have
@@ -85,6 +77,10 @@ public class KinectSandbox extends JavaPlugin implements Listener {
             wsHandler.closeConnection();
         }
         getLogger().info("Plugin disabled.");
+    }
+    
+    public static KinectSandbox getInstance() {
+        return instance;
     }
 
 

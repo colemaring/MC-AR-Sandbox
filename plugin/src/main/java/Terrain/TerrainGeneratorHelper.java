@@ -1,24 +1,25 @@
 package Terrain;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 
 import Main.KinectSandbox;
-import net.md_5.bungee.api.ChatColor;
 
 public class TerrainGeneratorHelper {
-	private KinectSandbox plugin;
 	public static int terrainWidth = 0;
 	public static int terrainHeight = 0;
-	public TerrainGeneratorHelper(KinectSandbox plugin)
+	public static boolean terrainPaused = false;
+	
+	public static void pauseTerrain()
 	{
-		this.plugin = plugin;
+//		Bukkit.broadcastMessage(ChatColor.GOLD + "Terrain Paused.");
+		terrainPaused = true;
+	}
+	
+	public static void unpauseTerrain()
+	{
+//		Bukkit.broadcastMessage(ChatColor.GOLD + "Terrain unpaused.");
+		terrainPaused = false;
 	}
 	
 	public int[][][] findDifference(int[][] prevDepth, int [][] newDepth)
@@ -61,13 +62,13 @@ public class TerrainGeneratorHelper {
 	// set all blocks to air in the region that depth encompasses
 	public void resetBlocks() {
 		
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			player.sendMessage(ChatColor.GREEN + "Loading new terrain..");
-		}
-        for (int x = 0; x < 400; x++) {
-            for (int y = -150; y < 200; y++) {
-                for (int z = 0; z < 400; z++) {
-                	plugin.world.getBlockAt(x, y, z).setType(Material.AIR);
+//		for (Player player : Bukkit.getOnlinePlayers()) {
+//			player.sendMessage(ChatColor.GREEN + "Resetting terrain..");
+//		}
+        for (int x = -2; x < 200; x++) {
+            for (int y = -100; y < 100; y++) {
+                for (int z = -2; z < 200; z++) {
+                	KinectSandbox.getInstance().world.getBlockAt(x, y, z).setType(Material.AIR);
                 }
             }
         }
@@ -203,17 +204,17 @@ public class TerrainGeneratorHelper {
 			if (adding)
 			{
 				if (k > 20)
-					plugin.world.getBlockAt(i, k, j).setType(Material.SNOW_BLOCK);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.SNOW_BLOCK);
 				else if (k > 10)
-					plugin.world.getBlockAt(i, k, j).setType(Material.STONE);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.STONE);
 				else
-					plugin.world.getBlockAt(i, k, j).setType(Material.GRASS_BLOCK);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.GRASS_BLOCK);
 			}
 			else
-				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
+				KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.AIR);
 			
 			int waterLevel = 6;
-			if (plugin.waterEnabled)
+			if (KinectSandbox.getInstance().waterEnabled)
 				placeLiquid(i, waterLevel, j, "water");
 		}
 		if (biome.equals("snow"))
@@ -221,17 +222,17 @@ public class TerrainGeneratorHelper {
 			if (adding)
 			{
 				if (k > 20)
-					plugin.world.getBlockAt(i, k, j).setType(Material.SNOW_BLOCK);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.SNOW_BLOCK);
 				else if (k > 10)
-					plugin.world.getBlockAt(i, k, j).setType(Material.ICE);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.ICE);
 				else
-					plugin.world.getBlockAt(i, k, j).setType(Material.BLUE_ICE);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.BLUE_ICE);
 			}
 			else
-				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
+				KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.AIR);
 			
 			int waterLevel = 10;
-			if (plugin.waterEnabled)
+			if (KinectSandbox.getInstance().waterEnabled)
 				placeLiquid(i, waterLevel, j, "water");
 		}
 		if (biome.equals("sand"))
@@ -239,65 +240,65 @@ public class TerrainGeneratorHelper {
 			if (adding)
 			{
 				if (k > 20)
-					plugin.world.getBlockAt(i, k, j).setType(Material.SAND);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.SAND);
 				else if (k > 10)
-					plugin.world.getBlockAt(i, k, j).setType(Material.SANDSTONE);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.SANDSTONE);
 				else
-					plugin.world.getBlockAt(i, k, j).setType(Material.STONE);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.STONE);
 			}
 			else
-				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
+				KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.AIR);
 		}
 		if (biome.equals("mesa"))
 		{	
 			if (adding)
 			{
 				if (k > 20)
-					plugin.world.getBlockAt(i, k, j).setType(Material.RED_TERRACOTTA);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.RED_TERRACOTTA);
 				else if (k > 19)
-					plugin.world.getBlockAt(i, k, j).setType(Material.WHITE_TERRACOTTA);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.WHITE_TERRACOTTA);
 				else if (k > 15)
-					plugin.world.getBlockAt(i, k, j).setType(Material.RED_TERRACOTTA);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.RED_TERRACOTTA);
 				else if (k > 14)
-					plugin.world.getBlockAt(i, k, j).setType(Material.GRAY_TERRACOTTA);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.GRAY_TERRACOTTA);
 				else if (k > 10)
-					plugin.world.getBlockAt(i, k, j).setType(Material.ORANGE_TERRACOTTA);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.ORANGE_TERRACOTTA);
 				else
-					plugin.world.getBlockAt(i, k, j).setType(Material.RED_SAND);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.RED_SAND);
 			}
 			else
-				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
+				KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.AIR);
 		}
 		if (biome.equals("stone"))
 		{	
 			if (adding)
 			{
 				if (k > 20)
-					plugin.world.getBlockAt(i, k, j).setType(Material.STONE);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.STONE);
 				else if (k > 10)
-					plugin.world.getBlockAt(i, k, j).setType(Material.STONE);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.STONE);
 				else
-					plugin.world.getBlockAt(i, k, j).setType(Material.GRASS_BLOCK);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.GRASS_BLOCK);
 			}
 			else
-				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
+				KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.AIR);
 		}
 		if (biome.equals("nether"))
 		{	
 			if (adding)
 			{
 				if (k > 20)
-					plugin.world.getBlockAt(i, k, j).setType(Material.NETHERRACK);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.NETHERRACK);
 				else if (k > 10)
-					plugin.world.getBlockAt(i, k, j).setType(Material.BASALT);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.BASALT);
 				else
-					plugin.world.getBlockAt(i, k, j).setType(Material.SOUL_SAND);
+					KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.SOUL_SAND);
 			}
 			else
-				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
+				KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.AIR);
 			
 			int lavaLevel = 14;
-			if (plugin.waterEnabled)
+			if (KinectSandbox.getInstance().waterEnabled)
 				placeLiquid(i, lavaLevel, j, "lava");
 		}
 		if (biome.equals("rainbow"))
@@ -306,9 +307,9 @@ public class TerrainGeneratorHelper {
 			Random random = new Random();
 		    Material randomOreBlock = oreBlocks[random.nextInt(oreBlocks.length)];
 			if (adding)
-				plugin.world.getBlockAt(i, k, j).setType(randomOreBlock);	
+				KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(randomOreBlock);	
 			else
-				plugin.world.getBlockAt(i, k, j).setType(Material.AIR);
+				KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.AIR);
 		}
 	}
 	
@@ -354,14 +355,14 @@ public class TerrainGeneratorHelper {
 		if (type.equals("water"))
 		{
 			for (int x = 0; x < level; x++)
-				if (plugin.world.getBlockAt(i, x, j).getType().equals(Material.AIR))
-					plugin.world.getBlockAt(i, x, j).setType(Material.WATER);
+				if (KinectSandbox.getInstance().world.getBlockAt(i, x, j).getType().equals(Material.AIR))
+					KinectSandbox.getInstance().world.getBlockAt(i, x, j).setType(Material.WATER);
 		}
 		else
 		{
 			for (int x = 0; x < level; x++)
-				if (plugin.world.getBlockAt(i, x, j).getType().equals(Material.AIR))
-					plugin.world.getBlockAt(i, x, j).setType(Material.LAVA);
+				if (KinectSandbox.getInstance().world.getBlockAt(i, x, j).getType().equals(Material.AIR))
+					KinectSandbox.getInstance().world.getBlockAt(i, x, j).setType(Material.LAVA);
 		}
 			
 		

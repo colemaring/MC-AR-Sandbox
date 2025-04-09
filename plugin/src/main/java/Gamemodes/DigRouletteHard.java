@@ -8,14 +8,14 @@ import net.md_5.bungee.api.ChatColor;
 
 public class DigRouletteHard {
 
-	public static void startCountdown(KinectSandbox plugin) {
-        GamemodeHelper.countdown("Dig Roulette (hard)", 5, plugin, () -> {
+	public static void startCountdown() {
+        GamemodeHelper.countdown("Dig Roulette (hard)", 5, () -> {
             // Runs after countdown finishes
-        	startOreHunt(plugin);
+        	startOreHunt();
         });
     }
 	
-	public static void startOreHunt(KinectSandbox plugin)
+	public static void startOreHunt()
 	{
 		Bukkit.broadcastMessage(ChatColor.GOLD + "Dig Roulette (hard) has begun, 30 second remain!");
 	}

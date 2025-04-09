@@ -1,26 +1,65 @@
 package Misc;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityCombustEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
-import Main.KinectSandbox;
 import Terrain.TerrainGeneratorHelper;
 
 public class MiscHandlers implements Listener{
-	KinectSandbox plugin;
-	public MiscHandlers(KinectSandbox plugin)
-	{
-		this.plugin = plugin;
+	
+	// Prevent hand swap
+	@EventHandler
+    public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
+        event.setCancelled(true);
+    }
+	
+	// Stop zombie burning in daylight
+	@EventHandler
+	public void onEntityCombust(EntityCombustEvent event) {
+	    if (event.getEntity() instanceof Zombie) {
+	        event.setCancelled(true);
+	    }
 	}
+	
+	// Prevent item drops when entities die
+	@EventHandler
+	public void onEntityDeath(EntityDeathEvent event) {
+	    if (event.getEntity() instanceof Animals) {
+	        event.getDrops().clear(); // Removes all item drops
+	        event.setDroppedExp(0);   // Optional: remove XP drop too
+	    }
+	}
+	
+	 // Prevent tnt from dropping entities when it breaks blocks
+    @EventHandler
+    public void onEntityExplode(EntityExplodeEvent event) {
+        List<Block> blocks = event.blockList();
+        for (Block block : blocks) {
+            block.setType(org.bukkit.Material.AIR); // Remove block
+        }
+        blocks.clear(); // Prevent items from dropping
+    }
+
 	
     // Disable water & lava flow
 	// lava flow not being stopped?
@@ -34,11 +73,13 @@ public class MiscHandlers implements Listener{
     
     // Disable blocks from falling
     @EventHandler
-    public void onBlockPhysics(BlockPhysicsEvent event) {
-        Material type = event.getBlock().getType();
-
-        if (type == Material.SAND || type == Material.RED_SAND) {
-            event.setCancelled(true);
+    public void onEntityChangeBlock(EntityChangeBlockEvent event) {
+        if (event.getEntity() instanceof FallingBlock) {
+            FallingBlock fallingBlock = (FallingBlock) event.getEntity();
+            Material type = fallingBlock.getBlockData().getMaterial();
+            if (type == Material.SAND || type == Material.RED_SAND) {
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -82,5 +123,19 @@ public class MiscHandlers implements Listener{
         if (!p.isOp())
             event.setCancelled(true);
     }
+    
+    // Remove any kind of entity, except players
+    public static void killEntities() {
+        for (World world : Bukkit.getWorlds()) {
+            for (Entity entity : world.getEntities()) {
+                // Check if the entity is not a player
+                if (!(entity instanceof Player)) {
+                    entity.remove(); // Remove the entity if it's not a player
+                }
+            }
+        }
+    }
+
+    
 
 }

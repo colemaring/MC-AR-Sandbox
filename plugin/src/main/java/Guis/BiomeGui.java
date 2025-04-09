@@ -13,12 +13,7 @@ import de.themoep.inventorygui.StaticGuiElement;
 import net.md_5.bungee.api.ChatColor;
 
 public class BiomeGui {
-	private KinectSandbox plugin;
-	public BiomeGui(KinectSandbox plugin)
-	{
-		this.plugin = plugin;
-	}
-	
+
 	public InventoryGui createGui()
 	{
 		String[] guiSetup = {
@@ -26,15 +21,17 @@ public class BiomeGui {
 	            " abcdefg ",
 	            "    w    "
 	        };
-		InventoryGui gui = new InventoryGui(plugin, null, "Biome Menu & Water Toggle", guiSetup);
+		InventoryGui gui = new InventoryGui(KinectSandbox.getInstance(), null, "Biome Menu & Water Toggle", guiSetup);
 		//gui.setFiller(new ItemStack(Material.GRAY_STAINED_GLASS, 1));
 		GuiStateElement element = new GuiStateElement('w', 
 		        new GuiStateElement.State(
 		                change -> {
-		                	for (Player player : Bukkit.getOnlinePlayers()) {
-		            			player.sendMessage(ChatColor.GREEN + "Disabling water..");
+		                	Player player = (Player) change.getWhoClicked();
+					        player.closeInventory();
+		                	for (Player p : Bukkit.getOnlinePlayers()) {
+		            			p.sendMessage(ChatColor.GREEN + "Disabling water..");
 		            		}
-		                	plugin.waterEnabled = false;
+		                	KinectSandbox.getInstance().waterEnabled = false;
 		                },
 		                "waterDisabled", // a key to identify this state by
 		                new ItemStack(Material.BUCKET), // the item to display as an icon
@@ -43,10 +40,19 @@ public class BiomeGui {
 		        ),
 		        new GuiStateElement.State(
 		                change -> {
-		                	for (Player player : Bukkit.getOnlinePlayers()) {
-		            			player.sendMessage(ChatColor.GREEN + "Enabling water..");
+		            	    if (KinectSandbox.biome.equals("sand") || KinectSandbox.biome.equals("mesa") || KinectSandbox.biome.equals("rainbow"))
+		            	    {
+		            	    	for (Player player : Bukkit.getOnlinePlayers())
+		            	    		player.sendMessage(ChatColor.GREEN + "Water enabled, but this biome doesn't have water.");
+		            	    	KinectSandbox.getInstance().waterEnabled = true;
+		            	    	return;
+		            	    }
+		                	Player player = (Player) change.getWhoClicked();
+					        player.closeInventory();
+		                	for (Player p : Bukkit.getOnlinePlayers()) {
+		            			p.sendMessage(ChatColor.GREEN + "Enabling water..");
 		            		}
-		                	plugin.waterEnabled = true;
+		                	KinectSandbox.getInstance().waterEnabled = true;
 		                },
 		                "waterEnabled",
 		                new ItemStack(Material.WATER_BUCKET),
@@ -67,10 +73,11 @@ public class BiomeGui {
 			    new ItemStack(Material.GRASS_BLOCK),
 			    1,
 			    click -> {
-			    	Bukkit.getWorld("world").setTime(1000L);
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
 			    	KinectSandbox.biome = "grass";
-			    	for (Player player : Bukkit.getOnlinePlayers()) {
-						player.sendMessage(ChatColor.GREEN + "Changing biome to grass..");
+			    	for (Player p : Bukkit.getOnlinePlayers()) {
+						p.sendMessage(ChatColor.GREEN + "Changing biome to grass..");
 					}
 			    	return true;
 			    },
@@ -81,9 +88,11 @@ public class BiomeGui {
 			    new ItemStack(Material.SAND),
 			    1,
 			    click -> {
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
 			    	KinectSandbox.biome = "sand";
-			    	for (Player player : Bukkit.getOnlinePlayers()) {
-						player.sendMessage(ChatColor.GREEN + "Changing biome to sand..");
+			    	for (Player p : Bukkit.getOnlinePlayers()) {
+						p.sendMessage(ChatColor.GREEN + "Changing biome to sand..");
 					}
 			    	return true;
 			    },
@@ -94,9 +103,11 @@ public class BiomeGui {
 			    new ItemStack(Material.SNOW_BLOCK),
 			    1,
 			    click -> {
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
 			    	KinectSandbox.biome = "snow";
-			    	for (Player player : Bukkit.getOnlinePlayers()) {
-						player.sendMessage(ChatColor.GREEN + "Changing biome to snow..");
+			    	for (Player p : Bukkit.getOnlinePlayers()) {
+						p.sendMessage(ChatColor.GREEN + "Changing biome to snow..");
 					}
 			    	return true;
 			    },
@@ -107,9 +118,11 @@ public class BiomeGui {
 			    new ItemStack(Material.RED_SAND),
 			    1,
 			    click -> {
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
 			    	KinectSandbox.biome = "mesa";
-			    	for (Player player : Bukkit.getOnlinePlayers()) {
-						player.sendMessage(ChatColor.GREEN + "Changing biome to badlands..");
+			    	for (Player p : Bukkit.getOnlinePlayers()) {
+						p.sendMessage(ChatColor.GREEN + "Changing biome to badlands..");
 					}
 			    	return true;
 			    },
@@ -120,9 +133,11 @@ public class BiomeGui {
 			    new ItemStack(Material.COAL_ORE),
 			    1,
 			    click -> {
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
 			    	KinectSandbox.biome = "stone";
-			    	for (Player player : Bukkit.getOnlinePlayers()) {
-						player.sendMessage(ChatColor.GREEN + "Changing biome to stony peaks..");
+			    	for (Player p : Bukkit.getOnlinePlayers()) {
+						p.sendMessage(ChatColor.GREEN + "Changing biome to stony peaks..");
 					}
 			    	return true;
 			    },
@@ -133,10 +148,11 @@ public class BiomeGui {
 			    new ItemStack(Material.NETHERRACK),
 			    1,
 			    click -> {
-			    	
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
 			    	KinectSandbox.biome = "nether";
-			    	for (Player player : Bukkit.getOnlinePlayers()) {
-						player.sendMessage(ChatColor.GREEN + "Changing biome to nether..");
+			    	for (Player p : Bukkit.getOnlinePlayers()) {
+						p.sendMessage(ChatColor.GREEN + "Changing biome to nether..");
 					}
 			    	return true;
 			    },
@@ -154,16 +170,18 @@ public class BiomeGui {
 		        currentOreIndex[0] = (currentOreIndex[0] + 1) % oreBlocks.length;
 		        gui.draw();
 		    }
-		}.runTaskTimer(plugin, 0L, 6L); // Run every 6 ticks (0.3 seconds)
+		}.runTaskTimer(KinectSandbox.getInstance(), 0L, 6L); // Run every 6 ticks (0.3 seconds)
 
 		gui.addElement(new DynamicGuiElement('g', (viewer) -> {
 		    ItemStack oreItem = new ItemStack(oreBlocks[currentOreIndex[0]]);
 
 		    return new StaticGuiElement('g', oreItem, 1, click -> {
+		    	Player player = (Player) click.getWhoClicked();
+		        player.closeInventory();
 		    	Bukkit.getWorld("world").setTime(1000L);
 		        KinectSandbox.biome = "rainbow";
-		        for (Player player : Bukkit.getOnlinePlayers()) {
-		            player.sendMessage(ChatColor.GREEN + "Changing biome to placeholder..");
+		        for (Player p : Bukkit.getOnlinePlayers()) {
+		            p.sendMessage(ChatColor.GREEN + "Changing biome to placeholder..");
 		        }
 		        return true;
 		    }, 

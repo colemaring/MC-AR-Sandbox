@@ -1,30 +1,28 @@
 package Main;
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import com.google.gson.Gson;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import Terrain.TerrainGenerator;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 public class WebsocketsHandler {
     private WebSocketClient wsClient;
-    private Gson gson = new Gson();
     private boolean connected = false;
-    private KinectSandbox plugin;
     private TerrainGenerator terrainGenerator;
+    private int messageCounter;
     
 
     // Constructor with reference to plugin instance
-    public WebsocketsHandler(KinectSandbox plugin, TerrainGenerator terrainGenerator) {
-        this.plugin = plugin;
+    public WebsocketsHandler( TerrainGenerator terrainGenerator) {
         this.terrainGenerator = terrainGenerator;
     }
 
@@ -35,9 +33,9 @@ public class WebsocketsHandler {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {
                     connected = true;
-                    plugin.getLogger().info("Connected to WebSocket server!");
+                    KinectSandbox.getInstance().getLogger().info("Connected to WebSocket server!");
                     
-                    Bukkit.getScheduler().runTask(plugin, () -> {
+                    Bukkit.getScheduler().runTask(KinectSandbox.getInstance(), () -> {
                         for (Player p : Bukkit.getOnlinePlayers()) {
                             p.sendMessage(ChatColor.GREEN + "Connected to Kinect sensor!");
                         }
@@ -48,6 +46,12 @@ public class WebsocketsHandler {
                 @Override
                 public void onMessage(String message) {
                     try {
+                        messageCounter++;
+
+                        // Serves as a throttling mechanism
+                        if (messageCounter % KinectSandbox.getInstance().settings.captureSpeed != 0)
+                            return;
+                        
                     	 // Parse the message
                         JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
                         JsonArray depthArray = jsonObject.getAsJsonArray("data");
@@ -69,19 +73,19 @@ public class WebsocketsHandler {
                         terrainGenerator.updateTerrain(depthData);
                         
                     } catch (Exception e) {
-                        plugin.getLogger().warning(e.getMessage());
+                    	KinectSandbox.getInstance().getLogger().warning(e.getMessage());
                     }
                 }
 
                 @Override
                 public void onClose(int code, String reason, boolean remote) {
                     connected = false;
-                    plugin.getLogger().info("WebSocket connection closed: " + reason);
+                    KinectSandbox.getInstance().getLogger().info("WebSocket connection closed: " + reason);
 
                     // Notify players on the main thread
-                    Bukkit.getScheduler().runTask(plugin, () -> {
+                    Bukkit.getScheduler().runTask(KinectSandbox.getInstance(), () -> {
                         for (Player p : Bukkit.getOnlinePlayers()) {
-                            p.sendMessage(ChatColor.RED + "Lost connection to Kinect sensor!");
+                            p.sendMessage(ChatColor.RED + "Lost connection to Kinect sensor, is the launcher closed?");
                         }
                     });
                 }
@@ -89,14 +93,14 @@ public class WebsocketsHandler {
                 @Override
                 public void onError(Exception ex) {
                     connected = false;
-                    plugin.getLogger().warning("WebSocket error: " + ex.getMessage());
+                    KinectSandbox.getInstance().getLogger().warning("WebSocket error: " + ex.getMessage());
                 }
             };
 
             // Connect asynchronously
             wsClient.connect();
         } catch (URISyntaxException e) {
-            plugin.getLogger().severe("Invalid WebSocket URI: " + e.getMessage());
+        	KinectSandbox.getInstance().getLogger().severe("Invalid WebSocket URI: " + e.getMessage());
         }
     }
 

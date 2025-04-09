@@ -1,5 +1,4 @@
 package Guis;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -10,22 +9,16 @@ import org.bukkit.inventory.meta.ItemMeta;
 import Gamemodes.Aquaduct;
 import Gamemodes.DigRouletteEasy;
 import Gamemodes.DigRouletteHard;
+import Gamemodes.GamemodeHelper;
 import Gamemodes.OreHunt;
 import Gamemodes.OreHunt2p;
 import Gamemodes.VolcanoSimulator;
 import Gamemodes.ZombieRush;
 import Main.KinectSandbox;
-import de.themoep.inventorygui.GuiStateElement;
 import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
-import net.md_5.bungee.api.ChatColor;
 
 public class GamemodeGui {
-	private KinectSandbox plugin;
-	public GamemodeGui(KinectSandbox plugin)
-	{
-		this.plugin = plugin;
-	}
 	
 	public InventoryGui createGui()
 	{
@@ -34,16 +27,15 @@ public class GamemodeGui {
 	            " abcdefg ",
 	            "    z    "
 	        };
-		InventoryGui gui = new InventoryGui(plugin, null, "Gamemode Menu", guiSetup);
+		InventoryGui gui = new InventoryGui(KinectSandbox.getInstance(), null, "Gamemode Menu", guiSetup);
 		
 		gui.addElement(new StaticGuiElement('z',
 			    new ItemStack(Material.REDSTONE_BLOCK),
 			    1,
 			    click -> {
-
-			    	for (Player player : Bukkit.getOnlinePlayers()) {
-						player.sendMessage(ChatColor.GREEN + "Stopping gamemode");
-					}
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
+			        GamemodeHelper.stopCurrentGamemodeIfRunning();
 			    	return true;
 			    },
 			    "§aEnd current gamemode"
@@ -58,10 +50,12 @@ public class GamemodeGui {
 			    diamondPickaxe,
 			    1,
 			    click -> {
-			    	OreHunt.startCountdown(plugin);
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
+			    	OreHunt.startCountdown();
 			        return true;
 			    },
-			    "§aOre Hunt",
+			    "§aOre Hunt (WIP)",
 			    "§7",
 			    "§7Find as many buried ores as possible in 30 seconds.",
 			    "§7Coal = 5 pts",
@@ -82,10 +76,12 @@ public class GamemodeGui {
 				goldenPickaxe,
 			    1,
 			    click -> {
-			    	OreHunt2p.startCountdown(plugin);
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
+			    	OreHunt2p.startCountdown();
 			    	return true;
 			    },
-			    "§aOre Hunt (2 Player)",
+			    "§aOre Hunt (2 Player) (WIP)",
 			    "§7",
 			    "§7Compete to find as many buried ores as possible in 30 seconds.",
 			    "§7Coal = 5 pts",
@@ -99,7 +95,9 @@ public class GamemodeGui {
 			    new ItemStack(Material.ZOMBIE_HEAD),
 			    1,
 			    click -> {
-			    	ZombieRush.startCountdown(plugin);
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
+			    	ZombieRush.prepareTerrain();
 			    	return true;
 			    },
 			    "§aZombie Rush",
@@ -117,10 +115,12 @@ public class GamemodeGui {
 			    new ItemStack(Material.OBSIDIAN),
 			    1,
 			    click -> {
-			    	VolcanoSimulator.startCountdown(plugin);
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
+			    	VolcanoSimulator.startCountdown();
 			    	return true;
 			    },
-			    "§aVolcano Simulator",
+			    "§aVolcano Simulator (WIP)",
 			    "§7",
 			    "§7Build a volcano and watch it erupt after 30 seconds.",
 			    "§7",
@@ -131,10 +131,12 @@ public class GamemodeGui {
 			    new ItemStack(Material.WATER_BUCKET),
 			    1,
 			    click -> {
-			    	Aquaduct.startCountdown(plugin);
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
+			    	Aquaduct.startCountdown();
 			    	return true;
 			    },
-			    "§aAquaduct",
+			    "§aAquaduct (WIP)",
 			    "§7",
 			    "§7Redirect water from the source to the end.",
 			    "§7",
@@ -144,10 +146,12 @@ public class GamemodeGui {
 			    new ItemStack(Material.TNT),
 			    1,
 			    click -> {
-			    	DigRouletteEasy.startCountdown(plugin);
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
+			    	DigRouletteEasy.startCountdown();
 			    	return true;
 			    },
-			    "§aDig Roulette (easy)",
+			    "§aDig Roulette (easy) (WIP)",
 			    "§7",
 			    "§7Dig up as much gold as possible without hitting TNT.",
 			    "§7Gold blocks = 5 pts",
@@ -163,10 +167,12 @@ public class GamemodeGui {
 				tnt,
 			    1,
 			    click -> {
-			    	DigRouletteHard.startCountdown(plugin);
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
+			    	DigRouletteHard.startCountdown();
 			    	return true;
 			    },
-			    "§aDig Roulette (hard)",
+			    "§aDig Roulette (hard) (WIP)",
 			    "§7",
 			    "§7Dig up as much gold as possible without hitting TNT.",
 			    "§7Gold blocks = 5 pts",

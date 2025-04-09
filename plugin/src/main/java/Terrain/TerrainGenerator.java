@@ -1,33 +1,23 @@
 package Terrain;
-import java.util.ArrayList;
-
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import Main.KinectSandbox;
 
 public class TerrainGenerator implements Listener{
-    private KinectSandbox plugin;
     public TerrainGeneratorHelper tgHelper;
-    private int[][] prevDepth;
+    public static int[][] prevDepth;
     private final int meanPoolSize = 2; // adjusts size of world
     private final int smoothingSize = 2; // adjusts smoothing
     private final int kinectDistanceScalar = 4; // need to tune to find good scalars 
     private String prevSettingsHash;
     private String prevBiome;
     private boolean prevWaterEnabled;
-    private volatile boolean resetCalled = false;
+    public static volatile boolean resetCalled = false;
     // Constructor with reference to plugin instance
-    public TerrainGenerator(KinectSandbox plugin) {
-        this.plugin = plugin;
-        this.tgHelper= new TerrainGeneratorHelper(plugin);
-        this.prevDepth = new int[plugin.rawKinectHeight][plugin.rawKinectWidth];
+    public TerrainGenerator() {
+        this.tgHelper= new TerrainGeneratorHelper();
         this.prevSettingsHash = "";
     }
     
@@ -37,13 +27,13 @@ public class TerrainGenerator implements Listener{
 			prevDepth = currDepth;
 
 			
-		int[][] newDepth = tgHelper.cropArray(currDepth, plugin.settings.x1, plugin.settings.x2, plugin.settings.y1 ,plugin.settings.y2);
+		int[][] newDepth = tgHelper.cropArray(currDepth, KinectSandbox.getInstance().settings.x1, KinectSandbox.getInstance().settings.x2, KinectSandbox.getInstance().settings.y1 ,KinectSandbox.getInstance().settings.y2);
 		newDepth = tgHelper.meanPool(newDepth, meanPoolSize); 
 		newDepth = tgHelper.meanFilter(newDepth, smoothingSize); 
 		newDepth = tgHelper.mirrorXYAxis(newDepth);
-		newDepth = tgHelper.convertToCoordinates(newDepth, plugin.settings.elevationMultiplier/100.0, plugin.settings.kinectDistance/kinectDistanceScalar); 
+		newDepth = tgHelper.convertToCoordinates(newDepth, KinectSandbox.getInstance().settings.elevationMultiplier/300.0, KinectSandbox.getInstance().settings.kinectDistance/kinectDistanceScalar); 
 		
-		if (!prevSettingsHash.equals(plugin.settings.settingsHash))
+		if (!prevSettingsHash.equals(KinectSandbox.getInstance().settings.settingsHash))
 		{
 			 prevDepth = new int[newDepth.length][newDepth[0].length];
 		}
@@ -62,12 +52,12 @@ public class TerrainGenerator implements Listener{
             	
 				// exists for threading issues where run statement from previous update call is still processing while next call is initiated.
             	// conditions for which to re-render all terrain
-            	if (!prevSettingsHash.equals(plugin.settings.settingsHash) || !prevBiome.equals(plugin.biome) || prevWaterEnabled != plugin.waterEnabled)
+            	if (!prevSettingsHash.equals(KinectSandbox.getInstance().settings.settingsHash) || !prevBiome.equals(KinectSandbox.getInstance().biome) || prevWaterEnabled != KinectSandbox.getInstance().waterEnabled)
             	{
-            	    prevSettingsHash = plugin.settings.settingsHash;
-            	    prevBiome = plugin.biome;
-            	    prevWaterEnabled = plugin.waterEnabled;
-            	    prevDepth = new int[plugin.settings.y2 - plugin.settings.y1 + 1][plugin.settings.x2 - plugin.settings.x1 + 1];
+            	    prevSettingsHash = KinectSandbox.getInstance().settings.settingsHash;
+            	    prevBiome = KinectSandbox.getInstance().biome;
+            	    prevWaterEnabled = KinectSandbox.getInstance().waterEnabled;
+            	    prevDepth = new int[KinectSandbox.getInstance().settings.y2 - KinectSandbox.getInstance().settings.y1 + 1][KinectSandbox.getInstance().settings.x2 - KinectSandbox.getInstance().settings.x1 + 1];
             	    tgHelper.resetBlocks();
             	    // read by main thread bukkit api to check if current updateTerrain called needs to cancel current block placements
             	    resetCalled = true;
@@ -81,12 +71,22 @@ public class TerrainGenerator implements Listener{
             	{
             		for (int j = 0; j < diffDepth[0].length; j++)
             		{
-            			// Scheduled block place is canceled, caused another call to reset
+            			// Scheduled block place is canceled, caused by another call to 
+            			// or terrainPaused
                         if (resetCalled) {
-                        	plugin.getLogger().info("CANCELED BLOCK PLACES");
+                        	KinectSandbox.getInstance().getLogger().info("CANCELED BLOCK PLACES");
                         	resetCalled = false;
                             return;
                         }
+                        
+                        // Still calculate block placements but dont do them
+                        if (TerrainGeneratorHelper.terrainPaused)
+                        {
+//                        	prevDepth = new int[plugin.settings.y2 - plugin.settings.y1 + 1][plugin.settings.x2 - plugin.settings.x1 + 1];
+                        	
+                        	continue;
+                        }
+                        	
             			
             			int upperRange = diffDepth[i][j][0];
             			int lowerRange = diffDepth[i][j][1];
@@ -113,7 +113,7 @@ public class TerrainGenerator implements Listener{
             		}
             	}
             }
-        }.runTask(plugin); // Ensures synchronous execution on the main thread
+        }.runTask(KinectSandbox.getInstance()); // Ensures synchronous execution on the main thread
         
         prevDepth = newDepth;
 	}

@@ -1,21 +1,19 @@
 package Gamemodes;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
-import Main.KinectSandbox;
 import net.md_5.bungee.api.ChatColor;
 
 public class OreHunt {
 
-	public static void startCountdown(KinectSandbox plugin) {
-        GamemodeHelper.countdown("Ore Hunt", 5, plugin, () -> {
+	public static void startCountdown() {
+        GamemodeHelper.countdown("Ore Hunt", 3, () -> {
             // Runs after countdown finishes
-        	startOreHunt(plugin);
+        	startOreHunt();
         });
     }
 	
-	public static void startOreHunt(KinectSandbox plugin)
+	public static void startOreHunt()
 	{
 		Bukkit.broadcastMessage(ChatColor.GOLD + "Ore Hunt has begun, 30 second remain!");
 	}

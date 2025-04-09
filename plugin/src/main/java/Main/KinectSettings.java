@@ -1,19 +1,17 @@
 package Main;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class KinectSettings {
     public int x1;
@@ -22,6 +20,7 @@ public class KinectSettings {
     public int y2;
     public int kinectDistance;
     public int elevationMultiplier;
+    public int captureSpeed;
     public String settingsHash;
     private final File settingsFile;
     private final AtomicReference<KinectSettings> settingsReference;
@@ -49,6 +48,7 @@ public class KinectSettings {
             this.y2 = crop.get("y2").getAsInt();
             this.kinectDistance = root.get("kinect_surface_distance_cm").getAsInt();
             this.elevationMultiplier = root.get("minecraft_elevation").getAsInt();
+            this.captureSpeed = root.get("kinect_capture_speed").getAsInt();
             this.settingsHash = this.x1+""+this.x2+""+this.y1+""+this.y2+""+this.kinectDistance+""+elevationMultiplier;
         } catch (IOException e) {
             e.printStackTrace();
@@ -72,9 +72,9 @@ public class KinectSettings {
                             if (modifiedFile.equals(settingsFile.toPath().getFileName())) {
                                 // File has changed, reload settings
                                 loadSettings();
-                                for (Player player : Bukkit.getOnlinePlayers()) {
-                                    player.sendMessage(ChatColor.GREEN + "Loading new changes...");
-                                }
+//                                for (Player player : Bukkit.getOnlinePlayers()) {
+//                                    player.sendMessage(ChatColor.GREEN + "Loading new settings..");
+//                                }
 
                                 // Update the reference to the latest settings
                                 settingsReference.set(this);
@@ -90,9 +90,5 @@ public class KinectSettings {
                 e.printStackTrace();
             }
         }).start();
-    }
-
-    public KinectSettings getSettings() {
-        return settingsReference.get();
     }
 }
