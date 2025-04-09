@@ -8,8 +8,8 @@ configure settings <br><br>
 
 Required: <br>
 [Java 21+](https://www.oracle.com/java/technologies/downloads/#java21) <br>
-[PrismLauncher](https://prismlauncher.org/download/windows/) <br>
- - Log into Microsoft account and add a 1.21.5 instance <br>
+[PrismLauncher](https://prismlauncher.org/download/windows/)
+ - Log into Microsoft account and add a 1.21.5 instance<br>
 [Kinect SDK](https://www.microsoft.com/en-us/download/details.aspx?id=44561) <br>
 
 # V2 Development
