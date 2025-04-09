@@ -4,8 +4,10 @@ name: Maven Build and Deploy
 on:
   push:
     branches:
-      - main/plugin
-
+      - main
+    paths:
+      - 'plugin/**'
+      
 jobs:
   build:
     runs-on: ubuntu-latest
