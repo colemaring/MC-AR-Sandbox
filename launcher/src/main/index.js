@@ -1,25 +1,27 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-const custom_icon = join(__dirname, '../../resources/icon.png')
-import config_handler from './config_handler'
-import { startKinectProcess } from './kinect'
-import { startMinecraftServer } from './mc_server'
-const { exec } = require('child_process')
-import { terminateAllProcesses } from './terminate_processes'
-import { checkDependencies } from './check_dependencies'
-import { launchPrismLauncher } from './launch'
-import { serverProcess } from './mc_server'
-import { Rcon } from 'rcon-client'
+import { app, shell, BrowserWindow, ipcMain } from "electron";
+import { join } from "path";
+import { electronApp, optimizer, is } from "@electron-toolkit/utils";
+const custom_icon = join(__dirname, "../../resources/icon.png");
+import config_handler from "./config_handler";
+import { startKinectProcess } from "./kinect";
+import { startMinecraftServer } from "./mc_server";
+const { exec } = require("child_process");
+import { terminateAllProcesses } from "./terminate_processes";
+import { checkDependencies } from "./check_dependencies";
+import { launchPrismLauncher } from "./launch";
+import { serverProcess } from "./mc_server";
+import { Rcon } from "rcon-client";
 
-let kinectProcess
-let mainWindow
-let isQuitting = false
+let kinectProcess;
+let mainWindow;
+let isQuitting = false;
 
-export function sendLogMessage(text, type = 'normal') {
-  const windowToUse = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed())
+export function sendLogMessage(text, type = "normal") {
+  const windowToUse = BrowserWindow.getAllWindows().find(
+    (w) => !w.isDestroyed()
+  );
   if (windowToUse) {
-    windowToUse.webContents.send('logMessage', { text, type })
+    windowToUse.webContents.send("logMessage", { text, type });
   }
 }
 
@@ -27,39 +29,39 @@ async function sendRconCommand(command) {
   try {
     // Create a new connection for each command (simple but reliable approach)
     const rcon = new Rcon({
-      host: 'localhost',
-      port: '25575',
-      password: 'doesntmatter',
-      timeout: 5000
-    })
+      host: "localhost",
+      port: "25575",
+      password: "doesntmatter",
+      timeout: 5000,
+    });
 
-    await rcon.connect()
-    const response = await rcon.send(command)
-    await rcon.end()
+    await rcon.connect();
+    const response = await rcon.send(command);
+    await rcon.end();
 
-    return { success: true, response }
+    return { success: true, response };
   } catch (error) {
-    console.error('RCON error:', error)
-    return { success: false, error: error.message }
+    console.error("RCON error:", error);
+    return { success: false, error: error.message };
   }
 }
 
-process.on('SIGINT', async () => {
-  if (isQuitting) return // Prevent multiple calls
+process.on("SIGINT", async () => {
+  if (isQuitting) return; // Prevent multiple calls
 
-  isQuitting = true
-  console.log('Received SIGINT (Ctrl+C), terminating all processes...')
+  isQuitting = true;
+  console.log("Received SIGINT (Ctrl+C), terminating all processes...");
 
   try {
-    await terminateAllProcesses()
-    console.log('Cleanup complete, exiting application')
+    await terminateAllProcesses();
+    console.log("Cleanup complete, exiting application");
   } catch (error) {
-    console.error('Error during cleanup:', error)
+    console.error("Error during cleanup:", error);
   } finally {
     // Force exit after cleanup
-    process.exit(0)
+    process.exit(0);
   }
-})
+});
 
 function createWindow() {
   // Create the browser window.
@@ -71,79 +73,79 @@ function createWindow() {
     autoHideMenuBar: true,
     // ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
-    }
-  })
+      preload: join(__dirname, "../preload/index.js"),
+      sandbox: false,
+    },
+  });
 
   // Handle window close event
-  mainWindow.on('close', async (e) => {
+  mainWindow.on("close", async (e) => {
     if (!isQuitting) {
-      e.preventDefault()
-      isQuitting = true
-      console.log('Window close event intercepted, shutting down services...')
-      await terminateAllProcesses()
-      mainWindow.destroy() // Force destroy the window after cleanup
+      e.preventDefault();
+      isQuitting = true;
+      console.log("Window close event intercepted, shutting down services...");
+      await terminateAllProcesses();
+      mainWindow.destroy(); // Force destroy the window after cleanup
     }
-  })
+  });
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+  mainWindow.on("ready-to-show", () => {
+    mainWindow.show();
     // Send initial logs after the window is ready and showing
-    sendLogMessage('Application started', 'normal')
-  })
+    sendLogMessage("Application started", "normal");
+  });
 
-  mainWindow.webContents.on('did-finish-load', async () => {
-    kinectProcess = startKinectProcess(mainWindow)
-    await checkDependencies()
-    // Start Minecraft server when the app is ready
-    const serverStarted = await startMinecraftServer()
-    if (serverStarted) {
-      // sendLogMessage('Minecraft server started on application ready', 'success')
-    } else {
-      sendLogMessage('Failed to start Minecraft server on application ready', 'error')
-    }
+  mainWindow.webContents.on("did-finish-load", async () => {
+    kinectProcess = startKinectProcess(mainWindow);
+    await checkDependencies();
+    
 
-    ipcMain.on('launch-prism', async (event, instanceName) => {
-      const launched = await launchPrismLauncher(instanceName, mainWindow)
+    ipcMain.on("launch-prism", async (event, instanceName) => {
+      const launched = await launchPrismLauncher(instanceName, mainWindow);
       if (launched) {
-        sendLogMessage(`PrismLauncher launch requested for ${instanceName}`, 'normal')
+        sendLogMessage(
+          `PrismLauncher launch requested for ${instanceName}`,
+          "normal"
+        );
       } else {
-        sendLogMessage(`PrismLauncher launch failed for ${instanceName}`, 'error')
+        sendLogMessage(
+          `PrismLauncher launch failed for ${instanceName}`,
+          "error"
+        );
       }
-    })
-    ipcMain.on('serverCommand', async (event, command) => {
-      console.log(`Attempting to send RCON command: ${command}`)
+    });
+    ipcMain.on("serverCommand", async (event, command) => {
+      console.log(`Attempting to send RCON command: ${command}`);
 
-      const result = await sendRconCommand(command)
+      const result = await sendRconCommand(command);
 
       if (result.success) {
-        console.log(`Command sent successfully: ${command}`)
-        console.log(`Response: ${result.response}`)
-        sendLogMessage(`Command sent: ${command}`, 'normal')
+        console.log(`Command sent successfully: ${command}`);
+        console.log(`Response: ${result.response}`);
+        sendLogMessage(`Command sent: ${command}`, "normal");
 
         // Only show response if it's not empty
-        if (result.response && result.response.trim() !== '') {
-          sendLogMessage(`Server response: ${result.response}`, 'success')
+        if (result.response && result.response.trim() !== "") {
+          sendLogMessage(`Server response: ${result.response}`, "success");
         }
       } else {
-        console.error(`Failed to send command: ${result.error}`)
-        sendLogMessage(`Failed to send command: ${result.error}`, 'error')
+        console.error(`Failed to send command: ${result.error}`);
+        sendLogMessage(`Failed to send command: ${result.error}`, "error");
       }
-    })
-  })
+    });
+  });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
+    shell.openExternal(details.url);
+    return { action: "deny" };
+  });
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+  if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
+    mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
   }
 }
 
@@ -152,46 +154,46 @@ function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId("com.electron");
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
+  app.on("browser-window-created", (_, window) => {
+    optimizer.watchWindowShortcuts(window);
+  });
 
-  createWindow()
+  createWindow();
 
-  app.on('activate', function () {
+  app.on("activate", function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-})
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
   }
-})
+});
 
 // Handle the before-quit event
-app.on('before-quit', async (event) => {
-  if (isQuitting) return // Prevent multiple calls
+app.on("before-quit", async (event) => {
+  if (isQuitting) return; // Prevent multiple calls
 
-  event.preventDefault() // Prevent default quit
-  isQuitting = true
+  event.preventDefault(); // Prevent default quit
+  isQuitting = true;
 
-  console.log('App is quitting, terminating all processes...')
-  await terminateAllProcesses()
+  console.log("App is quitting, terminating all processes...");
+  await terminateAllProcesses();
 
   // Now quit the app
-  app.quit()
-})
+  app.quit();
+});
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

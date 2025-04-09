@@ -1,38 +1,50 @@
-import { exec } from 'child_process'
-import fs from 'fs'
-import path from 'path'
-import { sendLogMessage } from './index' // Assuming this is your main file
-import { checkAndGetServerJar } from './build_server_jar'
+import { exec } from "child_process";
+import fs from "fs";
+import path from "path";
+import { sendLogMessage } from "./index"; // Assuming this is your main file
+import { checkAndGetServerJar } from "./build_server_jar";
+import { startMinecraftServer } from "./mc_server";
 
 /**
  * Checks for Java 21+ and PrismLauncher existence.
  */
 export async function checkDependencies() {
   // Check for Java 21+
-  const javaVersionCheck = await checkJavaVersion()
+  const javaVersionCheck = await checkJavaVersion();
   if (javaVersionCheck.success) {
-    sendLogMessage(javaVersionCheck.message, 'success')
+    sendLogMessage(javaVersionCheck.message, "success");
   } else {
-    sendLogMessage(javaVersionCheck.message, 'error')
+    sendLogMessage(javaVersionCheck.message, "error");
   }
 
   // Check for PrismLauncher existence
-  const prismLauncherCheck = await checkPrismLauncher()
+  const prismLauncherCheck = await checkPrismLauncher();
   if (prismLauncherCheck.success) {
-    sendLogMessage(prismLauncherCheck.message, 'success')
-    sendLogMessage('PrismLauncher is ready!', 'success')
+    sendLogMessage(prismLauncherCheck.message, "success");
+    sendLogMessage("PrismLauncher is ready!", "success");
   } else {
-    sendLogMessage(prismLauncherCheck.message, 'error')
+    sendLogMessage(prismLauncherCheck.message, "error");
+  }
+
+  // Start Minecraft server when the app is ready
+  const serverStarted = await startMinecraftServer();
+  if (serverStarted) {
+    // sendLogMessage('Minecraft server started on application ready', 'success')
+  } else {
+    sendLogMessage(
+      "Failed to start Minecraft server on application ready",
+      "error"
+    );
   }
 
   checkAndGetServerJar().then((success) => {
     if (success) {
-      console.log('Server JAR is ready to use')
+      console.log("Server JAR is ready to use");
       // Proceed with other initialization
     } else {
-      console.error('Failed to ensure server JAR exists')
+      console.error("Failed to ensure server JAR exists");
     }
-  })
+  });
 }
 
 /**
@@ -41,33 +53,36 @@ export async function checkDependencies() {
  */
 async function checkJavaVersion() {
   return new Promise((resolve) => {
-    exec('java -version', (error, stdout, stderr) => {
+    exec("java -version", (error, stdout, stderr) => {
       if (error) {
         resolve({
           success: false,
-          message: `Java check failed: Java is not installed or not in PATH. Error: ${error.message}`
-        })
-        return
+          message: `Java check failed: Java is not installed or not in PATH. Error: ${error.message}`,
+        });
+        return;
       }
 
-      const versionLine = stderr.split('\n')[0]
+      const versionLine = stderr.split("\n")[0];
       const javaVersion = versionLine.substring(
         versionLine.indexOf('"') + 1,
         versionLine.lastIndexOf('"')
-      )
+      );
 
-      const majorVersion = parseInt(javaVersion.split('.')[0])
+      const majorVersion = parseInt(javaVersion.split(".")[0]);
 
       if (majorVersion >= 21) {
-        resolve({ success: true, message: `Java ${javaVersion} is installed.` })
+        resolve({
+          success: true,
+          message: `Java ${javaVersion} is installed.`,
+        });
       } else {
         resolve({
           success: false,
-          message: `Java version is ${javaVersion}. Java 21 or higher is required.`
-        })
+          message: `Java version is ${javaVersion}. Java 21 or higher is required.`,
+        });
       }
-    })
-  })
+    });
+  });
 }
 
 /**
@@ -77,30 +92,36 @@ async function checkJavaVersion() {
 async function checkPrismLauncher() {
   try {
     // Read the config file
-    const configPath = path.join(__dirname, '../../settings_config.json')
-    const configData = fs.readFileSync(configPath, 'utf8')
-    const config = JSON.parse(configData)
+    const configPath = path.join(__dirname, "../../settings_config.json");
+    const configData = fs.readFileSync(configPath, "utf8");
+    const config = JSON.parse(configData);
 
     // Get the PrismLauncher path from the config
-    const prismLauncherPath = config?.minecraft_prismlauncher_path
+    const prismLauncherPath = config?.minecraft_prismlauncher_path;
 
     if (!prismLauncherPath) {
       return {
         success: false,
-        message: 'PrismLauncher path is not defined in settings_config.json.'
-      }
+        message: "PrismLauncher path is not defined in settings_config.json.",
+      };
     }
 
     // Check if the file exists
     if (fs.existsSync(prismLauncherPath)) {
-      return { success: true, message: `PrismLauncher found at ${prismLauncherPath}` }
+      return {
+        success: true,
+        message: `PrismLauncher found at ${prismLauncherPath}`,
+      };
     } else {
-      return { success: false, message: `PrismLauncher not found at ${prismLauncherPath}` }
+      return {
+        success: false,
+        message: `PrismLauncher not found at ${prismLauncherPath}`,
+      };
     }
   } catch (error) {
     return {
       success: false,
-      message: `Error checking PrismLauncher: ${error.message}`
-    }
+      message: `Error checking PrismLauncher: ${error.message}`,
+    };
   }
 }
