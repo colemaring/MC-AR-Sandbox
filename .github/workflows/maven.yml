@@ -35,5 +35,6 @@ jobs:
         run: mkdir -p MC-AR-Sandbox/launcher/server/plugins
       
       - name: Copy JAR to plugins directory
+        working-directory: plugin
         run: cp target/KinectSandbox-0.0.1-SNAPSHOT.jar MC-AR-Sandbox/launcher/server/plugins/KinectSandbox.jar
 
