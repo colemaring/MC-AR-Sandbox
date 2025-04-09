@@ -58,7 +58,7 @@ world-settings:
     verbose: true
     hanging-tick-frequency: 100
     item-despawn-rate: 6000
-    view-distance: default
+    view-distance: 32
     simulation-distance: default
     thunder-chance: 100000
     merge-radius:
@@ -85,10 +85,10 @@ world-settings:
     unload-frozen-chunks: false
     mob-spawn-range: 6
     entity-tracking-range:
-      players: 48
-      animals: 48
-      monsters: 48
-      misc: 32
+      players: 200
+      animals: 200
+      monsters: 200
+      misc: 200
       display: 128
       other: 64
     growth:
