@@ -31,6 +31,9 @@ jobs:
       # Copy the built JAR from the target directory to the desired location.
       # Here, we assume that the target JAR is located at plugin/target and that
       # MC-AR-Sandbox/launcher/server/plugins is at the repository root.
-      - name: Copy final JAR to plugins directory
-        working-directory: plugin
+      - name: Ensure plugins directory exists
+        run: mkdir -p MC-AR-Sandbox/launcher/server/plugins
+      
+      - name: Copy JAR to plugins directory
         run: cp target/KinectSandbox-0.0.1-SNAPSHOT.jar MC-AR-Sandbox/launcher/server/plugins/KinectSandbox.jar
+
