@@ -17,4 +17,13 @@ public class OreHunt {
 	{
 		Bukkit.broadcastMessage(ChatColor.GOLD + "Ore Hunt has begun, 30 second remain!");
 	}
+	public static void startOreHunt2() //testing gha
+	{
+		Bukkit.broadcastMessage(ChatColor.GOLD + "Ore Hunt has begun, 30 second remain!");
+	}
+	public static void startOreHunt1()//testing gha
+	
+	{
+		Bukkit.broadcastMessage(ChatColor.GOLD + "Ore Hunt has begun, 30 second remain!");
+	}
 }
