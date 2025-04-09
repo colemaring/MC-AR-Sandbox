@@ -9,9 +9,11 @@ configure settings <br><br>
 Required: <br>
 [Java 21+](https://www.oracle.com/java/technologies/downloads/#java21) <br>
 [PrismLauncher](https://prismlauncher.org/download/windows/) <br>
- - Add 1.21.5 instance <br>
+ - Log into Microsoft account and add a 1.21.5 instance <br>
 [Kinect SDK](https://www.microsoft.com/en-us/download/details.aspx?id=44561) <br>
 
+# V2 Development
+This is the second version of the MC-AR Sandbox visualizer, where I've created a desktop application that makes the entire system a one-click launch. The desktop application handles the minecraft server, minecraft launcher, kinect sdk runtime, and topographic projection. I've programmed the MCAR launcher to automatically handle errors and first launches, where it will attempt to build the spigot server jar using the buildtools jar. Instead of writing to a text file and reading that in the plugin, I am now streaming the depth data over websockets. This drastically improved performance. I've also written a faster algorithm to only update blocks that need to be (which I am proud of). I've ran into a lot of interesting threading issues and race conditions while working on this project which is something I've never had to face before. <br>
 
 # V1 Development
 This program uses the Kinect SDK to take depth data from an Xbox Kinect Sensor. That data is then parsed and scaled down to be rendered real-time in a minecraft server. <br><br>
