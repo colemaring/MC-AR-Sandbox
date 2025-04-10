@@ -31,39 +31,16 @@ jobs:
       # Ensure plugins directory exists
       - name: Ensure plugins directory exists
         run: mkdir -p launcher/server/plugins
-      
-      - name: Rename JAR to KinectSandbox.jar
-        run: mv plugin/target/KinectSandbox-0.0.1-SNAPSHOT.jar plugin/target/KinectSandbox.jar
 
-  release:
-    needs: build
-    runs-on: ubuntu-latest
+      # Copy the built JAR from the target directory to the desired location.
+      - name: Copy JAR to plugins directory
+        working-directory: plugin
+        run: cp target/KinectSandbox-0.0.1-SNAPSHOT.jar ../launcher/server/plugins/KinectSandbox.jar
 
-    steps:
-      # Checkout the repository again (necessary for the release job)
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      # Set up GitHub CLI to create a release
-      - name: Set up GitHub CLI
-        uses: cli/cli-action@v2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      # Create GitHub Release
+      # Create a new GitHub Release and upload the JAR to the release
       - name: Create GitHub Release
-        run: |
-          RELEASE_TAG="v$(date +'%Y%m%d%H%M%S')"  # Generate a timestamp-based version
-          gh release create $RELEASE_TAG \
-            plugin/target/KinectSandbox.jar \
-            --title "KinectSandbox Release $RELEASE_TAG" \
-            --notes "Built by build-jar-release.yml" \
-            --draft
-
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: List releases
-        run: gh release list
+        uses: softprops/action-gh-release@v1
+        with:
+          files: launcher/server/plugins/KinectSandbox.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
