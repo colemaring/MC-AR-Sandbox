@@ -42,7 +42,7 @@ jobs:
       - name: Create a new tag
         id: create_tag
         run: |
-          TAG_NAME="Plugin Jar v$(date +'%Y%m%d%H%M%S')"  # Generate a tag based on the current timestamp
+          TAG_NAME="v$(date +'%Y%m%d%H%M%S')"  # Generate a tag based on the current timestamp
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
           git tag $TAG_NAME
           git push origin $TAG_NAME
