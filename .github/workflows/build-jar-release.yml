@@ -37,7 +37,17 @@ jobs:
         working-directory: plugin
         run: cp target/KinectSandbox-0.0.1-SNAPSHOT.jar ../launcher/server/plugins/KinectSandbox.jar
 
-      # Create a new GitHub Release and upload the JAR to the release
+      # Create a new tag for the release
+      - name: Create a new tag
+        id: create_tag
+        run: |
+          TAG_NAME="v$(date +'%Y%m%d%H%M%S')"  # Generate a tag based on the current timestamp
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Create GitHub Release and upload the JAR to the release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
