@@ -22,10 +22,40 @@
     "win": {
       "icon": "resources/icon.png"
     },
+    "asarUnpack": [
+      "**/node_modules/kinect2/**/*", 
+      "**/node_modules/kinect2/build/Release/*.node" ,
+      "**/node_modules/ws/**/*" ,
+      "**/node_modules/node-gyp-build/**/*"
+    ],
     "extraResources": [
       {
         "from": "server/BuildTools.jar",
         "to": "BuildTools.jar"
+      },
+      {
+        "from": "server/plugins/KinectSandbox.jar",
+        "to": "plugins/KinectSandbox.jar"
+      },
+      {
+        "from": "server/server.properties",
+        "to": "server.properties"
+      },
+      {
+        "from": "server/eula.txt",
+        "to": "eula.txt"
+      },
+      {
+        "from": "server/spigot.yml",
+        "to": "spigot.yml"
+      },
+      {
+        "from": "server/world",
+        "to": "world"
+      },
+      {
+        "from": "src/main/processes/kinect_child.js",
+        "to": "kinect_child.js"
       }
     ]
   },
