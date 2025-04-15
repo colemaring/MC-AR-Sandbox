@@ -17,6 +17,14 @@
     "build:mac": "npm run build && electron-builder --mac",
     "build:linux": "npm run build && electron-builder --linpmnux"
   },
+  "build": {
+    "extraResources": [
+      {
+        "from": "server/BuildTools.jar",
+        "to": "BuildTools.jar"
+      }
+    ]
+  },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
