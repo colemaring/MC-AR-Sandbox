@@ -33,13 +33,15 @@ public class KinectSandbox extends JavaPlugin implements Listener {
     	MiscHandlers.killEntities();
     	Bukkit.getPluginManager().registerEvents(terrainGenerator, this);
     	// Read settings_config.json for values
+    	String appDataPath = System.getenv("APPDATA"); // This gives C:\Users\<user>\AppData\Roaming
+    	File configFile = new File(appDataPath, "mc-ar-launcher/settings_config.json");
     	String path = "";
-		try {
-			path = new File("../settings_config.json").getCanonicalPath();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	try {
+    	    path = configFile.getCanonicalPath();
+    	} catch (IOException e) {
+    	    e.printStackTrace();
+    	}
+
 		
 		// Create inventory
 		InventoryHelper ih = new InventoryHelper();
