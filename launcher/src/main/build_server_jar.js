@@ -3,16 +3,17 @@ import fs from 'fs'
 import path from 'path'
 import { sendLogMessage } from './index'
 import { startMinecraftServer } from './mc_server' // Add this import
+import { app } from 'electron' // Import app from electron
 
-/**
- * Checks if the Spigot server JAR exists, and if not, runs BuildTools to generate it
- * @returns {Promise<boolean>} True if server JAR exists or was successfully created
- */
 export async function checkAndGetServerJar() {
   // Define paths
-  const serverDir = path.join(__dirname, '../../server')
-  const serverJarPath = path.join(serverDir, 'spigot-1.21.5.jar')
-  const buildToolsPath = path.join(__dirname, '../../server/BuildTools.jar')
+  const serverDir = app.isPackaged ? process.resourcesPath : path.join(__dirname, '../../server')
+  const serverJarPath = app.isPackaged
+    ? path.join(process.resourcesPath, 'spigot-1.21.5.jar')
+    : path.join(__dirname, '../../server/spigot-1.21.5.jar')
+  const buildToolsPath = app.isPackaged
+    ? path.join(process.resourcesPath, 'BuildTools.jar')
+    : path.join(__dirname, '../../server/BuildTools.jar')
 
   // Check if server JAR already exists
   if (fs.existsSync(serverJarPath)) {
@@ -22,18 +23,21 @@ export async function checkAndGetServerJar() {
 
   // Check if BuildTools exists
   if (!fs.existsSync(buildToolsPath)) {
-    sendLogMessage('BuildTools.jar not found in server directory.', 'error')
+    sendLogMessage('BuildTools.jar not found in server directory: ' + buildToolsPath, 'error')
     return false
   }
 
   // If JAR doesn't exist, run BuildTools
-  sendLogMessage('Spigot server JAR not found. Running BuildTools to generate it...', 'warning')
+  sendLogMessage(
+    'Spigot server JAR not found. Running BuildTools to generate it. This is expected on first launch.' ,'warning'
+  )
 
   return new Promise((resolve) => {
     try {
       // Run BuildTools.jar with the specified version
       const buildProcess = spawn('java', ['-jar', buildToolsPath, '--rev', '1.21.5'], {
-        cwd: serverDir // Run in the server directory
+        cwd: serverDir, // Run in the server directory
+        env: { ...process.env }
       })
 
       // Forward stdout logs

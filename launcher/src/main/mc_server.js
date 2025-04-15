@@ -2,6 +2,7 @@ const { spawn, exec } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 import { sendLogMessage } from './index'
+import { app } from 'electron'
 
 let serverProcess = null
 let serverRunning = false
@@ -10,8 +11,9 @@ let startingInterval // Variable to hold the interval ID
 
 // Configure Java settings here
 const JAVA_PATH = 'java' // Use 'java' to use system's default Java or specify full path
-const SERVER_DIR = path.join(__dirname, '../../server') // Adjust as needed
 const SERVER_JAR = 'spigot-1.21.5.jar' // Your server JAR filename
+const SERVER_DIR = app.isPackaged ? process.resourcesPath : path.join(__dirname, '../../server')
+
 const MIN_RAM = '1G' // Minimum RAM allocation
 const MAX_RAM = '4G' // Maximum RAM allocation
 
@@ -134,7 +136,10 @@ export async function startMinecraftServer() {
       clearInterval(startingInterval) // Clear the interval when server exits
 
       if (code === 0) {
-        sendLogMessage('Minecraft server stopped gracefully', 'normal')
+        sendLogMessage(
+          'Minecraft server stopped gracefully. If this is the first launch, ensure eula=true. See the GitHub readme instructions.',
+          'warning'
+        )
       } else {
         sendLogMessage(`Minecraft server crashed (code: ${code}, signal: ${signal})`, 'error')
       }

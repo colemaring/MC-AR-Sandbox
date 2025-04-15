@@ -4,6 +4,7 @@ import path from 'path'
 import { sendLogMessage } from './index' // Assuming this is your main file
 import { checkAndGetServerJar } from './build_server_jar'
 import { startMinecraftServer } from './mc_server'
+import { readConfig } from './config_handler' // Import readConfig function
 
 /**
  * Checks for Java 21+ and PrismLauncher existence.
@@ -88,10 +89,7 @@ async function checkJavaVersion() {
  */
 async function checkPrismLauncher() {
   try {
-    // Read the config file
-    const configPath = path.join(__dirname, '../../settings_config.json')
-    const configData = fs.readFileSync(configPath, 'utf8')
-    const config = JSON.parse(configData)
+    const config = await readConfig()
 
     // Get the PrismLauncher path from the config
     const prismLauncherPath = config?.minecraft_prismlauncher_path

@@ -3,6 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { sendLogMessage } from './index' // Assuming this is your main file
 import { ipcMain } from 'electron' // Import ipcMain
+import { readConfig } from './config_handler' // Import readConfig function
 
 /**
  * Launches PrismLauncher with the specified instance.
@@ -12,10 +13,7 @@ import { ipcMain } from 'electron' // Import ipcMain
 export async function launchPrismLauncher(instanceName, mainWindow) {
   // Add mainWindow parameter
   try {
-    // 1. Read the config file
-    const configPath = path.join(__dirname, '../../settings_config.json')
-    const configData = fs.readFileSync(configPath, 'utf8')
-    const config = JSON.parse(configData)
+    const config = await readConfig() 
 
     // 2. Get the PrismLauncher path from the config
     const prismLauncherPath = config?.minecraft_prismlauncher_path
