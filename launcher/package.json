@@ -18,6 +18,7 @@
     "build:linux": "npm run build && electron-builder --linpmnux"
   },
   "build": {
+    "npmRebuild": false,
     "extraResources": [
       {
         "from": "server/BuildTools.jar",
