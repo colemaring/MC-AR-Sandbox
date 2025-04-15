@@ -4,7 +4,6 @@ import homeIcon from '@renderer/assets/icons/home_icon.png'
 import settingsIcon from '@renderer/assets/icons/settings_icon.png'
 import infoIcon from '@renderer/assets/icons/info_icon.png'
 import { useState, useEffect } from 'react'
-import Update from './Update'
 
 function NavBar() {
   const navigate = useNavigate()
@@ -47,7 +46,6 @@ function NavBar() {
       >
         <img src={infoIcon} alt="Info"></img> Info
       </Button>
-      <Update></Update>
     </div>
   )
 }

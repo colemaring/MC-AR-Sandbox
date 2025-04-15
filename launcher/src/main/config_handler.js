@@ -51,7 +51,7 @@ export async function readConfig() {
   }
 }
 
-async function writeConfig(event, newConfig) {
+export async function writeConfig(event, newConfig) {
   try {
     // Ensure the directory exists
     const configDir = path.dirname(configPath)

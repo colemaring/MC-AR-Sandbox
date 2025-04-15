@@ -1,11 +1,35 @@
-const { ipcMain } = require('electron')
+const path = require('path')
+
+const isPackaged = !process.mainModule.filename.includes('app.asar')
+
+if (isPackaged) {
+  try {
+    const unpackedModulesPath = path.join(
+      process.resourcesPath,
+      'app.asar.unpacked',
+      'node_modules'
+    )
+    module.paths.push(unpackedModulesPath)
+    console.log(`[kinect_child] Added to module.paths: ${unpackedModulesPath}`)
+  } catch (pathError) {
+    console.error(`[kinect_child] Error adjusting module paths: ${pathError.message}`)
+    // Send error back if possible, though process.send might not be ready yet
+    if (process.send)
+      process.send({
+        type: 'error',
+        message: `Failed to adjust module paths: ${pathError.message}`
+      })
+    process.exit(1) // Exit if we can't set up paths correctly
+  }
+}
+
 const Kinect2 = require('kinect2')
 const kinect = new Kinect2()
 const WebSocket = require('ws') // Import the ws library
 
 // Add throttling variables only for parent process
 let lastParentSendTimestamp = 0
-const PARENT_THROTTLE_INTERVAL = 3000 // Throttle for parent process
+const PARENT_THROTTLE_INTERVAL = 2000 // Throttle for parent process
 
 // WebSocket server setup
 const wss = new WebSocket.Server({ port: 8080 }) // Choose a port

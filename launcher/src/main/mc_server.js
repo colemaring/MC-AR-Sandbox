@@ -17,7 +17,7 @@ const SERVER_DIR = app.isPackaged ? process.resourcesPath : path.join(__dirname,
 const MIN_RAM = '1G' // Minimum RAM allocation
 const MAX_RAM = '4G' // Maximum RAM allocation
 
-async function killExistingMinecraftServer() {
+export async function killExistingMinecraftServer() {
   return new Promise((resolve) => {
     if (process.platform === 'win32') {
       console.log('Checking for running Java processes')
@@ -136,10 +136,7 @@ export async function startMinecraftServer() {
       clearInterval(startingInterval) // Clear the interval when server exits
 
       if (code === 0) {
-        sendLogMessage(
-          'Minecraft server stopped gracefully. If this is the first launch, ensure eula=true. See the GitHub readme instructions.',
-          'warning'
-        )
+        sendLogMessage('Minecraft server stopped gracefully.', 'warning')
       } else {
         sendLogMessage(`Minecraft server crashed (code: ${code}, signal: ${signal})`, 'error')
       }
