@@ -1,10 +1,10 @@
 {
-  "name": "launcher",
+  "name": "mc-ar-launcher",
   "version": "1.0.0",
-  "description": "An Electron application with React",
+  "description": "MC-AR Sandbox Launcher",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "Colton Maring",
+  "homepage": "https://coltonmaring.com",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
@@ -19,6 +19,9 @@
   },
   "build": {
     "npmRebuild": false,
+    "win": {
+      "icon": "resources/icon.png"
+    },
     "extraResources": [
       {
         "from": "server/BuildTools.jar",
