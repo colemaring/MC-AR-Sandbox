@@ -6,7 +6,7 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
 - Download [PrismLauncher](https://prismlauncher.org/download/windows/), [Kinect SDK](https://www.microsoft.com/en-us/download/details.aspx?id=44561), and [Java 21+](https://www.oracle.com/java/technologies/downloads/#java21). <br>
 - Log into PrismLauncher with your Microsoft/Minecraft account. <br>
 - Launch the new MC-AR Launcher (First-Time setup takes about 5 minutes). <br>
-- Tune the Kinect settings. <br><br>
+- Tune the Kinect settings. <br>
 
 # Hardware
 - A Kinect V2 sensor / Xbox One sensor.
@@ -36,7 +36,6 @@ Minecraft Settings:
 - Show On: Choose which display device to launch Minecraft on.
 - Elevation Multiplier: Choose how much y axis range you'd like in Minecraft.
 - PrismLauncher Filepath: Specify the filepath to the Prismlauncher exe.
-<br>
 Save button: Save your configuration to persist between launches and reflect changes in the currently running Minecraft instance.
 
 # Info Page
