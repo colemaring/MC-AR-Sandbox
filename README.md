@@ -53,9 +53,9 @@ Save button: Save your configuration to persist between launches and reflect cha
 ```cd launcher```<br>
 ```npm i```<br>
 ```npm run dev```<br>
-Note: The packaged version of this electron app will reference a different Minecraft server world directory than the dev environment.
+Note: The packaged version of this electron app will reference a different Minecraft server world directory than the dev environment.<br>
 Packaged: C:\Users\<user>\AppData\Local\Programs\mc-ar-launcher\resources\world <br>
-eg. Dev: C:\Users\<user>\Desktop\mcar\launcher\server\world <br><br>
+eg. Dev: C:\Users\<user>\Desktop\mcar\launcher\server\world <br>
 
 Utilize the [plugman](https://www.spigotmc.org/resources/plugmanx.88135/) plugin, the powershell scripts, and the maven pom.xml to hot-reload the KinectSandbox plugin when developing. <br>
 
