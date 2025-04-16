@@ -13,13 +13,13 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
 - A windows 10/11 PC with a Decent CPU and GPU.
 - (Optional) A projector.
 
-# Home Page
+# [Home Page](https://github.com/user-attachments/assets/f27ef5f5-a43b-4053-8044-72e953e55e1f)
 - Color coded logs showing MC-AR Launcher status.
 - Send commands to the running Minecraft server (eg. op <username>).
 - Launch Minecreaft & Projection if Auto Launch not toggled.
 
-# Settings Page
-Kinect Settings [screenshot](https://github.com/user-attachments/assets/f27ef5f5-a43b-4053-8044-72e953e55e1f):
+# [Settings Page](https://github.com/user-attachments/assets/611abce0-67b2-4a2d-b5cf-1073f39617b0)
+Kinect Settings:
 - Crop Kinect View: Drag the crop edges to correspond with the boundaries of your sandbox.
 - Kinect to Surface Distance: The distance from your Kinect sensor to the sand, in cm.
 - Capture Speed: Change the speed at which the Kinect sends updates to Minecraft.
@@ -39,14 +39,9 @@ Minecraft Settings:
   
 Save button: Save your configuration to persist between launches and reflect changes in the currently running Minecraft instance.
 
-# Info Page
+# [Info Page](https://github.com/user-attachments/assets/04bb55f9-e500-4f6b-9cf1-bec1d613143a)
 - Gamemode Information
 - In-Game Commands (Outdated, changed to GUIs)
-
-# Screenshots
-![image](https://github.com/user-attachments/assets/f27ef5f5-a43b-4053-8044-72e953e55e1f)
-![image](https://github.com/user-attachments/assets/611abce0-67b2-4a2d-b5cf-1073f39617b0)
-![image](https://github.com/user-attachments/assets/04bb55f9-e500-4f6b-9cf1-bec1d613143a)
 
 # V2 Development
 This is the second version of the MC-AR Sandbox visualizer, where I've created a desktop application that makes the entire system a one-click launch. The desktop application handles the minecraft server, minecraft launcher, kinect sdk runtime, and topographic projection. I've programmed the MCAR launcher to automatically handle errors and first launches, where it will attempt to build the spigot server jar using the buildtools jar. Instead of writing to a text file and reading that in the plugin, I am now streaming the depth data over websockets. This drastically improved performance. I've also written a faster algorithm to only update blocks that need to be (which I am proud of). I've ran into a lot of interesting threading issues and race conditions while working on this project which is something I've never had to face before. <br>
