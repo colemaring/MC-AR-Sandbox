@@ -9,9 +9,9 @@ Launch the new MC-AR Launcher (First-Time setup takes about 5 minutes)
 Tune the Kinect settings <br><br>
 
 # Hardware
--A Kinect V2 sensor / Xbox One sensor.
--A windows 10/11 PC with a Decent CPU and GPU.
--(Optional) A projector.
+- A Kinect V2 sensor / Xbox One sensor.
+- A windows 10/11 PC with a Decent CPU and GPU.
+- (Optional) A projector.
 
 # Home Page
 -Color coded logs showing MC-AR Launcher status.
