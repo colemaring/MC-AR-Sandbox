@@ -25,7 +25,7 @@ Kinect Settings:
 - Capture Speed: Change the speed at which the Kinect sends updates to Minecraft.
 
 Topographic Projection Settings:
-- Fullscreen on Launch: Toggle to launch the projection in fullscreen
+- Fullscreen on Launch: Toggle to launch the projection in fullscreen.
 - Auto Launch: Toggle to automatically launch the projection when the MC-AR Launcher opens.
 - Show On: Choose which display device to launch the projection on.
 - Smoothing: Determine how much detail you want on your topographic layer lines.
@@ -35,7 +35,7 @@ Minecraft Settings:
 - Auto Launch: Toggle to automatically launch Minecraft when the MC-AR Launcher opens.
 - Show On: Choose which display device to launch Minecraft on.
 - Elevation Multiplier: Choose how much y axis range you'd like in Minecraft.
-- PrismLauncher Filepath: Specify the filepath to the Prismlauncher exe.
+- PrismLauncher Filepath: Specify the filepath to the Prismlauncher exe. <br>
 Save button: Save your configuration to persist between launches and reflect changes in the currently running Minecraft instance.
 
 # Info Page
