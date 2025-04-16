@@ -35,7 +35,8 @@ Minecraft Settings:
 - Auto Launch: Toggle to automatically launch Minecraft when the MC-AR Launcher opens.
 - Show On: Choose which display device to launch Minecraft on.
 - Elevation Multiplier: Choose how much y axis range you'd like in Minecraft.
-- PrismLauncher Filepath: Specify the filepath to the Prismlauncher exe. <br>
+- PrismLauncher Filepath: Specify the filepath to the Prismlauncher exe.
+  
 Save button: Save your configuration to persist between launches and reflect changes in the currently running Minecraft instance.
 
 # Info Page
