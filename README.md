@@ -19,7 +19,7 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
 - Launch Minecreaft & Projection if Auto Launch not toggled.
 
 # Settings Page
-Kinect Settings:
+Kinect Settings [screenshot](https://github.com/user-attachments/assets/f27ef5f5-a43b-4053-8044-72e953e55e1f):
 - Crop Kinect View: Drag the crop edges to correspond with the boundaries of your sandbox.
 - Kinect to Surface Distance: The distance from your Kinect sensor to the sand, in cm.
 - Capture Speed: Change the speed at which the Kinect sends updates to Minecraft.
