@@ -14,34 +14,34 @@ Tune the Kinect settings <br><br>
 - (Optional) A projector.
 
 # Home Page
--Color coded logs showing MC-AR Launcher status.
--Send commands to the running Minecraft server (eg. op <username>).
--Launch Minecreaft & Projection if Auto Launch not toggled.
+- Color coded logs showing MC-AR Launcher status.
+- Send commands to the running Minecraft server (eg. op <username>).
+- Launch Minecreaft & Projection if Auto Launch not toggled.
 
 # Settings Page
 Kinect Settings:
--Crop Kinect View: Drag the crop edges to correspond with the boundaries of your sandbox.
--Kinect to Surface Distance: The distance from your Kinect sensor to the sand, in cm.
--Capture Speed: Change the speed at which the Kinect sends updates to Minecraft.
+- Crop Kinect View: Drag the crop edges to correspond with the boundaries of your sandbox.
+- Kinect to Surface Distance: The distance from your Kinect sensor to the sand, in cm.
+- Capture Speed: Change the speed at which the Kinect sends updates to Minecraft.
 
 Topographic Projection Settings:
--Fullscreen on Launch: Toggle to launch the projection in fullscreen
--Auto Launch: Toggle to automatically launch the projection when the MC-AR Launcher opens.
--Show On: Choose which display device to launch the projection on.
--Smoothing: Determine how much detail you want on your topographic layer lines.
--Color Mode: Choose which color profile to project onto the sand.
+- Fullscreen on Launch: Toggle to launch the projection in fullscreen
+- Auto Launch: Toggle to automatically launch the projection when the MC-AR Launcher opens.
+- Show On: Choose which display device to launch the projection on.
+- Smoothing: Determine how much detail you want on your topographic layer lines.
+- Color Mode: Choose which color profile to project onto the sand.
 
 Minecraft Settings:
--Auto Launch: Toggle to automatically launch Minecraft when the MC-AR Launcher opens.
--Show On: Choose which display device to launch Minecraft on.
--Elevation Multiplier: Choose how much y axis range you'd like in Minecraft.
--PrismLauncher Filepath: Specify the filepath to the Prismlauncher exe.
+- Auto Launch: Toggle to automatically launch Minecraft when the MC-AR Launcher opens.
+- Show On: Choose which display device to launch Minecraft on.
+- Elevation Multiplier: Choose how much y axis range you'd like in Minecraft.
+- PrismLauncher Filepath: Specify the filepath to the Prismlauncher exe.
 <br>
 Save button: Save your configuration to persist between launches and reflect changes in the currently running Minecraft instance.
 
 # Info Page
--Gamemode Information
--In-Game Commands (Outdated, changed to GUIs)
+- Gamemode Information
+- In-Game Commands (Outdated, changed to GUIs)
 
 # Screenshots
 ![image](https://github.com/user-attachments/assets/f27ef5f5-a43b-4053-8044-72e953e55e1f)
