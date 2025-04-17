@@ -77,7 +77,7 @@ function SettingsPage() {
         <span>Capture Speed</span>
         <Form.Range
           min={1}
-          max={10}
+          max={30}
           step={1}
           value={captureSpeed}
           onChange={(e) => setCaptureSpeed(Number(e.target.value))}
@@ -188,7 +188,7 @@ function SettingsPage() {
           </Dropdown>
         </div>
 
-        <div className="mt-1 centerRange">
+        {/* <div className="mt-1 centerRange">
           <span>Elevation Multipler</span>
           <Form.Range
             min={0}
@@ -198,7 +198,7 @@ function SettingsPage() {
             onChange={(e) => setElevation(Number(e.target.value))}
             style={{ width: '10rem', display: 'inline-block', marginLeft: '1rem' }}
           />
-        </div>
+        </div> */}
       </div>
       <div className="mt-1">
         <span>PrismLauncher Filepath</span>

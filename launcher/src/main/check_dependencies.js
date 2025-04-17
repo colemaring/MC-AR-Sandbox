@@ -27,6 +27,15 @@ export async function checkDependencies() {
     sendLogMessage(prismLauncherCheck.message, 'error')
   }
 
+  // Check for Kinect SDK
+  const kinectSDKCheck = await checkKinectSDK()
+  if (kinectSDKCheck.success) {
+    sendLogMessage(kinectSDKCheck.message, 'success')
+  } else {
+    sendLogMessage(kinectSDKCheck.message, 'error')
+    // This is a critical error for Kinect functionality
+  }
+
   // Start Minecraft server when the app is ready
   const serverStarted = await startMinecraftServer()
   if (serverStarted) {
@@ -119,4 +128,33 @@ async function checkPrismLauncher() {
       message: `Error checking PrismLauncher: ${error.message}`
     }
   }
+}
+
+async function checkKinectSDK() {
+  // Only run this check on Windows
+  if (process.platform !== 'win32') {
+    return { success: true, message: 'Kinect SDK check skipped (not on Windows).' }
+  }
+
+  // Registry key for Kinect SDK v2
+  const registryKey = '"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Kinect\\v2.0"'
+
+  return new Promise((resolve) => {
+    // Use reg query command to check if the key exists
+    exec(`reg query ${registryKey}`, (error, stdout, stderr) => {
+      if (error) {
+        // If the command fails, the key likely doesn't exist (or another error occurred)
+        resolve({
+          success: false,
+          message: 'Kinect SDK v2 not found in registry. Please install it.'
+        })
+      } else {
+        // If the command succeeds, the key exists
+        resolve({
+          success: true,
+          message: 'Kinect SDK v2 found.'
+        })
+      }
+    })
+  })
 }
