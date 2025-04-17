@@ -87,9 +87,10 @@ public class ZombieRush {
     // Spawn zombie on surface at i, j, attracted to walk right
     public static void spawnZombie(int i, int j) {
         World world = Bukkit.getWorlds().get(0);
-        j--;
+        j-= 5;
         int y = world.getHighestBlockYAt(i, j) + 1;
         Location spawnLocation = new Location(world, i, y, j);
+        //Bukkit.broadcastMessage(i + " " + y + " " + j);
         Zombie zombie = (Zombie) world.spawnEntity(spawnLocation, EntityType.ZOMBIE);
         zombie.setRemoveWhenFarAway(false);
         zombie.setAge(0); // Ensure the zombie is an adult

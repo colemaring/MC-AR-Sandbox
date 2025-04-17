@@ -46,22 +46,24 @@ public class GamemodeGui {
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		diamondPickaxe.setItemMeta(meta);
 		
-		gui.addElement(new StaticGuiElement('a',
+		gui.addElement(new StaticGuiElement('b',
 			    diamondPickaxe,
 			    1,
 			    click -> {
 			    	Player player = (Player) click.getWhoClicked();
 			        player.closeInventory();
-			    	OreHunt.startCountdown();
+			    	OreHunt.initOreHunt();
 			        return true;
 			    },
-			    "§aOre Hunt (WIP)",
+			    "§aOre Hunt",
 			    "§7",
 			    "§7Find as many buried ores as possible in 30 seconds.",
 			    "§7Coal = 5 pts",
 			    "§7Iron = 10 pts",
 			    "§7Diamond = 15 pts",
 			    "§7Emerald = 15 pts",
+			    "§7",
+			    "§7The ore needs to be completely uncovered for it to count.",
 			    "§7",
 			    "§bClick to start"
 			));
@@ -72,7 +74,7 @@ public class GamemodeGui {
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		goldenPickaxe.setItemMeta(meta);
 		
-		gui.addElement(new StaticGuiElement('b',
+		gui.addElement(new StaticGuiElement('c',
 				goldenPickaxe,
 			    1,
 			    click -> {
@@ -91,7 +93,7 @@ public class GamemodeGui {
 			    "§7",
 			    "§bClick to start"
 			));
-		gui.addElement(new StaticGuiElement('c',
+		gui.addElement(new StaticGuiElement('a',
 			    new ItemStack(Material.ZOMBIE_HEAD),
 			    1,
 			    click -> {

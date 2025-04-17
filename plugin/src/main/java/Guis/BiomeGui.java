@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import Gamemodes.GamemodeHelper;
 import Main.KinectSandbox;
 import de.themoep.inventorygui.DynamicGuiElement;
 import de.themoep.inventorygui.GuiStateElement;
@@ -28,9 +29,12 @@ public class BiomeGui {
 		                change -> {
 		                	Player player = (Player) change.getWhoClicked();
 					        player.closeInventory();
-		                	for (Player p : Bukkit.getOnlinePlayers()) {
-		            			p.sendMessage(ChatColor.GREEN + "Disabling water..");
-		            		}
+					        if (GamemodeHelper.gamemodeRunning)
+					        {
+					        	Bukkit.broadcastMessage(ChatColor.RED + "Cant disable water while gamemode in progress.");
+					        	return;
+					        }
+					        Bukkit.broadcastMessage(ChatColor.GREEN + "Disabling water..");
 		                	KinectSandbox.getInstance().waterEnabled = false;
 		                },
 		                "waterDisabled", // a key to identify this state by
@@ -40,15 +44,20 @@ public class BiomeGui {
 		        ),
 		        new GuiStateElement.State(
 		                change -> {
+		                	Player player = (Player) change.getWhoClicked();
+					        player.closeInventory();
+					        if (GamemodeHelper.gamemodeRunning)
+					        {
+					        	Bukkit.broadcastMessage(ChatColor.RED + "Cant enable water while gamemode in progress.");
+					        	return;
+					        }
 		            	    if (KinectSandbox.biome.equals("sand") || KinectSandbox.biome.equals("mesa") || KinectSandbox.biome.equals("rainbow"))
 		            	    {
-		            	    	for (Player player : Bukkit.getOnlinePlayers())
-		            	    		player.sendMessage(ChatColor.GREEN + "Water enabled, but this biome doesn't have water.");
+		            	    	Bukkit.broadcastMessage(ChatColor.GREEN + "Water enabled, but this biome doesn't have water.");
 		            	    	KinectSandbox.getInstance().waterEnabled = true;
 		            	    	return;
 		            	    }
-		                	Player player = (Player) change.getWhoClicked();
-					        player.closeInventory();
+		                	
 		                	for (Player p : Bukkit.getOnlinePlayers()) {
 		            			p.sendMessage(ChatColor.GREEN + "Enabling water..");
 		            		}
@@ -75,6 +84,11 @@ public class BiomeGui {
 			    click -> {
 			    	Player player = (Player) click.getWhoClicked();
 			        player.closeInventory();
+			        if (GamemodeHelper.gamemodeRunning)
+			        {
+			        	Bukkit.broadcastMessage(ChatColor.RED + "Cant change biome while gamemode in progress.");
+			        	return true;
+			        }
 			    	KinectSandbox.biome = "grass";
 			    	for (Player p : Bukkit.getOnlinePlayers()) {
 						p.sendMessage(ChatColor.GREEN + "Changing biome to grass..");
@@ -90,6 +104,11 @@ public class BiomeGui {
 			    click -> {
 			    	Player player = (Player) click.getWhoClicked();
 			        player.closeInventory();
+			        if (GamemodeHelper.gamemodeRunning)
+			        {
+			        	Bukkit.broadcastMessage(ChatColor.RED + "Cant change biome while gamemode in progress.");
+			        	return true;
+			        }
 			    	KinectSandbox.biome = "sand";
 			    	for (Player p : Bukkit.getOnlinePlayers()) {
 						p.sendMessage(ChatColor.GREEN + "Changing biome to sand..");
@@ -105,6 +124,11 @@ public class BiomeGui {
 			    click -> {
 			    	Player player = (Player) click.getWhoClicked();
 			        player.closeInventory();
+			        if (GamemodeHelper.gamemodeRunning)
+			        {
+			        	Bukkit.broadcastMessage(ChatColor.RED + "Cant change biome while gamemode in progress.");
+			        	return true;
+			        }
 			    	KinectSandbox.biome = "snow";
 			    	for (Player p : Bukkit.getOnlinePlayers()) {
 						p.sendMessage(ChatColor.GREEN + "Changing biome to snow..");
@@ -120,6 +144,11 @@ public class BiomeGui {
 			    click -> {
 			    	Player player = (Player) click.getWhoClicked();
 			        player.closeInventory();
+			        if (GamemodeHelper.gamemodeRunning)
+			        {
+			        	Bukkit.broadcastMessage(ChatColor.RED + "Cant change biome while gamemode in progress.");
+			        	return true;
+			        }
 			    	KinectSandbox.biome = "mesa";
 			    	for (Player p : Bukkit.getOnlinePlayers()) {
 						p.sendMessage(ChatColor.GREEN + "Changing biome to badlands..");
@@ -135,6 +164,11 @@ public class BiomeGui {
 			    click -> {
 			    	Player player = (Player) click.getWhoClicked();
 			        player.closeInventory();
+			        if (GamemodeHelper.gamemodeRunning)
+			        {
+			        	Bukkit.broadcastMessage(ChatColor.RED + "Cant change biome while gamemode in progress.");
+			        	return true;
+			        }
 			    	KinectSandbox.biome = "stone";
 			    	for (Player p : Bukkit.getOnlinePlayers()) {
 						p.sendMessage(ChatColor.GREEN + "Changing biome to stony peaks..");
@@ -150,6 +184,11 @@ public class BiomeGui {
 			    click -> {
 			    	Player player = (Player) click.getWhoClicked();
 			        player.closeInventory();
+			        if (GamemodeHelper.gamemodeRunning)
+			        {
+			        	Bukkit.broadcastMessage(ChatColor.RED + "Cant change biome while gamemode in progress.");
+			        	return true;
+			        }
 			    	KinectSandbox.biome = "nether";
 			    	for (Player p : Bukkit.getOnlinePlayers()) {
 						p.sendMessage(ChatColor.GREEN + "Changing biome to nether..");

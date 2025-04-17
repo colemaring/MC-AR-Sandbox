@@ -13,18 +13,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import Terrain.TerrainGenerator;
+import Terrain.TerrainGeneratorHelper;
 
 public class WebsocketsHandler {
     private WebSocketClient wsClient;
     private boolean connected = false;
-    private TerrainGenerator terrainGenerator;
     private int messageCounter;
-    
-
-    // Constructor with reference to plugin instance
-    public WebsocketsHandler( TerrainGenerator terrainGenerator) {
-        this.terrainGenerator = terrainGenerator;
-    }
 
     public void connectToWebSocket() {
         try {
@@ -47,12 +41,8 @@ public class WebsocketsHandler {
                 public void onMessage(String message) {
                     try {
                         messageCounter++;
-
-                        // Serves as a throttling mechanism
-                        if (messageCounter % KinectSandbox.getInstance().settings.captureSpeed != 0)
-                            return;
                         
-                    	 // Parse the message
+                        // Parse the message
                         JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
                         JsonArray depthArray = jsonObject.getAsJsonArray("data");
 
@@ -69,8 +59,14 @@ public class WebsocketsHandler {
                                 depthData[i][j] = row.get(j).getAsInt();                            
                         }
                         
+                        depthData = TerrainGeneratorHelper.movingMode(depthData);
+                        //depthData = terrainGenerator.tgHelper.stretchTo150(depthData);
+
+                        // Serves as a throttling mechanism
+                        if (messageCounter % KinectSandbox.getInstance().settings.captureSpeed != 0)
+                            return;
                         
-                        terrainGenerator.updateTerrain(depthData);
+                        TerrainGenerator.updateTerrain(depthData);
                         
                     } catch (Exception e) {
                     	KinectSandbox.getInstance().getLogger().warning(e.getMessage());

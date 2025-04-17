@@ -1,4 +1,7 @@
 package Terrain;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 
 import org.bukkit.Material;
@@ -12,17 +15,15 @@ public class TerrainGeneratorHelper {
 	
 	public static void pauseTerrain()
 	{
-//		Bukkit.broadcastMessage(ChatColor.GOLD + "Terrain Paused.");
 		terrainPaused = true;
 	}
 	
 	public static void unpauseTerrain()
 	{
-//		Bukkit.broadcastMessage(ChatColor.GOLD + "Terrain unpaused.");
 		terrainPaused = false;
 	}
 	
-	public int[][][] findDifference(int[][] prevDepth, int [][] newDepth)
+	public static int[][][] findDifference(int[][] prevDepth, int [][] newDepth)
 	{
 		int [][][] ret = new int[newDepth.length][newDepth[0].length][3];
 		for (int i = 0; i < newDepth.length; i++)
@@ -60,14 +61,10 @@ public class TerrainGeneratorHelper {
 	}
 	
 	// set all blocks to air in the region that depth encompasses
-	public void resetBlocks() {
-		
-//		for (Player player : Bukkit.getOnlinePlayers()) {
-//			player.sendMessage(ChatColor.GREEN + "Resetting terrain..");
-//		}
-        for (int x = -2; x < 200; x++) {
-            for (int y = -100; y < 100; y++) {
-                for (int z = -2; z < 200; z++) {
+	public static void resetBlocks() {
+        for (int x = -2; x < 525; x++) {
+            for (int y = -70; y < 255; y++) {
+                for (int z = -2; z < 525; z++) {
                 	KinectSandbox.getInstance().world.getBlockAt(x, y, z).setType(Material.AIR);
                 }
             }
@@ -75,7 +72,7 @@ public class TerrainGeneratorHelper {
     }
 	
 	// given input, crop array from user-defined values in the launcher
-	public int[][] cropArray(int[][] input, int x1, int x2, int y1, int y2) {
+	public static int[][] cropArray(int[][] input, int x1, int x2, int y1, int y2) {
 	    // Ensure the input array is not null and the dimensions are valid
 	    if (input == null || x1 < 0 || y1 < 0 || x2 >= input[0].length || y2 >= input.length) {
 	        throw new IllegalArgumentException("Invalid cropping indices.");
@@ -98,9 +95,46 @@ public class TerrainGeneratorHelper {
 	    return croppedArray;
 	}
 
+    private final static int MAX_HISTORY = 2;
+    private final static LinkedList<int[][]> historyFrames = new LinkedList<>();
+
+    public static int[][] movingMode(int[][] currentFrame) {
+        int height = currentFrame.length;
+        int width = currentFrame[0].length;
+
+        // Add current frame to history
+        historyFrames.addLast(currentFrame);
+        if (historyFrames.size() > MAX_HISTORY) {
+            historyFrames.removeFirst(); // Keep only the last 10
+        }
+
+        int[][] output = new int[height][width];
+
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                Map<Integer, Integer> freq = new HashMap<>();
+                int maxCount = 0;
+                int mode = 0;
+
+                for (int[][] frame : historyFrames) {
+                    int val = frame[i][j];
+                    int count = freq.getOrDefault(val, 0) + 1;
+                    freq.put(val, count);
+
+                    if (count > maxCount || (count == maxCount && val < mode)) {
+                        maxCount = count;
+                        mode = val;
+                    }
+                }
+
+                output[i][j] = mode;
+            }
+        }
+
+        return output;
+    }
 	
-	// Given int[][], it will return an int[][] downsampled
-	public int[][] meanPool(int[][] input, int size) {
+	public static int[][] modePool(int[][] input, int size) {
 	    int height = input.length;
 	    int width = input[0].length;
 
@@ -112,79 +146,53 @@ public class TerrainGeneratorHelper {
 
 	    for (int i = 0; i < newHeight; i++) {
 	        for (int j = 0; j < newWidth; j++) {
-	            int sum = 0;
-	            int count = 0;
+	            Map<Integer, Integer> freq = new HashMap<>();
+	            int maxCount = 0;
+	            int mode = 0;
 
-	            // Iterate over the size x size block
 	            for (int di = 0; di < size; di++) {
 	                for (int dj = 0; dj < size; dj++) {
 	                    int row = i * size + di;
 	                    int col = j * size + dj;
 
-	                    // Only include values within bounds of the input array
 	                    if (row < height && col < width) {
-	                        sum += input[row][col];
-	                        count++;
+	                        int val = input[row][col];
+	                        int count = freq.getOrDefault(val, 0) + 1;
+	                        freq.put(val, count);
+
+	                        if (count > maxCount || (count == maxCount && val < mode)) {
+	                            maxCount = count;
+	                            mode = val;
+	                        }
 	                    }
 	                }
 	            }
 
-	            // Compute the mean, avoid division by zero (though count should never be zero)
-	            output[i][j] = sum / count;
+	            output[i][j] = mode;
 	        }
 	    }
 
-	    return output;
-	}
-
-	
-	// Similar to meanPool but doesnt not change dimension of input
-	public int[][] meanFilter(int[][] input, int size) {
-	    int height = input.length;
-	    int width = input[0].length;
-	    int[][] output = new int[height][width];
-	    
-	    int halfSize = size / 2;
-	    
-	    for (int i = 0; i < height; i++) {
-	        for (int j = 0; j < width; j++) {
-	            int sum = 0;
-	            int count = 0;
-	            
-	            // Loop over the window centered at (i, j)
-	            for (int di = -halfSize; di <= halfSize; di++) {
-	                for (int dj = -halfSize; dj <= halfSize; dj++) {
-	                    int ni = i + di;
-	                    int nj = j + dj;
-	                    
-	                    // Check boundaries: if within bounds, include the element in the mean calculation
-	                    if (ni >= 0 && ni < height && nj >= 0 && nj < width) {
-	                        sum += input[ni][nj];
-	                        count++;
-	                    }
-	                }
-	            }
-	            
-	            // Set the output pixel to the average of the valid pixels in the window
-	            output[i][j] = sum / count;
-	        }
-	    }
-	    
 	    return output;
 	}
 
 	// val is an arbitrary scaling factor to concert kinect depth values to minecraft y values
-	// offset represents the distance from kinect to the sandbox (inimplemented)
-	public int[][] convertToCoordinates(int [][] depth, double val, int offset)
+	// offset represents the distance from kinect to the sandbox (nimplemented)
+	public static int[][] convertToCoordinates(int [][] depth, int offset)
 	{
 		for (int i = 0; i < depth.length; i++)
+		{
 			for (int j = 0; j < depth[0].length; j++)
-				depth[i][j] = offset - (int)Math.floor(depth[i][j] * val);
-		
+			{
+				if (depth[i][j] == 0)
+					continue;
+				depth[i][j] = offset - (int)Math.floor(depth[i][j]);
+			}
+		}
+			
 		return depth;
 	}
 	
-	public int[][] mirrorXYAxis(int[][] array) {
+	public static int[][] mirrorXYAxis(int[][] array) {
 	    int rows = array.length;
 	    int cols = array[0].length;
 	    int[][] mirroredArray = new int[rows][cols];
@@ -197,8 +205,14 @@ public class TerrainGeneratorHelper {
 	    return mirroredArray;
 	}
 	
-	public void placeAsBiome(int i, int k, int j, String biome, boolean adding)
+	public static void placeAsBiome(int i, int k, int j, String biome, boolean adding)
 	{
+		// Ignore ores from OreHunt Gamemode
+		if (KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.IRON_BLOCK) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.DIAMOND_BLOCK) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.EMERALD_BLOCK) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.COAL_BLOCK))
+		{
+			return;
+		}
+		
 		if (biome.equals("grass"))
 		{	
 			if (adding)
@@ -316,7 +330,7 @@ public class TerrainGeneratorHelper {
 	// add random veins, blocks, or etc to make biomes look more natural
 	// not the most optimal way to do this, as im re-scanning through all blocks
 	// only expensive part is replacing blocks so it should be fine
-	public void touchUpBiome(String biome)
+	public static void touchUpBiome(String biome)
 	{
 		if (biome.equals("grass"))
 		{
@@ -350,7 +364,7 @@ public class TerrainGeneratorHelper {
 	
 	// scan y coordinate and below for air, replace with water
 	// not efficient, use the difference array somehow
-	public void placeLiquid(int i, int level, int j, String type)
+	public static void placeLiquid(int i, int level, int j, String type)
 	{
 		if (type.equals("water"))
 		{

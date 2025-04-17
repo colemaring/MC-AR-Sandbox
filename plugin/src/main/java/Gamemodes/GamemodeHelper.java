@@ -10,12 +10,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import Main.KinectSandbox;
 import Misc.MiscHandlers;
 import Terrain.TerrainGenerator;
+import Terrain.TerrainGeneratorHelper;
 import net.md_5.bungee.api.ChatColor;
 
 public class GamemodeHelper {
 	public static boolean gamemodeRunning = false;
     // This Runnable will hold the cleanup logic for the currently running gamemode.
-    private static Runnable currentGameStopper = null;
+    public static Runnable currentGameStopper = null;
     public static Set<Integer> scheduledTaskIDs = new HashSet<>();
 	 public static void countdown(String name, int time, Runnable onFinish) {
 	        new BukkitRunnable() {
@@ -66,11 +67,11 @@ public class GamemodeHelper {
             currentGameStopper = null;
             MiscHandlers.killEntities();
             TerrainGenerator.prevDepth = new int[KinectSandbox.getInstance().settings.y2 - KinectSandbox.getInstance().settings.y1 + 1][KinectSandbox.getInstance().settings.x2 - KinectSandbox.getInstance().settings.x1 + 1];
-            KinectSandbox.getInstance().terrainGenerator.tgHelper.resetBlocks();
+            TerrainGeneratorHelper.resetBlocks();
         }
         else
         {
-        	// Bukkit.broadcastMessage(ChatColor.YELLOW + "No active gamemodes.");
+        	Bukkit.broadcastMessage(ChatColor.YELLOW + "No active gamemodes.");
         }
         
         gamemodeRunning = false;

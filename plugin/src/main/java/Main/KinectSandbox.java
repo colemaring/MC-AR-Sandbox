@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import Guis.InventoryHelper;
 import Misc.MiscHandlers;
 import Terrain.TerrainGenerator;
+import Terrain.TerrainGeneratorHelper;
 
 // ctrl + ] to build
 
@@ -23,7 +24,6 @@ public class KinectSandbox extends JavaPlugin implements Listener {
     private WebsocketsHandler wsHandler;
     public boolean waterEnabled = false;
     public TerrainGenerator terrainGenerator = new TerrainGenerator();
-    private String prevSettingsHash = "";
     private static KinectSandbox instance;
     
     @Override
@@ -58,8 +58,8 @@ public class KinectSandbox extends JavaPlugin implements Listener {
         
         // Connect to Websocker server, passing in instance of KinectSandbox
         // wsHandler instance handles passing data to terrainGenerator instance
-        wsHandler = new WebsocketsHandler(terrainGenerator);
-        terrainGenerator.tgHelper.resetBlocks();
+        wsHandler = new WebsocketsHandler();
+        TerrainGeneratorHelper.resetBlocks();
         wsHandler.connectToWebSocket();
         
         
