@@ -25,7 +25,7 @@ public class OreHunt {
 	private static int foundCount = 0;
 	private static int taskID = -1;
 	private static int points = 0;
-	private static int DIFFICULTY = 1000;
+	private static int DIFFICULTY = 1000; // changes how common ores are to spawn
 	
 	public static void initOreHunt()
 	{
@@ -135,9 +135,9 @@ public class OreHunt {
 	            Random random = new Random();
 
 	            // Iterate through potential starting points for the 2x2x2 vein center
-	            for (int i = 0; i < KinectSandbox.getInstance().rawKinectHeight / 2 ; i += 2)
+	            for (int i = 0; i < TerrainGeneratorHelper.findXEnd() ; i += 2)
 	            {
-	                for (int j = 0; j < KinectSandbox.getInstance().rawKinectWidth / 2; j += 2)
+	                for (int j = 0; j < TerrainGeneratorHelper.findZEnd(); j += 2)
 	                {
 	                    for (int k = -100; k < 100 - 2; k += 2)
 	                    {
@@ -216,7 +216,7 @@ public class OreHunt {
 
                     // can be surrounded by air or ore from other veins
                     Material surrounding = center.getWorld().getBlockAt(x, y, z).getType();
-                    if (surrounding != Material.AIR && surrounding != Material.IRON_BLOCK && surrounding != Material.EMERALD_BLOCK && surrounding != Material.COAL_BLOCK && surrounding != Material.DIAMOND_BLOCK) {
+                    if (surrounding != Material.AIR && surrounding != Material.IRON_BLOCK && surrounding != Material.EMERALD_BLOCK && surrounding != Material.COAL_BLOCK && surrounding != Material.DIAMOND_BLOCK && surrounding != Material.WATER) {
                         return false;
                     }
                 }

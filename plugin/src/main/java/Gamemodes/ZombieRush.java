@@ -78,8 +78,8 @@ public class ZombieRush {
         zombieTargets.clear();
         startTimer();
         for (int i = 0; i < TerrainGeneratorHelper.terrainHeight; i++) {
-            spawnZombie(i, TerrainGeneratorHelper.terrainWidth);
-            spawnZombie(i - 1, TerrainGeneratorHelper.terrainWidth);
+            spawnZombie(i, TerrainGeneratorHelper.findZEnd());
+            spawnZombie(i - 1, TerrainGeneratorHelper.findZEnd());
         }
         
     }
@@ -87,7 +87,7 @@ public class ZombieRush {
     // Spawn zombie on surface at i, j, attracted to walk right
     public static void spawnZombie(int i, int j) {
         World world = Bukkit.getWorlds().get(0);
-        j-= 5;
+        j--;
         int y = world.getHighestBlockYAt(i, j) + 1;
         Location spawnLocation = new Location(world, i, y, j);
         //Bukkit.broadcastMessage(i + " " + y + " " + j);

@@ -45,7 +45,25 @@ public class GamemodeGui {
 		ItemMeta meta = diamondPickaxe.getItemMeta();
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		diamondPickaxe.setItemMeta(meta);
-		
+		gui.addElement(new StaticGuiElement('a',
+			    new ItemStack(Material.ZOMBIE_HEAD),
+			    1,
+			    click -> {
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
+			    	ZombieRush.prepareTerrain();
+			    	return true;
+			    },
+			    "§aZombie Rush",
+			    "§7",
+			    "§7Stop an army of zombies from traversing your terrain.",
+			    "§7You have 30 second to prepare your terrain and",
+			    "§7zombies have 1 minute to attempt to cross it!",
+			    "§7",
+			    "§7Zombies will start on the left side and move right.",
+			    "§7",
+			    "§bClick to start"
+			));
 		gui.addElement(new StaticGuiElement('b',
 			    diamondPickaxe,
 			    1,
@@ -80,10 +98,10 @@ public class GamemodeGui {
 			    click -> {
 			    	Player player = (Player) click.getWhoClicked();
 			        player.closeInventory();
-			    	OreHunt2p.startCountdown();
+			    	OreHunt2p.initOreHunt();
 			    	return true;
 			    },
-			    "§aOre Hunt (2 Player) (WIP)",
+			    "§aOre Hunt (2 Player)",
 			    "§7",
 			    "§7Compete to find as many buried ores as possible in 30 seconds.",
 			    "§7Coal = 5 pts",
@@ -91,28 +109,10 @@ public class GamemodeGui {
 			    "§7Diamond = 15 pts",
 			    "§7Emerald = 15 pts",
 			    "§7",
-			    "§bClick to start"
-			));
-		gui.addElement(new StaticGuiElement('a',
-			    new ItemStack(Material.ZOMBIE_HEAD),
-			    1,
-			    click -> {
-			    	Player player = (Player) click.getWhoClicked();
-			        player.closeInventory();
-			    	ZombieRush.prepareTerrain();
-			    	return true;
-			    },
-			    "§aZombie Rush",
-			    "§7",
-			    "§7Stop an army of zombies from traversing your terrain.",
-			    "§7You have 30 second to prepare your terrain and",
-			    "§7zombies have 1 minute to attempt to cross it!",
-			    "§7",
-			    "§7Zombies will start on the left side and move right.",
+			    "§7The ore needs to be completely uncovered for it to count.",
 			    "§7",
 			    "§bClick to start"
 			));
-		
 		gui.addElement(new StaticGuiElement('d',
 			    new ItemStack(Material.OBSIDIAN),
 			    1,
@@ -150,13 +150,12 @@ public class GamemodeGui {
 			    click -> {
 			    	Player player = (Player) click.getWhoClicked();
 			        player.closeInventory();
-			    	DigRouletteEasy.startCountdown();
+			    	DigRouletteEasy.initDigRoulette();
 			    	return true;
 			    },
-			    "§aDig Roulette (easy) (WIP)",
+			    "§aDig Roulette (easy)",
 			    "§7",
 			    "§7Dig up as much gold as possible without hitting TNT.",
-			    "§7Gold blocks = 5 pts",
 			    "§7TNT = game over",
 			    "§7",
 			    "§7TNT is less common in easy mode",
@@ -171,13 +170,12 @@ public class GamemodeGui {
 			    click -> {
 			    	Player player = (Player) click.getWhoClicked();
 			        player.closeInventory();
-			    	DigRouletteHard.startCountdown();
+			    	DigRouletteHard.initDigRoulette();
 			    	return true;
 			    },
-			    "§aDig Roulette (hard) (WIP)",
+			    "§aDig Roulette (hard)",
 			    "§7",
 			    "§7Dig up as much gold as possible without hitting TNT.",
-			    "§7Gold blocks = 5 pts",
 			    "§7TNT = game over",
 			    "§7",
 			    "§7TNT is more common in hard mode",

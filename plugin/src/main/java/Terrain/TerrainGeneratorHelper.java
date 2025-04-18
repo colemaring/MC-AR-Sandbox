@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 
 import Main.KinectSandbox;
 
@@ -205,10 +206,40 @@ public class TerrainGeneratorHelper {
 	    return mirroredArray;
 	}
 	
+	public static int findZEnd() {
+	    int lastNonZeroZ = -1;
+
+	    for (int z = 0; z < 525; z++) {
+	        Block block = KinectSandbox.getInstance().world.getHighestBlockAt(0, z); // ✅ Correct order: x, z
+	        Material type = block.getType();
+	        if (type.isSolid()) {
+	            lastNonZeroZ = z;
+	        }
+	    }
+
+	    return lastNonZeroZ;
+	}
+
+	public static int findXEnd() {
+	    int lastNonZeroX = -1;
+
+	    for (int x = 0; x < 525; x++) {
+	        Block block = KinectSandbox.getInstance().world.getHighestBlockAt(x, 0);
+	        Material type = block.getType();
+	        if (type.isSolid()) {
+	            lastNonZeroX = x;
+	        }
+	    }
+
+	    return lastNonZeroX;
+	}
+
+
+	
 	public static void placeAsBiome(int i, int k, int j, String biome, boolean adding)
 	{
-		// Ignore ores from OreHunt Gamemode
-		if (KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.IRON_BLOCK) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.DIAMOND_BLOCK) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.EMERALD_BLOCK) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.COAL_BLOCK))
+		// Ignore ores from OreHunt and Dig Roulette gamemodes
+		if (KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.IRON_BLOCK) ||KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.GOLD_BLOCK) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.TNT) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.DIAMOND_BLOCK) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.EMERALD_BLOCK) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.COAL_BLOCK) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.BEDROCK))
 		{
 			return;
 		}
@@ -317,7 +348,7 @@ public class TerrainGeneratorHelper {
 		}
 		if (biome.equals("rainbow"))
 		{	
-			Material[] oreBlocks = {Material.NETHERITE_BLOCK, Material.DIAMOND_BLOCK, Material.REDSTONE_BLOCK, Material.GOLD_BLOCK, Material.IRON_BLOCK, Material.EMERALD_BLOCK, Material.LAPIS_BLOCK};
+			Material[] oreBlocks = {Material.NETHERITE_BLOCK, Material.DIAMOND_BLOCK, Material.REDSTONE_BLOCK, Material.IRON_BLOCK, Material.EMERALD_BLOCK, Material.LAPIS_BLOCK};
 			Random random = new Random();
 		    Material randomOreBlock = oreBlocks[random.nextInt(oreBlocks.length)];
 			if (adding)
