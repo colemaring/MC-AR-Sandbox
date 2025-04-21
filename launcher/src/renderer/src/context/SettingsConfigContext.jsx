@@ -37,7 +37,7 @@ export const SettingsConfigProvider = ({ children }) => {
         setX2(config?.kinect_view_crop?.x2 || 0)
         setY2(config?.kinect_view_crop?.y2 || 0)
         setDistance(config?.kinect_surface_distance_cm || 0)
-        setCaptureSpeed(config?.kinect_capture_speed || 50)
+        setCaptureSpeed(config?.kinect_capture_speed || 15)
         setDisplayOnLaunchTopographic(config?.topographic_display_on_launch || false)
         setDisplayTopographic(config?.topographic_display_assignment || 'Display 1')
         setSmoothing(config?.topographic_smoothing || 40)

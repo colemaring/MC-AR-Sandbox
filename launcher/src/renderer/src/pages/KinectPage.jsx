@@ -180,7 +180,7 @@ function KinectPage() {
 
   return (
     <div className="kinectContainer">
-      <p>Crop the kinect view to correspond with the boundaries of the sandbox.</p>
+      <p>Crop the kinect view to correspond with the boundaries of your environment.</p>
       <div
         className="kinectCropContainer"
         ref={containerRef}
