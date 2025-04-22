@@ -18,6 +18,7 @@ export const SettingsConfigProvider = ({ children }) => {
   const [smoothing, setSmoothing] = useState(40)
   const [colorMode, setColorMode] = useState('Default')
   const [autoLaunchProjector, setAutoLaunchProjector] = useState(false)
+  const [interpolation, setInterpolation] = useState('None')
 
   // Minecraft settings
   const [displayMinecraft, setDisplayMinecraft] = useState('Display 2')
@@ -42,6 +43,7 @@ export const SettingsConfigProvider = ({ children }) => {
         setDisplayTopographic(config?.topographic_display_assignment || 'Display 1')
         setSmoothing(config?.topographic_smoothing || 40)
         setColorMode(config?.topographic_color_mode || 'Default')
+        setInterpolation(config?.topographic_interpolation || 'None')
         setAutoLaunchProjector(config?.topographic_auto_launch_projector || false)
         setElevation(config?.minecraft_elevation || 40)
         setDisplayMinecraft(config?.minecraft_display_assignment || 'Display 2')
@@ -69,6 +71,7 @@ export const SettingsConfigProvider = ({ children }) => {
       topographic_display_assignment: displayTopographic,
       topographic_smoothing: smoothing,
       topographic_color_mode: colorMode,
+      topographic_interpolation: interpolation,
       topographic_auto_launch_projector: autoLaunchProjector,
       minecraft_elevation: elevation,
       minecraft_display_assignment: displayMinecraft,
@@ -107,7 +110,8 @@ export const SettingsConfigProvider = ({ children }) => {
     prismlauncherPath,
     autoLaunchMinecraft,
     autoLaunchProjector,
-    captureSpeed
+    captureSpeed,
+    interpolation
   ])
 
   return (
@@ -143,6 +147,8 @@ export const SettingsConfigProvider = ({ children }) => {
         setAutoLaunchProjector,
         captureSpeed,
         setCaptureSpeed,
+        interpolation,
+        setInterpolation,
         writeToConfig // call when you want to write state to config
       }}
     >

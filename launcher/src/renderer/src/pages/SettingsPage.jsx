@@ -42,6 +42,8 @@ function SettingsPage() {
     setAutoLaunchProjector,
     captureSpeed,
     setCaptureSpeed,
+    interpolation,
+    setInterpolation,
     writeToConfig
   } = useContext(SettingsConfigContext)
 
@@ -110,7 +112,9 @@ function SettingsPage() {
         <OverlayTrigger
           placement="right"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip('The distance from your Kinect sensor to the sand, in cm.')}
+          overlay={renderTooltip(
+            'Distance from your Kinect sensor to the sand, needs to be tuned.'
+          )}
           // container={overlayContainer} // Add back if using portal
         >
           <span style={{ display: 'inline-block' }}>
@@ -132,9 +136,7 @@ function SettingsPage() {
         <OverlayTrigger
           placement="bottom"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip(
-            'Change the speed at which the Kinect sends updates to Minecraft.'
-          )}
+          overlay={renderTooltip('Speed at which the Kinect sends updates to Minecraft.')}
           // container={overlayContainer} // Add back if using portal
         >
           <span style={{ display: 'flex' }}>
@@ -158,12 +160,12 @@ function SettingsPage() {
       <hr />
 
       {/* --- Topographic Projection Settings --- */}
-      <h3 className="mt-2">Projection Settings 🛠️</h3>
+      <h3 className="mt-2">Projection Settings</h3>
       <div className="mt-1">
         <OverlayTrigger
           placement="right"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip('Toggle to launch the projection in fullscreen.')}
+          overlay={renderTooltip('Launch the projection in fullscreen.')}
           // container={overlayContainer} // Add back if using portal
         >
           <span style={{ display: 'inline-block', marginRight: '15px' }}>
@@ -184,9 +186,7 @@ function SettingsPage() {
         <OverlayTrigger
           placement="left"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip(
-            'Toggle to automatically launch the projection when the MC-AR Launcher opens.'
-          )}
+          overlay={renderTooltip('Launch the projection when the MC-AR Launcher opens.')}
           // container={overlayContainer} // Add back if using portal
         >
           <span style={{ display: 'inline-block' }}>
@@ -209,13 +209,13 @@ function SettingsPage() {
           <OverlayTrigger
             placement="right"
             delay={{ show: 250, hide: 400 }}
-            overlay={renderTooltip('Choose which display device to launch the projection on.')}
+            overlay={renderTooltip('Display device to launch the projection on.')}
             // container={overlayContainer} // Add back if using portal
           >
             <span style={{ display: 'inline-block' }}>
               {' '}
               {/* Wrapper for trigger area */}
-              <span>Show on: </span>
+              <span>Show on </span>
               <Dropdown
                 style={{ display: 'inline-block', marginLeft: '10px' }}
                 onSelect={(key) => setDisplayTopographic(key)}
@@ -236,21 +236,21 @@ function SettingsPage() {
         <OverlayTrigger
           placement="right"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip(
-            'Determine how much detail you want on your topographic layer lines.'
-          )}
+          overlay={renderTooltip('Adjust to balance detail and smoothness in the projection.')}
           // container={overlayContainer} // Add back if using portal
         >
           <div style={{ display: 'flex' }}>
             <span>Smoothing</span>
+            <span style={{ marginLeft: '1rem', fontStyle: 'italic' }}>Less</span>
             <Form.Range
               min={0}
               max={100}
               step={1}
               value={smoothing}
               onChange={(e) => setSmoothing(Number(e.target.value))}
-              style={{ width: '10rem', display: 'inline-block', marginLeft: '1rem' }}
+              style={{ width: '10rem', display: 'inline-block', margin: '0 0.5rem' }}
             />
+            <span style={{ fontStyle: 'italic' }}>More</span>
           </div>
         </OverlayTrigger>
       </div>
@@ -258,13 +258,13 @@ function SettingsPage() {
         <OverlayTrigger
           placement="right"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip('Choose which color profile to project onto the sand.')}
+          overlay={renderTooltip('Color profile to project onto the sand.')}
           // container={overlayContainer} // Add back if using portal
         >
           <span style={{ display: 'inline-block' }}>
             {' '}
             {/* Wrapper for trigger area */}
-            <span>Color Mode</span>
+            <span>Colors</span>
             <Dropdown
               style={{ display: 'inline-block', marginLeft: '10px' }}
               onSelect={(key) => setColorMode(key)}
@@ -280,6 +280,31 @@ function SettingsPage() {
             </Dropdown>
           </span>
         </OverlayTrigger>
+        <OverlayTrigger
+          placement="left"
+          delay={{ show: 250, hide: 400 }}
+          overlay={renderTooltip('Interpolation mode for rendering the topographic projection.')}
+          // container={overlayContainer} // Add back if using portal
+        >
+          <span style={{ display: 'inline-block' }}>
+            {' '}
+            {/* Wrapper for trigger area */}
+            <span>Interpolation</span>
+            <Dropdown
+              style={{ display: 'inline-block', marginLeft: '10px' }}
+              onSelect={(key) => setInterpolation(key)}
+            >
+              <Dropdown.Toggle className="settingsOption" size="sm">
+                {interpolation}
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item eventKey="None">None</Dropdown.Item>
+                <Dropdown.Item eventKey="Median Filter">Median Filter</Dropdown.Item>
+                <Dropdown.Item eventKey="Guassian Blur">Guassian Blur</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </span>
+        </OverlayTrigger>
       </div>
       <hr />
 
@@ -289,9 +314,7 @@ function SettingsPage() {
         <OverlayTrigger
           placement="right"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip(
-            'Toggle to automatically launch Minecraft when the MC-AR Launcher opens.'
-          )}
+          overlay={renderTooltip('Launch Minecraft when the MC-AR Launcher opens.')}
           // container={overlayContainer} // Add back if using portal
         >
           <span style={{ display: 'inline-block' }}>
@@ -314,13 +337,13 @@ function SettingsPage() {
           <OverlayTrigger
             placement="right"
             delay={{ show: 250, hide: 400 }}
-            overlay={renderTooltip('Choose which display device to launch Minecraft on.')}
+            overlay={renderTooltip('Display device to launch Minecraft on.')}
             // container={overlayContainer} // Add back if using portal
           >
             <span style={{ display: 'inline-block' }}>
               {' '}
               {/* Wrapper for trigger area */}
-              <span>Show on: </span>
+              <span>Show on </span>
               <Dropdown
                 style={{ display: 'inline-block', marginLeft: '10px' }}
                 onSelect={(key) => setDisplayMinecraft(key)}
@@ -363,7 +386,7 @@ function SettingsPage() {
         <OverlayTrigger
           placement="top"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip('Specify the filepath to the Prismlauncher exe.')}
+          overlay={renderTooltip('Filepath to the Prismlauncher exe.')}
           // container={overlayContainer} // Add back if using portal
         >
           <span style={{ display: 'inline-block' }}>
