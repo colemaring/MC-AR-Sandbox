@@ -1,0 +1,8 @@
+asyncio
+websockets
+orjson
+watchdog
+numpy
+matplotlib
+scipy
+PyQt5
