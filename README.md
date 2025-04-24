@@ -27,20 +27,19 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
 ## [Settings Page](https://github.com/user-attachments/assets/611abce0-67b2-4a2d-b5cf-1073f39617b0)
 ### Kinect Settings:
 - Crop Kinect View: Drag the crop edges to correspond with the boundaries of your sandbox.
-- Kinect to Surface Distance: The distance from your Kinect sensor to the sand, in cm.
+- Kinect to Surface Offset: The distance from your Kinect sensor to the sand, units undefined as it is arbitrary.
 - Capture Speed: Change the speed at which the Kinect sends updates to Minecraft.
 
 ### Topographic Projection Settings:
-- Fullscreen on Launch: Toggle to launch the projection in fullscreen.
 - Auto Launch: Toggle to automatically launch the projection when the MC-AR Launcher opens.
 - Show On: Choose which display device to launch the projection on.
 - Smoothing: Determine how much detail you want on your topographic layer lines.
-- Color Mode: Choose which color profile to project onto the sand.
+- Color: Choose which color profile to project onto the sand.
+- Interpolation: Choose which type of interpolation to smooth the noise.
 
 ### Minecraft Settings:
 - Auto Launch: Toggle to automatically launch Minecraft when the MC-AR Launcher opens.
 - Show On: Choose which display device to launch Minecraft on.
-- Elevation Multiplier: Choose how much y axis range you'd like in Minecraft.
 - PrismLauncher Filepath: Specify the filepath to the Prismlauncher exe.
   
 Save button: Save your configuration to persist between launches and reflect changes in the currently running Minecraft instance.
