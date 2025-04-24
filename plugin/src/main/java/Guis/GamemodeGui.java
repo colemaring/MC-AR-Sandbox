@@ -57,7 +57,7 @@ public class GamemodeGui {
 			    "§aZombie Rush",
 			    "§7",
 			    "§7Stop an army of zombies from traversing your terrain.",
-			    "§7You have 30 second to prepare your terrain and",
+			    "§7You have 30 seconds to prepare your terrain and",
 			    "§7zombies have 1 minute to attempt to cross it!",
 			    "§7",
 			    "§7Zombies will start on the left side and move right.",
@@ -113,38 +113,8 @@ public class GamemodeGui {
 			    "§7",
 			    "§bClick to start"
 			));
+		
 		gui.addElement(new StaticGuiElement('d',
-			    new ItemStack(Material.OBSIDIAN),
-			    1,
-			    click -> {
-			    	Player player = (Player) click.getWhoClicked();
-			        player.closeInventory();
-			    	VolcanoSimulator.startCountdown();
-			    	return true;
-			    },
-			    "§aVolcano Simulator (WIP)",
-			    "§7",
-			    "§7Build a volcano and watch it erupt after 30 seconds.",
-			    "§7",
-			    "§bClick to start"
-			));
-
-		gui.addElement(new StaticGuiElement('e',
-			    new ItemStack(Material.WATER_BUCKET),
-			    1,
-			    click -> {
-			    	Player player = (Player) click.getWhoClicked();
-			        player.closeInventory();
-			    	Aquaduct.startCountdown();
-			    	return true;
-			    },
-			    "§aAquaduct (WIP)",
-			    "§7",
-			    "§7Redirect water from the source to the end.",
-			    "§7",
-			    "§bClick to start"
-			));
-		gui.addElement(new StaticGuiElement('f',
 			    new ItemStack(Material.TNT),
 			    1,
 			    click -> {
@@ -164,7 +134,7 @@ public class GamemodeGui {
 			));
 		ItemStack tnt = new ItemStack(Material.TNT);
 		tnt.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 1);;
-		gui.addElement(new StaticGuiElement('g',
+		gui.addElement(new StaticGuiElement('e',
 				tnt,
 			    1,
 			    click -> {
@@ -182,7 +152,37 @@ public class GamemodeGui {
 			    "§7",
 			    "§bClick to start"
 			));
-		
+		gui.addElement(new StaticGuiElement('f',
+			    new ItemStack(Material.OBSIDIAN),
+			    1,
+			    click -> {
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
+			    	VolcanoSimulator.startCountdown();
+			    	return true;
+			    },
+			    "§aVolcano Simulator (WIP)",
+			    "§7",
+			    "§7Build a volcano and watch it erupt after 30 seconds.",
+			    "§7",
+			    "§bClick to start"
+			));
+
+		gui.addElement(new StaticGuiElement('g',
+			    new ItemStack(Material.WATER_BUCKET),
+			    1,
+			    click -> {
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
+			    	Aquaduct.startCountdown();
+			    	return true;
+			    },
+			    "§aAquaduct (WIP)",
+			    "§7",
+			    "§7Redirect water from the source to the end.",
+			    "§7",
+			    "§bClick to start"
+			));
 		
 		return gui;
 	}

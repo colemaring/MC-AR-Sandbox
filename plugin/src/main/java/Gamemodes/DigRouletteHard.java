@@ -211,11 +211,17 @@ public class DigRouletteHard {
         return true;
     }
 	
-	public static void gameOver()
-	{
-		Bukkit.broadcastMessage("Game over");
-		Bukkit.broadcastMessage("You found " + foundCount + " gold before hitting TNT.");
-		GamemodeHelper.stopCurrentGamemodeIfRunning();
+	public static void gameOver() {
+		Bukkit.broadcastMessage(ChatColor.DARK_RED + "Game over!");
+	    Bukkit.broadcastMessage(ChatColor.RED + "You found " + ChatColor.AQUA + foundCount + ChatColor.RED + " gold before hitting TNT.");
+
+	    // Schedule to run 1 tick later
+	    new BukkitRunnable() {
+	        @Override
+	        public void run() {
+	            GamemodeHelper.stopCurrentGamemodeIfRunning();
+	        }
+	    }.runTaskLater(KinectSandbox.getInstance(), 1L);
 	}
 	
 	public static void cleanUp()

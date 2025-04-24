@@ -155,7 +155,7 @@ public class OreHunt2p {
 
         int gameTaskID = Bukkit.getScheduler().runTaskLater(KinectSandbox.getInstance(), () -> {
         	GamemodeHelper.gamemodeRunning = false;
-        	Bukkit.broadcastMessage(ChatColor.RED + "Time's up");
+        	Bukkit.broadcastMessage(ChatColor.DARK_RED + "Time's up!");
             Bukkit.broadcastMessage(ChatColor.RED + "Left player found " + ChatColor.AQUA + leftFoundCount + ChatColor.RED + " ore veins, for a total of " + ChatColor.AQUA + leftPoints + ChatColor.RED + " points.");
             Bukkit.broadcastMessage(ChatColor.RED + "Right player found " + ChatColor.AQUA + rightFoundCount + ChatColor.RED + " ore veins, for a total of " + ChatColor.AQUA + rightPoints + ChatColor.RED + " points.");
             cleanUp();

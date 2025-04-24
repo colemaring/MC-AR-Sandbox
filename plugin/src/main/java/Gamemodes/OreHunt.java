@@ -122,7 +122,8 @@ public class OreHunt {
 
         int gameTaskID = Bukkit.getScheduler().runTaskLater(KinectSandbox.getInstance(), () -> {
         	GamemodeHelper.gamemodeRunning = false;
-            Bukkit.broadcastMessage(ChatColor.RED + "Time's up, you found " + foundCount + " ore veins, for a total of " + points + " points.");
+        	Bukkit.broadcastMessage(ChatColor.DARK_RED + "Time's up!");
+            Bukkit.broadcastMessage(ChatColor.RED + "You found " + ChatColor.AQUA + foundCount + ChatColor.RED + " ore veins, for a total of " + ChatColor.AQUA +  points + ChatColor.RED + " points.");
             cleanUp();
         }, 30 * 20L).getTaskId();
         GamemodeHelper.scheduledTaskIDs.add(gameTaskID);

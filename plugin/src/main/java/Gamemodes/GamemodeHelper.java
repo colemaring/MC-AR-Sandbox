@@ -71,7 +71,7 @@ public class GamemodeHelper {
         }
         else
         {
-        	Bukkit.broadcastMessage(ChatColor.YELLOW + "No active gamemodes.");
+        	//Bukkit.broadcastMessage(ChatColor.YELLOW + "No active gamemodes.");
         }
         
         gamemodeRunning = false;

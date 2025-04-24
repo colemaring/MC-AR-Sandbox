@@ -44,7 +44,7 @@ public class ZombieRush {
             return;
         });
         
-        Bukkit.broadcastMessage(ChatColor.GOLD + "You have 30 seconds to prepare your terrain before the Zombie Rush begins.");
+        Bukkit.broadcastMessage(ChatColor.GREEN + "You have 30 seconds to prepare your terrain before the Zombie Rush begins.");
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.sendTitle(ChatColor.GOLD + "Prepare your terrain!", "", 2, 60, 2);
         }
@@ -139,7 +139,8 @@ public class ZombieRush {
                 if (timeLeft <= 0) {
                     this.cancel();
 //                    Bukkit.broadcastMessage(ChatColor.GOLD + "Zombie Rush has ended!");
-                    Bukkit.broadcastMessage(ChatColor.GREEN + "" + reachedZombies.size() + "/" + (TerrainGeneratorHelper.terrainHeight*2) + " zombies reached the end.");
+                    Bukkit.broadcastMessage(ChatColor.DARK_RED + "Time's up!");
+                    Bukkit.broadcastMessage(ChatColor.AQUA + "" + reachedZombies.size() + "/" + (TerrainGeneratorHelper.terrainHeight*2) + ChatColor.RED + " zombies reached the end.");
                     cleanupZombiesAndTargets();
                     GamemodeHelper.stopCurrentGamemodeIfRunning();
                     taskID = -1; // Reset task ID
