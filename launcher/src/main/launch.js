@@ -154,7 +154,7 @@ async function isProjectionRunning() {
   });
 }
 
-export async function launchProjection(instanceName, mainWindow) {
+export async function launchProjection(mainWindow) {
   try {
     // First, check if projection is already running
     const alreadyRunning = await isProjectionRunning();
