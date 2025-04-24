@@ -1,16 +1,16 @@
-import Button from 'react-bootstrap/Button'
-import Form from 'react-bootstrap/Form'
-import Dropdown from 'react-bootstrap/Dropdown'
-import externalIcon from '@renderer/assets/icons/external_icon.png'
-import saveIcon from '@renderer/assets/icons/save_icon.png'
-import { useNavigate } from 'react-router-dom'
-import { useContext } from 'react' // Removed useState, useEffect if not using portal
-import { SettingsConfigContext } from '../context/SettingsConfigContext'
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
-import Tooltip from 'react-bootstrap/Tooltip'
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Dropdown from "react-bootstrap/Dropdown";
+import externalIcon from "@renderer/assets/icons/external_icon.png";
+import saveIcon from "@renderer/assets/icons/save_icon.png";
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react"; // Removed useState, useEffect if not using portal
+import { SettingsConfigContext } from "../context/SettingsConfigContext";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
 
 function SettingsPage() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const {
     // x1, // Assuming these are handled in KinectPage
     // setX1,
@@ -44,8 +44,8 @@ function SettingsPage() {
     setCaptureSpeed,
     interpolation,
     setInterpolation,
-    writeToConfig
-  } = useContext(SettingsConfigContext)
+    writeToConfig,
+  } = useContext(SettingsConfigContext);
 
   // --- Removed state/effect for portal container, assuming simpler wrapping for now ---
   // const [overlayContainer, setOverlayContainer] = useState(null);
@@ -56,37 +56,38 @@ function SettingsPage() {
   // ---
 
   const openKinectView = () => {
-    navigate('/kinect')
-  }
+    navigate("/kinect");
+  };
 
   const handleSaveSettings = async () => {
-    await writeToConfig()
-  }
+    await writeToConfig();
+  };
 
   // Helper function to render tooltips
   const renderTooltip = (text) => (
     // Removed position: fixed as it might contribute to issues when not using portal
     <Tooltip
-      style={{ position: 'fixed' }}
-      id={`tooltip-${text.toLowerCase().replace(/\s+/g, '-')}`}
+      style={{ position: "fixed" }}
+      id={`tooltip-${text.toLowerCase().replace(/\s+/g, "-")}`}
     >
       {text}
     </Tooltip>
-  )
+  );
 
   // Define the min and max for the slider
-  const captureSpeedMin = 1
-  const captureSpeedMax = 30
+  const captureSpeedMin = 1;
+  const captureSpeedMax = 30;
 
   // Calculate the reversed value for the slider display
-  const reversedCaptureSpeedValue = captureSpeedMax + captureSpeedMin - captureSpeed
+  const reversedCaptureSpeedValue =
+    captureSpeedMax + captureSpeedMin - captureSpeed;
 
   // Handle the change from the reversed slider
   const handleReversedCaptureSpeedChange = (e) => {
-    const reversedValue = Number(e.target.value)
-    const actualValue = captureSpeedMax + captureSpeedMin - reversedValue
-    setCaptureSpeed(actualValue)
-  }
+    const reversedValue = Number(e.target.value);
+    const actualValue = captureSpeedMax + captureSpeedMin - reversedValue;
+    setCaptureSpeed(actualValue);
+  };
 
   return (
     <div className="pageContainer">
@@ -97,12 +98,16 @@ function SettingsPage() {
           placement="right"
           delay={{ show: 250, hide: 400 }}
           overlay={renderTooltip(
-            'Drag the crop edges to correspond with the boundaries of your sandbox.'
+            "Drag the crop edges to correspond with the boundaries of your sandbox."
           )}
           // container={overlayContainer} // Add back if using portal
         >
           <Button className="settingsButton" onClick={openKinectView}>
-            <img style={{ width: '1.3rem', height: '1.3rem' }} src={externalIcon} alt="Settings" />{' '}
+            <img
+              style={{ width: "1.3rem", height: "1.3rem" }}
+              src={externalIcon}
+              alt="Settings"
+            />{" "}
             Crop Kinect View
           </Button>
         </OverlayTrigger>
@@ -113,12 +118,12 @@ function SettingsPage() {
           placement="right"
           delay={{ show: 250, hide: 400 }}
           overlay={renderTooltip(
-            'Distance from your Kinect sensor to the sand, needs to be tuned.'
+            "Distance from your Kinect sensor to the sand, needs to be tuned."
           )}
           // container={overlayContainer} // Add back if using portal
         >
-          <span style={{ display: 'inline-block' }}>
-            {' '}
+          <span style={{ display: "inline-block" }}>
+            {" "}
             {/* Wrapper for trigger area */}
             <span>Kinect to Surface Offset</span>
             <Form.Control
@@ -127,7 +132,11 @@ function SettingsPage() {
               placeholder="in cm"
               value={distance}
               onChange={(e) => setDistance(Number(e.target.value))}
-              style={{ width: '100px', display: 'inline-block', marginLeft: '10px' }}
+              style={{
+                width: "100px",
+                display: "inline-block",
+                marginLeft: "10px",
+              }}
             />
           </span>
         </OverlayTrigger>
@@ -136,23 +145,31 @@ function SettingsPage() {
         <OverlayTrigger
           placement="bottom"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip('Speed at which the Kinect sends updates to Minecraft.')}
+          overlay={renderTooltip(
+            "Speed at which the Kinect sends updates to Minecraft."
+          )}
           // container={overlayContainer} // Add back if using portal
         >
-          <span style={{ display: 'flex' }}>
-            {' '}
+          <span style={{ display: "flex" }}>
+            {" "}
             {/* Wrapper for trigger area */}
             <span>Capture Speed</span>
-            <span style={{ marginLeft: '1rem', fontStyle: 'italic' }}>Slow</span>
+            <span style={{ marginLeft: "1rem", fontStyle: "italic" }}>
+              Slow
+            </span>
             <Form.Range
               min={captureSpeedMin}
               max={captureSpeedMax}
               step={1}
               value={reversedCaptureSpeedValue}
               onChange={handleReversedCaptureSpeedChange}
-              style={{ width: '10rem', display: 'inline-block', margin: '0 0.5rem' }}
+              style={{
+                width: "10rem",
+                display: "inline-block",
+                margin: "0 0.5rem",
+              }}
             />
-            <span style={{ fontStyle: 'italic' }}>Fast</span>
+            <span style={{ fontStyle: "italic" }}>Fast</span>
           </span>
         </OverlayTrigger>
       </div>
@@ -165,11 +182,13 @@ function SettingsPage() {
         <OverlayTrigger
           placement="left"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip('Launch the projection when the MC-AR Launcher opens.')}
+          overlay={renderTooltip(
+            "Launch the projection when the MC-AR Launcher opens."
+          )}
           // container={overlayContainer} // Add back if using portal
         >
-          <span style={{ display: 'inline-block' }}>
-            {' '}
+          <span style={{ display: "inline-block" }}>
+            {" "}
             {/* Wrapper for trigger area */}
             <span>Auto Launch</span>
             <Form.Check
@@ -179,7 +198,7 @@ function SettingsPage() {
               className="custom-switch"
               checked={autoLaunchProjector}
               onChange={(e) => setAutoLaunchProjector(e.target.checked)}
-              style={{ display: 'inline-block', marginLeft: '10px' }}
+              style={{ display: "inline-block", marginLeft: "10px" }}
             />
           </span>
         </OverlayTrigger>
@@ -188,15 +207,17 @@ function SettingsPage() {
           <OverlayTrigger
             placement="right"
             delay={{ show: 250, hide: 400 }}
-            overlay={renderTooltip('(WIP) Display device to launch the projection on.')}
+            overlay={renderTooltip(
+              "(WIP) Display device to launch the projection on."
+            )}
             // container={overlayContainer} // Add back if using portal
           >
-            <span style={{ display: 'inline-block' }}>
-              {' '}
+            <span style={{ display: "inline-block" }}>
+              {" "}
               {/* Wrapper for trigger area */}
               <span>🛠️🚧 Show on </span>
               <Dropdown
-                style={{ display: 'inline-block', marginLeft: '10px' }}
+                style={{ display: "inline-block", marginLeft: "10px" }}
                 onSelect={(key) => setDisplayTopographic(key)}
               >
                 <Dropdown.Toggle className="settingsOption" size="sm">
@@ -215,21 +236,29 @@ function SettingsPage() {
         <OverlayTrigger
           placement="right"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip('Adjust to balance detail and smoothness in the projection.')}
+          overlay={renderTooltip(
+            "Adjust to balance detail and smoothness in the projection."
+          )}
           // container={overlayContainer} // Add back if using portal
         >
-          <div style={{ display: 'flex' }}>
+          <div style={{ display: "flex" }}>
             <span>Smoothing</span>
-            <span style={{ marginLeft: '1rem', fontStyle: 'italic' }}>Less</span>
+            <span style={{ marginLeft: "1rem", fontStyle: "italic" }}>
+              Less
+            </span>
             <Form.Range
               min={0}
               max={100}
               step={1}
               value={smoothing}
               onChange={(e) => setSmoothing(Number(e.target.value))}
-              style={{ width: '10rem', display: 'inline-block', margin: '0 0.5rem' }}
+              style={{
+                width: "10rem",
+                display: "inline-block",
+                margin: "0 0.5rem",
+              }}
             />
-            <span style={{ fontStyle: 'italic' }}>More</span>
+            <span style={{ fontStyle: "italic" }}>More</span>
           </div>
         </OverlayTrigger>
       </div>
@@ -237,15 +266,15 @@ function SettingsPage() {
         <OverlayTrigger
           placement="right"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip('Color profile to project onto the sand.')}
+          overlay={renderTooltip("Color profile to project onto the sand.")}
           // container={overlayContainer} // Add back if using portal
         >
-          <span style={{ display: 'inline-block' }}>
-            {' '}
+          <span style={{ display: "inline-block" }}>
+            {" "}
             {/* Wrapper for trigger area */}
             <span>Colors</span>
             <Dropdown
-              style={{ display: 'inline-block', marginLeft: '10px' }}
+              style={{ display: "inline-block", marginLeft: "10px" }}
               onSelect={(key) => setColorMode(key)}
             >
               <Dropdown.Toggle className="settingsOption" size="sm">
@@ -253,7 +282,9 @@ function SettingsPage() {
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 <Dropdown.Item eventKey="Rainbow">Rainbow</Dropdown.Item>
-                <Dropdown.Item eventKey="Earthchromic">Earthchromic</Dropdown.Item>
+                <Dropdown.Item eventKey="Earthchromic">
+                  Earthchromic
+                </Dropdown.Item>
                 <Dropdown.Item eventKey="Default">Default</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -262,15 +293,17 @@ function SettingsPage() {
         <OverlayTrigger
           placement="left"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip('Interpolation mode for rendering the topographic projection.')}
+          overlay={renderTooltip(
+            "Interpolation mode for rendering the topographic projection."
+          )}
           // container={overlayContainer} // Add back if using portal
         >
-          <span style={{ display: 'inline-block' }}>
-            {' '}
+          <span style={{ display: "inline-block" }}>
+            {" "}
             {/* Wrapper for trigger area */}
             <span>Interpolation</span>
             <Dropdown
-              style={{ display: 'inline-block', marginLeft: '10px' }}
+              style={{ display: "inline-block", marginLeft: "10px" }}
               onSelect={(key) => setInterpolation(key)}
             >
               <Dropdown.Toggle className="settingsOption" size="sm">
@@ -278,8 +311,12 @@ function SettingsPage() {
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 <Dropdown.Item eventKey="None">None</Dropdown.Item>
-                <Dropdown.Item eventKey="Median Filter">Median Filter</Dropdown.Item>
-                <Dropdown.Item eventKey="Guassian Blur">Guassian Blur</Dropdown.Item>
+                <Dropdown.Item eventKey="Median Filter">
+                  Median Filter
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="Gaussian Blur">
+                  Gaussian Blur
+                </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           </span>
@@ -293,11 +330,13 @@ function SettingsPage() {
         <OverlayTrigger
           placement="right"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip('Launch Minecraft when the MC-AR Launcher opens.')}
+          overlay={renderTooltip(
+            "Launch Minecraft when the MC-AR Launcher opens."
+          )}
           // container={overlayContainer} // Add back if using portal
         >
-          <span style={{ display: 'inline-block' }}>
-            {' '}
+          <span style={{ display: "inline-block" }}>
+            {" "}
             {/* Wrapper for trigger area */}
             <span>Auto Launch</span>
             <Form.Check
@@ -307,7 +346,7 @@ function SettingsPage() {
               className="custom-switch"
               checked={autoLaunchMinecraft}
               onChange={(e) => setAutoLaunchMinecraft(e.target.checked)}
-              style={{ display: 'inline-block', marginLeft: '10px' }}
+              style={{ display: "inline-block", marginLeft: "10px" }}
             />
           </span>
         </OverlayTrigger>
@@ -316,15 +355,17 @@ function SettingsPage() {
           <OverlayTrigger
             placement="right"
             delay={{ show: 250, hide: 400 }}
-            overlay={renderTooltip('(WIP) Display device to launch Minecraft on.')}
+            overlay={renderTooltip(
+              "(WIP) Display device to launch Minecraft on."
+            )}
             // container={overlayContainer} // Add back if using portal
           >
-            <span style={{ display: 'inline-block' }}>
-              {' '}
+            <span style={{ display: "inline-block" }}>
+              {" "}
               {/* Wrapper for trigger area */}
               <span>🛠️🚧 Show on </span>
               <Dropdown
-                style={{ display: 'inline-block', marginLeft: '10px' }}
+                style={{ display: "inline-block", marginLeft: "10px" }}
                 onSelect={(key) => setDisplayMinecraft(key)}
               >
                 <Dropdown.Toggle className="settingsOption" size="sm">
@@ -365,11 +406,11 @@ function SettingsPage() {
         <OverlayTrigger
           placement="top"
           delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip('Filepath to the Prismlauncher exe.')}
+          overlay={renderTooltip("Filepath to the Prismlauncher exe.")}
           // container={overlayContainer} // Add back if using portal
         >
-          <span style={{ display: 'inline-block' }}>
-            {' '}
+          <span style={{ display: "inline-block" }}>
+            {" "}
             {/* Wrapper for trigger area */}
             <span>PrismLauncher Filepath</span>
             <Form.Control
@@ -378,7 +419,11 @@ function SettingsPage() {
               placeholder="C:\Path\To\PrismLauncher\prismlauncher.exe"
               value={prismlauncherPath}
               onChange={(e) => setPrismlauncherPath(e.target.value)}
-              style={{ width: '400px', display: 'inline-block', marginLeft: '10px' }}
+              style={{
+                width: "400px",
+                display: "inline-block",
+                marginLeft: "10px",
+              }}
             />
           </span>
         </OverlayTrigger>
@@ -389,17 +434,22 @@ function SettingsPage() {
           placement="top" // Place above the button
           delay={{ show: 250, hide: 400 }}
           overlay={renderTooltip(
-            'Changes persist between sessions and are made immediately upon saving.'
+            "Changes persist between sessions and are made immediately upon saving."
           )}
           // container={overlayContainer} // Add back if using portal
         >
           <Button className="mt-1 saveButton" onClick={handleSaveSettings}>
-            <img style={{ width: '1.2rem', height: '1.2rem' }} src={saveIcon} alt="Save" /> Save
+            <img
+              style={{ width: "1.2rem", height: "1.2rem" }}
+              src={saveIcon}
+              alt="Save"
+            />{" "}
+            Save
           </Button>
         </OverlayTrigger>
       </div>
     </div>
-  )
+  );
 }
 
-export default SettingsPage
+export default SettingsPage;
