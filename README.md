@@ -8,7 +8,7 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
 - Plugin consists of 7 biomes and 7 unique gamemodes to choose from.
 
 # Installation
-- Download Python 3.1x from the Microsoft Store. <br>
+- Download [Python 3.12 from the Microsoft Store](https://apps.microsoft.com/detail/9NCVDN91XZQP?hl=en-us&gl=US&ocid=pdpshare). <br>
 - Download [PrismLauncher](https://prismlauncher.org/download/windows/), [Kinect SDK](https://www.microsoft.com/en-us/download/details.aspx?id=44561), and [Java 21+](https://www.oracle.com/java/technologies/downloads/#java21). <br>
 - Log into PrismLauncher with your Microsoft/Minecraft account. <br>
 - Download the newest [MC-AR Launcher release](https://github.com/colemaring/MC-AR-Sandbox/releases). <br>
