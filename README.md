@@ -50,6 +50,9 @@ Save button: Save your configuration to persist between launches and reflect cha
 ## Tuning the settings
 todo
 
+## Troubleshooting
+Ensure you do not have python 2.x.x installed <br>
+
 ## Developers
 ```cd launcher```<br>
 ```npm i```<br>
