@@ -22,6 +22,7 @@ export async function readConfig() {
         topographic_display_assignment: 'Display 2',
         topographic_smoothing: 19,
         topographic_color_mode: 'Default',
+        topographic_interpolation: 'Median Filter',
         topographic_auto_launch_projector: false,
         minecraft_display_on_launch: false,
         minecraft_elevation: 85,
