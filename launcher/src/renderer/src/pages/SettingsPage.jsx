@@ -163,27 +163,6 @@ function SettingsPage() {
       <h3 className="mt-2">Projection Settings</h3>
       <div className="mt-1">
         <OverlayTrigger
-          placement="right"
-          delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip('Launch the projection in fullscreen.')}
-          // container={overlayContainer} // Add back if using portal
-        >
-          <span style={{ display: 'inline-block', marginRight: '15px' }}>
-            {' '}
-            {/* Wrapper for trigger area */}
-            <span>Fullscreen on Launch</span>
-            <Form.Check
-              type="switch"
-              id="topographic-launch-switch"
-              label=""
-              className="custom-switch"
-              checked={displayOnLaunchTopographic}
-              onChange={(e) => setDisplayOnLaunchTopographic(e.target.checked)}
-              style={{ display: 'inline-block', marginLeft: '10px' }}
-            />
-          </span>
-        </OverlayTrigger>
-        <OverlayTrigger
           placement="left"
           delay={{ show: 250, hide: 400 }}
           overlay={renderTooltip('Launch the projection when the MC-AR Launcher opens.')}
@@ -209,13 +188,13 @@ function SettingsPage() {
           <OverlayTrigger
             placement="right"
             delay={{ show: 250, hide: 400 }}
-            overlay={renderTooltip('Display device to launch the projection on.')}
+            overlay={renderTooltip('(WIP) Display device to launch the projection on.')}
             // container={overlayContainer} // Add back if using portal
           >
             <span style={{ display: 'inline-block' }}>
               {' '}
               {/* Wrapper for trigger area */}
-              <span>Show on </span>
+              <span>🛠️🚧 Show on </span>
               <Dropdown
                 style={{ display: 'inline-block', marginLeft: '10px' }}
                 onSelect={(key) => setDisplayTopographic(key)}
@@ -337,13 +316,13 @@ function SettingsPage() {
           <OverlayTrigger
             placement="right"
             delay={{ show: 250, hide: 400 }}
-            overlay={renderTooltip('Display device to launch Minecraft on.')}
+            overlay={renderTooltip('(WIP) Display device to launch Minecraft on.')}
             // container={overlayContainer} // Add back if using portal
           >
             <span style={{ display: 'inline-block' }}>
               {' '}
               {/* Wrapper for trigger area */}
-              <span>Show on </span>
+              <span>🛠️🚧 Show on </span>
               <Dropdown
                 style={{ display: 'inline-block', marginLeft: '10px' }}
                 onSelect={(key) => setDisplayMinecraft(key)}
@@ -410,7 +389,7 @@ function SettingsPage() {
           placement="top" // Place above the button
           delay={{ show: 250, hide: 400 }}
           overlay={renderTooltip(
-            'Save your configuration to persist between launches and reflect changes in the currently running Minecraft instance.'
+            'Changes persist between sessions and are made immediately upon saving.'
           )}
           // container={overlayContainer} // Add back if using portal
         >

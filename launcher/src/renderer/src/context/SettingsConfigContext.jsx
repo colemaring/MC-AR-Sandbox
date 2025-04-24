@@ -13,7 +13,6 @@ export const SettingsConfigProvider = ({ children }) => {
   const [captureSpeed, setCaptureSpeed] = useState(50)
 
   // Topographic settings
-  const [displayOnLaunchTopographic, setDisplayOnLaunchTopographic] = useState(false)
   const [displayTopographic, setDisplayTopographic] = useState('Display 1')
   const [smoothing, setSmoothing] = useState(40)
   const [colorMode, setColorMode] = useState('Default')
@@ -39,7 +38,6 @@ export const SettingsConfigProvider = ({ children }) => {
         setY2(config?.kinect_view_crop?.y2 || 0)
         setDistance(config?.kinect_surface_distance_cm || 0)
         setCaptureSpeed(config?.kinect_capture_speed || 15)
-        setDisplayOnLaunchTopographic(config?.topographic_display_on_launch || false)
         setDisplayTopographic(config?.topographic_display_assignment || 'Display 1')
         setSmoothing(config?.topographic_smoothing || 40)
         setColorMode(config?.topographic_color_mode || 'Default')
@@ -67,7 +65,6 @@ export const SettingsConfigProvider = ({ children }) => {
       kinect_view_crop: { x1, y1, x2, y2 },
       kinect_surface_distance_cm: distance,
       kinect_capture_speed: captureSpeed,
-      topographic_display_on_launch: displayOnLaunchTopographic,
       topographic_display_assignment: displayTopographic,
       topographic_smoothing: smoothing,
       topographic_color_mode: colorMode,
@@ -101,7 +98,6 @@ export const SettingsConfigProvider = ({ children }) => {
     x2,
     y2,
     distance,
-    displayOnLaunchTopographic,
     displayTopographic,
     smoothing,
     elevation,
@@ -122,7 +118,6 @@ export const SettingsConfigProvider = ({ children }) => {
         x2,
         y2,
         distance,
-        displayOnLaunchTopographic,
         displayTopographic,
         smoothing,
         elevation,
@@ -135,7 +130,6 @@ export const SettingsConfigProvider = ({ children }) => {
         setX2,
         setY2,
         setDistance,
-        setDisplayOnLaunchTopographic,
         setDisplayTopographic,
         setSmoothing,
         setColorMode,

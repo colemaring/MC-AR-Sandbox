@@ -8,7 +8,7 @@ import { startMinecraftServer } from './mc_server'
 const { exec } = require('child_process')
 import { terminateAllProcesses } from './terminate_processes'
 import { checkDependencies } from './check_dependencies'
-import { launchPrismLauncher } from './launch'
+import { launchPrismLauncher, launchProjection } from './launch'
 import { serverProcess } from './mc_server'
 import { Rcon } from 'rcon-client'
 import { readConfig } from './config_handler'
@@ -114,12 +114,30 @@ function createWindow() {
       }
     }
 
-    ipcMain.on('launch-prism', async (event, instanceName) => {
+    if (config.topographic_auto_launch_projector === true) {
+      sendLogMessage('Auto-launching Projection based on settings...', 'normal')
+
+      // Launch Projection
+      const projectionLaunched = await launchProjection(instanceName, mainWindow)
+      if (projectionLaunched) {
+        sendLogMessage('Projection auto-launched successfully', 'success')
+      } else {
+        sendLogMessage('Failed to auto-launch Projection', 'error')
+      }
+    }
+
+    ipcMain.on('start-launch', async (event, instanceName) => {
       const launched = await launchPrismLauncher(instanceName, mainWindow)
+      const projectionLaunched = await launchProjection(instanceName, mainWindow)
       if (launched) {
-        sendLogMessage(`PrismLauncher launch requested for ${instanceName}`, 'normal')
+        //sendLogMessage(`PrismLauncher launch requested for ${instanceName}`, 'normal')
       } else {
         sendLogMessage(`PrismLauncher launch failed for ${instanceName}`, 'error')
+      }
+      if (projectionLaunched) {
+        //sendLogMessage(`Projection launch requested for ${instanceName}`, 'normal')
+      } else {
+        sendLogMessage(`Projection launch failed for ${instanceName}`, 'error')
       }
     })
     ipcMain.on('serverCommand', async (event, command) => {

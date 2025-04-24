@@ -19,7 +19,6 @@ export async function readConfig() {
         },
         kinect_surface_distance_cm: 185,
         kinect_capture_speed: 10,
-        topographic_display_on_launch: true,
         topographic_display_assignment: 'Display 2',
         topographic_smoothing: 19,
         topographic_color_mode: 'Default',

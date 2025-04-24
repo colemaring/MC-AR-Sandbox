@@ -4,6 +4,9 @@ import path from 'path'
 import { sendLogMessage } from './index' // Assuming this is your main file
 import { ipcMain } from 'electron' // Import ipcMain
 import { readConfig } from './config_handler' // Import readConfig function
+import { join } from 'path' // Import join from path
+import { app } from 'electron' // Import app from electron
+import { send } from 'process'
 
 /**
  * Launches PrismLauncher with the specified instance.
@@ -13,7 +16,7 @@ import { readConfig } from './config_handler' // Import readConfig function
 export async function launchPrismLauncher(instanceName, mainWindow) {
   // Add mainWindow parameter
   try {
-    const config = await readConfig() 
+    const config = await readConfig()
 
     // 2. Get the PrismLauncher path from the config
     const prismLauncherPath = config?.minecraft_prismlauncher_path
@@ -95,6 +98,123 @@ export async function launchPrismLauncher(instanceName, mainWindow) {
   } catch (error) {
     sendLogMessage(`Error launching PrismLauncher: ${error.message}`, 'error')
     console.error(`Error launching PrismLauncher:`, error)
+    return false
+  }
+}
+
+async function isProjectionRunning() {
+  return new Promise((resolve) => {
+    // Windows specific check - simpler approach
+    exec('tasklist | findstr /I "python"', (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error checking for Python process: ${error}`)
+        resolve(false) // Assume not running on error
+        return
+      }
+
+      if (!stdout.trim()) {
+        // No Python processes found
+        resolve(false)
+        return
+      }
+
+      // Check if topoprojection.py is in the command line
+      exec('wmic process where "name like \'%python%\'" get commandline', (err, output) => {
+        if (err) {
+          console.error(`Error checking Python command line: ${err}`)
+          resolve(false)
+          return
+        }
+
+        const isRunning = output.toLowerCase().includes('topoprojection.py')
+        resolve(isRunning)
+      })
+    })
+  })
+}
+
+export async function launchProjection(instanceName, mainWindow) {
+  try {
+    // First, check if projection is already running
+    const alreadyRunning = await isProjectionRunning()
+    if (alreadyRunning) {
+      const errorMsg = 'Topographic projection is already running'
+      sendLogMessage(errorMsg, 'warning')
+      return false
+    }
+    sendLogMessage('Starting topographic projection...', 'normal')
+
+    const pythonExecutable = 'python3'
+    let scriptPath
+
+    if (app.isPackaged) {
+      scriptPath = path.join(process.resourcesPath, 'topoprojection.py')
+    } else {
+      scriptPath = path.join(__dirname, '../../topoprojection.py')
+    }
+
+    // Spawn Python process
+    const projectionProcess = spawn(pythonExecutable, [scriptPath], {
+      stdio: ['pipe', 'pipe', 'pipe']
+    })
+
+    // Handle stdout
+    projectionProcess.stdout.on('data', (data) => {
+      console.log(`Projection stdout: ${data}`)
+      //sendLogMessage(`${data}`, 'normal')
+      // mainWindow.webContents.send('logMessage', {
+      //   text: `Projection: ${data}`,
+      //   type: 'normal'
+      // })
+    })
+
+    // Handle stderr
+    projectionProcess.stderr.on('data', (data) => {
+      console.error(`Projection stderr: ${data}`)
+      sendLogMessage(`Projection Error: ${data}`, 'error')
+      mainWindow.webContents.send('logMessage', {
+        text: `Projection Error: ${data}`,
+        type: 'error'
+      })
+    })
+
+    // Handle process exit
+    projectionProcess.on('close', (code) => {
+      console.log(`Projection process exited with code ${code}`)
+      if (code !== 0) {
+        sendLogMessage(`Projection process exited with code ${code}`, 'error')
+        mainWindow.webContents.send('logMessage', {
+          text: `Projection process exited with code ${code}`,
+          type: 'error'
+        })
+      } else {
+        sendLogMessage('Projection process closed successfully', 'success')
+      }
+    })
+
+    // Handle process errors
+    projectionProcess.on('error', (err) => {
+      console.error('Failed to start projection:', err)
+      sendLogMessage(`Failed to start projection: ${err.message}`, 'error')
+      mainWindow.webContents.send('logMessage', {
+        text: `Failed to start projection: ${err.message}`,
+        type: 'error'
+      })
+      return false
+    })
+
+    // Store the process for cleanup
+    global.projectionProcess = projectionProcess
+    sendLogMessage('Projection started successfully', 'success')
+
+    return true
+  } catch (error) {
+    console.error('Error launching projection:', error)
+    sendLogMessage(`Error launching projection: ${error.message}`, 'error')
+    mainWindow.webContents.send('logMessage', {
+      text: `Error launching projection: ${error.message}`,
+      type: 'error'
+    })
     return false
   }
 }
