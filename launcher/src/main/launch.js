@@ -144,7 +144,7 @@ export async function launchProjection(instanceName, mainWindow) {
     }
     sendLogMessage('Starting topographic projection...', 'normal')
 
-    const pythonExecutable = 'python3'
+    const pythonExecutable = 'python'
     let scriptPath
 
     if (app.isPackaged) {
