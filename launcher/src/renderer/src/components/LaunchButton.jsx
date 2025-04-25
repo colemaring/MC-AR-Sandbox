@@ -2,25 +2,28 @@ import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 
 function LaunchButton() {
-  // Check if this is the first load of the app
-  const isFirstLoad = !localStorage.getItem("appInitialized");
-  const [launchButtonDisabled, setLaunchButtonDisabled] = useState(isFirstLoad); // Only disabled on first load
+  // Check if this is the first load of the current app session
+  const isFirstLoadThisSession = !sessionStorage.getItem("appInitialized");
+  const [launchButtonDisabled, setLaunchButtonDisabled] = useState(
+    isFirstLoadThisSession
+  );
   const [loadingText, setLoadingText] = useState(
-    isFirstLoad ? "Initializing..." : ""
-  ); // Only show text on first load
+    isFirstLoadThisSession ? "Initializing..." : ""
+  );
 
-  // Effect to enable button after initial loading period - only on first app load
+  // Effect to enable button after initial loading period - for each app launch
   useEffect(() => {
-    if (isFirstLoad) {
+    console.log("isFirstLoadThisSession", isFirstLoadThisSession);
+    if (isFirstLoadThisSession) {
       const timer = setTimeout(() => {
         setLaunchButtonDisabled(false);
         setLoadingText(""); // Clear the loading text
-        localStorage.setItem("appInitialized", "true"); // Mark app as initialized
-      }, 2000); // 2 seconds
+        sessionStorage.setItem("appInitialized", "true"); // Mark app as initialized for this session
+      }, 4000);
 
       return () => clearTimeout(timer); // Cleanup on unmount
     }
-  }, [isFirstLoad]); // Dependency on isFirstLoad
+  }, [isFirstLoadThisSession]);
 
   const handleLaunchClick = () => {
     setLaunchButtonDisabled(true); // Disable the button when clicked
