@@ -146,7 +146,7 @@ def main():
     else:  # Default
         cmap = plt.get_cmap('viridis')
         
-    levels = np.linspace(0, 255, 25)
+    levels = np.linspace(0, 255, 100)
     fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
 
     img_artist = None
