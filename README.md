@@ -10,7 +10,7 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
 # Installation
 - Download [Python 3.12 from the Microsoft Store](https://apps.microsoft.com/detail/9NCVDN91XZQP?hl=en-us&gl=US&ocid=pdpshare), [PrismLauncher](https://prismlauncher.org/download/windows/), [Kinect SDK](https://www.microsoft.com/en-us/download/details.aspx?id=44561), and [Java 21+](https://www.oracle.com/java/technologies/downloads/#java21). <br>
 - Log into PrismLauncher with your Microsoft/Minecraft account. <br>
-- Download the newest [MC-AR Launcher release](https://github.com/colemaring/MC-AR-Sandbox/releases). (First-Time setup takes about 5 minutes)<br>
+- Download the latest [MC-AR Launcher release](https://github.com/colemaring/MC-AR-Sandbox/releases). (First-Time setup takes about 5 minutes)<br>
 - [Tune the Kinect settings](#tuning-the-settings). <br>
 
 # Hardware
