@@ -26,11 +26,10 @@ import Terrain.TerrainGeneratorHelper;
 public class ZombieRush {
     private static int taskID = -1;
     private static int timeLeft = 60;
+    public static boolean running = false;
     private static Set<UUID> reachedZombies = new HashSet<>();
     // Map to track each zombie's individual target location.
     private static Map<UUID, Location> zombieTargets = new HashMap<>();
-    
-
     
     public static void prepareTerrain() {
     	// First stop any games if they exist
@@ -70,6 +69,7 @@ public class ZombieRush {
     }
     
     public static void startZombieRush() {
+    	running = true;
         Bukkit.broadcastMessage(ChatColor.GOLD + "Zombie Rush has begun. 1 minute remains!");
      // Start the timer
         TerrainGeneratorHelper.pauseTerrain();
@@ -141,8 +141,12 @@ public class ZombieRush {
 //                    Bukkit.broadcastMessage(ChatColor.GOLD + "Zombie Rush has ended!");
                     Bukkit.broadcastMessage(ChatColor.DARK_RED + "Time's up!");
                     Bukkit.broadcastMessage(ChatColor.AQUA + "" + reachedZombies.size() + "/" + (TerrainGeneratorHelper.terrainHeight*2) + ChatColor.RED + " zombies reached the end.");
-                    cleanupZombiesAndTargets();
-                    GamemodeHelper.stopCurrentGamemodeIfRunning();
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                        	GamemodeHelper.stopCurrentGamemodeIfRunning();
+                        }
+                    }.runTaskLater(KinectSandbox.getInstance(), 2 * 20L);
                     taskID = -1; // Reset task ID
                     return;
                 }
@@ -172,6 +176,7 @@ public class ZombieRush {
     }
     
     public static void cleanupZombiesAndTargets() {
+    	running = false;
         World world = Bukkit.getWorlds().get(0);
         for (Entity entity : world.getEntities()) {
             if (entity instanceof Zombie 

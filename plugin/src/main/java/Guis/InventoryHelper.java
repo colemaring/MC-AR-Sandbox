@@ -25,12 +25,13 @@ public class InventoryHelper implements Listener{
 	 @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
     	Player player = event.getPlayer();
-        if (event.getItem() != null && event.getItem().getType() == Material.NETHER_STAR && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Game Menu (Left Click)") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK))
+        if (event.getItem() != null && event.getItem().getType() == Material.NETHER_STAR && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Game Menu") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK))
         {
+        	
         	gameGui.show(player);
        		event.setCancelled(true); // prevent breaking a block
         }
-        if (event.getItem() != null && event.getItem().getType() == Material.COMPASS && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Biome Menu (Left Click)") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK))
+        if (event.getItem() != null && event.getItem().getType() == Material.COMPASS && event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Biome Menu") && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK))
         {
         	biomeGui.show(player);
         	event.setCancelled(true);
@@ -69,8 +70,8 @@ public class InventoryHelper implements Listener{
                 compass.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 1);
                 ItemMeta nether_star_meta = nether_star.getItemMeta();
                 ItemMeta compass_meta = compass.getItemMeta();
-                nether_star_meta.setDisplayName(ChatColor.GOLD + "Game Menu (Left Click)");
-                compass_meta.setDisplayName(ChatColor.GOLD + "Biome Menu (Left Click)");
+                nether_star_meta.setDisplayName(ChatColor.GOLD + "Game Menu");
+                compass_meta.setDisplayName(ChatColor.GOLD + "Biome Menu");
                 nether_star.setItemMeta(nether_star_meta);
                 compass.setItemMeta(compass_meta);
                 player.getInventory().addItem(compass);

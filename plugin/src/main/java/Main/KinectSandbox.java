@@ -19,6 +19,7 @@ public class KinectSandbox extends JavaPlugin implements Listener {
 	public int rawKinectWidth = 512;
 	public int rawKinectMaxDepth = 255;
     public World world;
+    public static boolean allowWaterFlow = false;
     public static String biome = "grass";
     public KinectSettings settings;
     private WebsocketsHandler wsHandler;

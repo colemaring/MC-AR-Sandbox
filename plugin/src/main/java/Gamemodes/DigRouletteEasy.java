@@ -215,13 +215,13 @@ public class DigRouletteEasy {
 	    Bukkit.broadcastMessage(ChatColor.DARK_RED + "Game over!");
 	    Bukkit.broadcastMessage(ChatColor.RED + "You found " + ChatColor.AQUA + foundCount + ChatColor.RED + " gold before hitting TNT.");
 
-	    // Schedule to run 1 tick later
+	    // Schedule to run 2 secs
 	    new BukkitRunnable() {
 	        @Override
 	        public void run() {
 	            GamemodeHelper.stopCurrentGamemodeIfRunning();
 	        }
-	    }.runTaskLater(KinectSandbox.getInstance(), 1L);
+	    }.runTaskLater(KinectSandbox.getInstance(), 2 * 20L);
 	}
 
 	

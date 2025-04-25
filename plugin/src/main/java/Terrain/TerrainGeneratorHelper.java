@@ -6,6 +6,7 @@ import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Levelled;
 
 import Main.KinectSandbox;
 
@@ -240,9 +241,11 @@ public class TerrainGeneratorHelper {
 	{
 		// Ignore ores from OreHunt and Dig Roulette gamemodes
 		if (KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.IRON_BLOCK) ||KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.GOLD_BLOCK) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.TNT) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.DIAMOND_BLOCK) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.EMERALD_BLOCK) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.COAL_BLOCK) || KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType().equals(Material.BEDROCK))
-		{
 			return;
-		}
+		
+		// dont overwrite water source blocks if allowWaterFlow is enabled (from aquaduct gamemode)
+		if ((KinectSandbox.allowWaterFlow  && KinectSandbox.getInstance().world.getBlockAt(i, k, j).getType() == Material.WATER  && KinectSandbox.getInstance().world.getBlockAt(i, k, j).getBlockData() instanceof Levelled  && ((Levelled) KinectSandbox.getInstance().world.getBlockAt(i, k, j).getBlockData()).getLevel() == 0))
+			return;
 		
 		if (biome.equals("grass"))
 		{	

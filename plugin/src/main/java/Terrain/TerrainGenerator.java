@@ -1,5 +1,4 @@
 package Terrain;
-import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -54,10 +53,10 @@ public class TerrainGenerator implements Listener{
             	    // read by main thread bukkit api to check if current updateTerrain called needs to cancel current block placements
             	    resetCalled = true;
             	}
-            	if (KinectSandbox.biome.equals("nether"))
-            		Bukkit.getWorld("world").setTime(20000L);
-            	else
-            		Bukkit.getWorld("world").setTime(1000L);
+//            	if (KinectSandbox.biome.equals("nether"))
+//            		Bukkit.getWorld("world").setTime(20000L);
+//            	else
+//            		Bukkit.getWorld("world").setTime(1000L);
 
             	for (int i = 0; i < diffDepth.length; i++)
             	{

@@ -19,7 +19,6 @@ public class KinectSettings {
     public int y1;
     public int y2;
     public int kinectDistance;
-    public int elevationMultiplier;
     public int captureSpeed;
     public String settingsHash;
     private final File settingsFile;
@@ -47,9 +46,8 @@ public class KinectSettings {
             this.x2 = crop.get("x2").getAsInt();
             this.y2 = crop.get("y2").getAsInt();
             this.kinectDistance = root.get("kinect_surface_distance_cm").getAsInt();
-            this.elevationMultiplier = root.get("minecraft_elevation").getAsInt();
             this.captureSpeed = root.get("kinect_capture_speed").getAsInt();
-            this.settingsHash = this.x1+""+this.x2+""+this.y1+""+this.y2+""+this.kinectDistance+""+elevationMultiplier;
+            this.settingsHash = this.x1+""+this.x2+""+this.y1+""+this.y2+""+this.kinectDistance;
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to read settings from file: " + settingsFile.getAbsolutePath());

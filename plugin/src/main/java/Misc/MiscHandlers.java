@@ -8,6 +8,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
@@ -16,6 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -23,6 +25,8 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
+import Gamemodes.ZombieRush;
+import Main.KinectSandbox;
 import Terrain.TerrainGeneratorHelper;
 
 public class MiscHandlers implements Listener{
@@ -40,6 +44,27 @@ public class MiscHandlers implements Listener{
 	        event.setCancelled(true);
 	    }
 	}
+	
+	// If zombie rush is running, allow zombie spawns, otherwise disable everything
+	@EventHandler
+	public void onCreatureSpawn(CreatureSpawnEvent event) {
+	    if (!ZombieRush.running)
+	        event.setCancelled(true);
+	    else if (event.getEntityType() != EntityType.ZOMBIE && event.getEntityType() != EntityType.ARMOR_STAND)
+	        event.setCancelled(true);
+	}
+	
+	// Prevent grass from turning into dirt
+//	@EventHandler
+//	public void onBlockPhysicsEvent(BlockPhysicsEvent event)
+//	{
+//		if (event.getChangedType().equals(Material.DIRT))
+//		{
+//			event.setCancelled(true);
+//		}
+//	}
+
+
 	
 	// Prevent item drops when entities die
 	@EventHandler
@@ -62,14 +87,16 @@ public class MiscHandlers implements Listener{
 
 	
     // Disable water & lava flow
-	// lava flow not being stopped?
     @EventHandler
     public void onBlockFromTo(BlockFromToEvent event) {
-        Material type = event.getBlock().getType();
-
-        if (type == Material.WATER || type == Material.LAVA)
-            event.setCancelled(true);
+        if (!KinectSandbox.allowWaterFlow) {
+            Material type = event.getBlock().getType();
+            if (type == Material.WATER || type == Material.LAVA) {
+                event.setCancelled(true);
+            }
+        }
     }
+
     
     // Disable blocks from falling
     @EventHandler

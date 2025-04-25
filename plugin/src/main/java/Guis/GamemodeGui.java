@@ -8,11 +8,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import Gamemodes.Aquaduct;
 import Gamemodes.DigRouletteEasy;
-import Gamemodes.DigRouletteHard;
 import Gamemodes.GamemodeHelper;
 import Gamemodes.OreHunt;
 import Gamemodes.OreHunt2p;
-import Gamemodes.VolcanoSimulator;
 import Gamemodes.ZombieRush;
 import Main.KinectSandbox;
 import de.themoep.inventorygui.InventoryGui;
@@ -123,52 +121,17 @@ public class GamemodeGui {
 			    	DigRouletteEasy.initDigRoulette();
 			    	return true;
 			    },
-			    "§aDig Roulette (easy)",
+			    "§aDig Roulette",
 			    "§7",
 			    "§7Dig up as much gold as possible without hitting TNT.",
 			    "§7TNT = game over",
-			    "§7",
-			    "§7TNT is less common in easy mode",
 			    "§7",
 			    "§bClick to start"
 			));
 		ItemStack tnt = new ItemStack(Material.TNT);
 		tnt.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 1);;
-		gui.addElement(new StaticGuiElement('e',
-				tnt,
-			    1,
-			    click -> {
-			    	Player player = (Player) click.getWhoClicked();
-			        player.closeInventory();
-			    	DigRouletteHard.initDigRoulette();
-			    	return true;
-			    },
-			    "§aDig Roulette (hard)",
-			    "§7",
-			    "§7Dig up as much gold as possible without hitting TNT.",
-			    "§7TNT = game over",
-			    "§7",
-			    "§7TNT is more common in hard mode",
-			    "§7",
-			    "§bClick to start"
-			));
-		gui.addElement(new StaticGuiElement('f',
-			    new ItemStack(Material.OBSIDIAN),
-			    1,
-			    click -> {
-			    	Player player = (Player) click.getWhoClicked();
-			        player.closeInventory();
-			    	VolcanoSimulator.startCountdown();
-			    	return true;
-			    },
-			    "§aVolcano Simulator (WIP)",
-			    "§7",
-			    "§7Build a volcano and watch it erupt after 30 seconds.",
-			    "§7",
-			    "§bClick to start"
-			));
 
-		gui.addElement(new StaticGuiElement('g',
+		gui.addElement(new StaticGuiElement('e',
 			    new ItemStack(Material.WATER_BUCKET),
 			    1,
 			    click -> {
@@ -177,12 +140,38 @@ public class GamemodeGui {
 			    	Aquaduct.startCountdown();
 			    	return true;
 			    },
-			    "§aAquaduct (WIP)",
+			    "§aAquaduct",
 			    "§7",
-			    "§7Redirect water from the source to the end.",
+			    "§7Redirect water from the source to the sink.",
+			    "§7",
+			    "§7The water source will spawn at the highest elevation point,",
+			    "§7and the sink (gold block) will spawn randomly above surface.",
 			    "§7",
 			    "§bClick to start"
 			));
+		gui.addElement(new StaticGuiElement('f',
+			    new ItemStack(Material.BARRIER),
+			    1,
+			    click -> {
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
+			    	return true;
+			    },
+			    "§aTo be developed.."
+			));
+		
+		gui.addElement(new StaticGuiElement('g',
+			    new ItemStack(Material.BARRIER),
+			    1,
+			    click -> {
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
+			    	return true;
+			    },
+			    "§aTo be developed.."
+			));
+
+		
 		
 		return gui;
 	}

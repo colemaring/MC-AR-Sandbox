@@ -14,7 +14,7 @@ import de.themoep.inventorygui.StaticGuiElement;
 import net.md_5.bungee.api.ChatColor;
 
 public class BiomeGui {
-
+	public static GuiStateElement waterElement;
 	public InventoryGui createGui()
 	{
 		String[] guiSetup = {
@@ -24,60 +24,116 @@ public class BiomeGui {
 	        };
 		InventoryGui gui = new InventoryGui(KinectSandbox.getInstance(), null, "Biome Menu & Water Toggle", guiSetup);
 		//gui.setFiller(new ItemStack(Material.GRAY_STAINED_GLASS, 1));
-		GuiStateElement element = new GuiStateElement('w', 
-		        new GuiStateElement.State(
-		                change -> {
-		                	Player player = (Player) change.getWhoClicked();
-					        player.closeInventory();
-					        if (GamemodeHelper.gamemodeRunning)
-					        {
-					        	Bukkit.broadcastMessage(ChatColor.RED + "Cant disable water while gamemode in progress.");
-					        	return;
-					        }
-					        Bukkit.broadcastMessage(ChatColor.GREEN + "Disabling water..");
-		                	KinectSandbox.getInstance().waterEnabled = false;
-		                },
-		                "waterDisabled", // a key to identify this state by
-		                new ItemStack(Material.BUCKET), // the item to display as an icon
-		                ChatColor.GREEN + "Enable water!", // explanation text what this element does
-		                "Water is currently disabled"
-		        ),
-		        new GuiStateElement.State(
-		                change -> {
-		                	Player player = (Player) change.getWhoClicked();
-					        player.closeInventory();
-					        if (GamemodeHelper.gamemodeRunning)
-					        {
-					        	Bukkit.broadcastMessage(ChatColor.RED + "Cant enable water while gamemode in progress.");
-					        	return;
-					        }
-		            	    if (KinectSandbox.biome.equals("sand") || KinectSandbox.biome.equals("mesa") || KinectSandbox.biome.equals("rainbow"))
-		            	    {
-		            	    	Bukkit.broadcastMessage(ChatColor.GREEN + "Water enabled, but this biome doesn't have water.");
-		            	    	KinectSandbox.getInstance().waterEnabled = true;
-		            	    	return;
-		            	    }
-		                	
-		                	for (Player p : Bukkit.getOnlinePlayers()) {
-		            			p.sendMessage(ChatColor.GREEN + "Enabling water..");
-		            		}
-		                	KinectSandbox.getInstance().waterEnabled = true;
-		                },
-		                "waterEnabled",
-		                new ItemStack(Material.WATER_BUCKET),
-		                ChatColor.RED + "Disable water!",
-		                "Water is currently enabled"
-		        )
+		// Assuming 'gui' is already defined somewhere above
+
+		// Create the GuiStateElement instance
+		  waterElement = new GuiStateElement(
+		    'w', // Slot char or identifier
+		    false, // Maybe 'locked'? Needs context from GuiStateElement docs
+		    // Set the INITIAL state key based on the current waterEnabled value
+		    KinectSandbox.getInstance().waterEnabled ? "waterEnabled" : "waterDisabled",
+		    
+
+		    // --- STATE: waterDisabled ---
+		    // This state represents the condition when water IS currently disabled.
+		    // Clicking it should attempt to ENABLE water.
+		    new GuiStateElement.State(
+		    		
+		        change -> { // Action executed when clicked in this state
+		            Player player = (Player) change.getWhoClicked();
+		            player.closeInventory(); // Close inventory first
+
+		            // --- Pre-conditions ---
+		            if (GamemodeHelper.gamemodeRunning) {
+		                Bukkit.broadcastMessage(ChatColor.RED + "Can't enable water while gamemode in progress.");
+		                return; // Stop execution
+		            }
+		            if (KinectSandbox.biome.equals("sand") || KinectSandbox.biome.equals("mesa") || KinectSandbox.biome.equals("rainbow")) {
+		                Bukkit.broadcastMessage(ChatColor.RED + "This biome doesn't allow water."); // Use RED for errors/restrictions
+		                // Ensure the state remains consistent if enabling fails
+		                if (KinectSandbox.getInstance().waterEnabled) { // Check if it somehow got enabled elsewhere
+		                     KinectSandbox.getInstance().waterEnabled = false;
+		                     // No need to set element state here, as we are aborting the switch
+		                }
+		                // No need to redraw if nothing changed visually
+		                return; // Stop execution
+		            }
+
+		            // --- Action ---
+		            // Send message before changing state
+		            for (Player p : Bukkit.getOnlinePlayers()) {
+		                p.sendMessage(ChatColor.GREEN + "Enabling water...");
+		            }
+		            // Update the underlying boolean value
+		            KinectSandbox.getInstance().waterEnabled = true;
+
+		            // --- Update GUI State ---
+		            // *** KEY CHANGE: Tell the element to switch to the 'waterEnabled' state ***
+		            // We assume 'change.getElement()' exists or the 'element' variable is accessible.
+		            // If using lambda, 'element' should be effectively final or captured.
+		            ((GuiStateElement) change.getElement()).setState("waterEnabled");
+
+
+		            // Redraw the GUI to reflect the changes
+		            change.getGui().draw();
+		        },
+		        "waterDisabled", // Key identifying this state
+		        new ItemStack(Material.BUCKET), // Icon: Empty bucket (represents "can enable")
+		        ChatColor.GREEN + "Enable Water", // Title: Action to take
+		        "Water is currently disabled.", // Lore/Description
+		        "Click to enable water flow." // Additional lore line
+		    ),
+
+		    // --- STATE: waterEnabled ---
+		    // This state represents the condition when water IS currently enabled.
+		    // Clicking it should attempt to DISABLE water.
+		    new GuiStateElement.State(
+		        change -> { // Action executed when clicked in this state
+		            Player player = (Player) change.getWhoClicked();
+		            player.closeInventory(); // Close inventory first
+
+		            // --- Pre-conditions ---
+		             if (GamemodeHelper.gamemodeRunning) {
+		                 Bukkit.broadcastMessage(ChatColor.RED + "Can't disable water while gamemode in progress.");
+		                 return; // Stop execution
+		             }
+
+		            // --- Action ---
+		            Bukkit.broadcastMessage(ChatColor.YELLOW + "Disabling water..."); // Use Yellow or Red for disabling actions
+		            // Update the underlying boolean value
+		            KinectSandbox.getInstance().waterEnabled = false;
+
+		            // --- Update GUI State ---
+		            // *** KEY CHANGE: Tell the element to switch to the 'waterDisabled' state ***
+		            ((GuiStateElement) change.getElement()).setState("waterDisabled");
+
+
+		            // Redraw the GUI to reflect the changes
+		            change.getGui().draw();
+		        },
+		        "waterEnabled", // Key identifying this state
+		        new ItemStack(Material.WATER_BUCKET), // Icon: Water bucket (represents "can disable")
+		        ChatColor.RED + "Disable Water", // Title: Action to take
+		        "Water is currently enabled.", // Lore/Description
+		        "Click to disable water flow." // Additional lore line
+		    )
 		);
-		 
-//		# Set the current state
-//		if (player.isFlying()) {
-//		    element.setState("flyingEnabled");
-//		} else {
-//		    element.setState("flyingDisabled");
-//		}
-		 
-		gui.addElement(element);
+
+		// Add the element to the GUI
+		gui.addElement(waterElement);
+
+		// --- Remove Redundant SetState ---
+		// The constructor already sets the initial state based on the boolean.
+		// This block is likely unnecessary and potentially confusing.
+		/*
+		if (KinectSandbox.getInstance().waterEnabled) {
+		    element.setState("waterEnabled");
+		} else {
+		    element.setState("waterDisabled");
+		}
+		// If the GUI needs an initial draw after adding elements, do it here:
+		// gui.draw(); // Or however the initial drawing is triggered for the whole GUI
+		*/
 		gui.addElement(new StaticGuiElement('a',
 			    new ItemStack(Material.GRASS_BLOCK),
 			    1,
@@ -110,6 +166,12 @@ public class BiomeGui {
 			        	return true;
 			        }
 			    	KinectSandbox.biome = "sand";
+			    	if (KinectSandbox.getInstance().waterEnabled)
+			    	{
+			    		Bukkit.broadcastMessage(ChatColor.RED + "Disabling water for this biome.");
+			    		KinectSandbox.getInstance().waterEnabled = false;
+				    	waterElement.setState("waterDisabled");
+			    	}
 			    	for (Player p : Bukkit.getOnlinePlayers()) {
 						p.sendMessage(ChatColor.GREEN + "Changing biome to sand..");
 					}
@@ -150,6 +212,13 @@ public class BiomeGui {
 			        	return true;
 			        }
 			    	KinectSandbox.biome = "mesa";
+			    	if (KinectSandbox.getInstance().waterEnabled)
+			    	{
+			    		Bukkit.broadcastMessage(ChatColor.RED + "Disabling water for this biome.");
+			    		KinectSandbox.getInstance().waterEnabled = false;
+				    	waterElement.setState("waterDisabled");
+			    	}
+			    	
 			    	for (Player p : Bukkit.getOnlinePlayers()) {
 						p.sendMessage(ChatColor.GREEN + "Changing biome to badlands..");
 					}
@@ -217,8 +286,14 @@ public class BiomeGui {
 		    return new StaticGuiElement('g', oreItem, 1, click -> {
 		    	Player player = (Player) click.getWhoClicked();
 		        player.closeInventory();
-		    	Bukkit.getWorld("world").setTime(1000L);
+		    	//Bukkit.getWorld("world").setTime(1000L);
 		        KinectSandbox.biome = "rainbow";
+		        if (KinectSandbox.getInstance().waterEnabled)
+		    	{
+		    		Bukkit.broadcastMessage(ChatColor.RED + "Disabling water for this biome.");
+		    		KinectSandbox.getInstance().waterEnabled = false;
+			    	waterElement.setState("waterDisabled");
+		    	}
 		        for (Player p : Bukkit.getOnlinePlayers()) {
 		            p.sendMessage(ChatColor.GREEN + "Changing biome to placeholder..");
 		        }
