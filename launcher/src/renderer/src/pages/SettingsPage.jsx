@@ -20,11 +20,13 @@ function SettingsPage() {
     // setX2,
     // y2,
     // setY2,
-    distance,
-    setDistance,
+    yCoordOffset,
+    setYCoordOffset,
     displayOnLaunchTopographic,
     setDisplayOnLaunchTopographic,
     displayTopographic,
+    kinectDistanceMM,
+    setKinectDistanceMM,
     setDisplayTopographic,
     smoothing,
     setSmoothing,
@@ -113,34 +115,6 @@ function SettingsPage() {
         </OverlayTrigger>
       </div>
 
-      <div className="mt-3">
-        <OverlayTrigger
-          placement="right"
-          delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltip(
-            "Distance from your Kinect sensor to the sand, needs to be tuned."
-          )}
-          // container={overlayContainer} // Add back if using portal
-        >
-          <span style={{ display: "inline-block" }}>
-            {" "}
-            {/* Wrapper for trigger area */}
-            <span>Kinect to Surface Offset</span>
-            <Form.Control
-              type="number"
-              size="sm"
-              placeholder="in cm"
-              value={distance}
-              onChange={(e) => setDistance(Number(e.target.value))}
-              style={{
-                width: "100px",
-                display: "inline-block",
-                marginLeft: "10px",
-              }}
-            />
-          </span>
-        </OverlayTrigger>
-      </div>
       <div className="mt-1 centerRange">
         <OverlayTrigger
           placement="bottom"
@@ -173,7 +147,34 @@ function SettingsPage() {
           </span>
         </OverlayTrigger>
       </div>
-
+      <div className="mt-1">
+        <OverlayTrigger
+          placement="right"
+          delay={{ show: 250, hide: 400 }}
+          overlay={renderTooltip(
+            "Flatten the sand and measure the distance from the Kinect to the sand. This value only is only used in the projection. In milimeters."
+          )}
+          // container={overlayContainer} // Add back if using portal
+        >
+          <span style={{ display: "inline-block" }}>
+            {" "}
+            {/* Wrapper for trigger area */}
+            <span>Kinect to Sandbox Distance</span>
+            <Form.Control
+              type="number"
+              size="sm"
+              placeholder="in mm"
+              value={kinectDistanceMM}
+              onChange={(e) => setKinectDistanceMM(Number(e.target.value))}
+              style={{
+                width: "100px",
+                display: "inline-block",
+                marginLeft: "10px",
+              }}
+            />
+          </span>
+        </OverlayTrigger>
+      </div>
       <hr />
 
       {/* --- Topographic Projection Settings --- */}
@@ -183,14 +184,14 @@ function SettingsPage() {
           placement="left"
           delay={{ show: 250, hide: 400 }}
           overlay={renderTooltip(
-            "Launch the projection when the MC-AR Launcher opens."
+            "Open the projection when the Launch button on home page is clicked."
           )}
           // container={overlayContainer} // Add back if using portal
         >
           <span style={{ display: "inline-block" }}>
             {" "}
             {/* Wrapper for trigger area */}
-            <span>Auto Launch</span>
+            <span>Open on Launch</span>
             <Form.Check
               type="switch"
               id="projection-auto-launch-switch"
@@ -262,6 +263,7 @@ function SettingsPage() {
           </div>
         </OverlayTrigger>
       </div>
+
       <div className="mt-1">
         <OverlayTrigger
           placement="right"
@@ -331,14 +333,14 @@ function SettingsPage() {
           placement="right"
           delay={{ show: 250, hide: 400 }}
           overlay={renderTooltip(
-            "Launch Minecraft when the MC-AR Launcher opens."
+            "Open Minecraft when the Launch button on home page is clicked."
           )}
           // container={overlayContainer} // Add back if using portal
         >
           <span style={{ display: "inline-block" }}>
             {" "}
             {/* Wrapper for trigger area */}
-            <span>Auto Launch</span>
+            <span>Open on Launch</span>
             <Form.Check
               type="switch"
               id="minecraft-auto-launch-switch"
@@ -411,6 +413,33 @@ function SettingsPage() {
               >
                 ({elevation})
               </span>
+            </span>
+          </OverlayTrigger>
+        </div>
+        <div className="mt-1">
+          <OverlayTrigger
+            placement="right"
+            delay={{ show: 250, hide: 400 }}
+            overlay={renderTooltip(
+              "Needs to be tuned to fit the Kinect/Sandbox environment."
+            )}
+            // container={overlayContainer} // Add back if using portal
+          >
+            <span style={{ display: "inline-block" }}>
+              {" "}
+              {/* Wrapper for trigger area */}
+              <span>Y Coordinate Offset</span>
+              <Form.Control
+                type="number"
+                size="sm"
+                value={yCoordOffset}
+                onChange={(e) => setYCoordOffset(Number(e.target.value))}
+                style={{
+                  width: "100px",
+                  display: "inline-block",
+                  marginLeft: "10px",
+                }}
+              />
             </span>
           </OverlayTrigger>
         </div>

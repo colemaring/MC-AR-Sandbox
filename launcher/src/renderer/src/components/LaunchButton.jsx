@@ -50,9 +50,7 @@ function LaunchButton() {
       onClick={handleLaunchClick}
       disabled={launchButtonDisabled}
     >
-      {launchButtonDisabled
-        ? loadingText || "Launching..."
-        : "Launch Minecraft & Projection"}
+      {launchButtonDisabled ? loadingText || "Launching..." : "Launch"}
     </Button>
   );
 }

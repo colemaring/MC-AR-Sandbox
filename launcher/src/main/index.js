@@ -69,7 +69,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     icon: custom_icon,
     width: 800,
-    height: 770,
+    height: 794,
     show: false,
     autoHideMenuBar: true,
     // ...(process.platform === 'linux' ? { icon } : {}),
@@ -101,51 +101,82 @@ function createWindow() {
     await checkDependencies();
 
     // Read configuration
-    const config = await readConfig();
+    let config = await readConfig();
 
-    // Check if auto launch is enabled for Minecraft
-    if (config.minecraft_auto_launch === true) {
-      sendLogMessage("Auto-launching Minecraft based on settings...", "normal");
+    // // Check if auto launch is enabled for Minecraft
+    // if (config.minecraft_auto_launch === true) {
+    //   sendLogMessage("Auto-launching Minecraft based on settings...", "normal");
 
-      // Launch Minecraft with PrismLauncher
-      const launched = await launchPrismLauncher("1.21.5", mainWindow);
-      if (launched) {
-        sendLogMessage("PrismLauncher auto-launched successfully", "success");
-      } else {
-        sendLogMessage("Failed to auto-launch PrismLauncher", "error");
-      }
-    }
+    //   // Launch Minecraft with PrismLauncher
+    //   const launched = await launchPrismLauncher("1.21.5", mainWindow);
+    //   if (launched) {
+    //     sendLogMessage("PrismLauncher auto-launched successfully", "success");
+    //   } else {
+    //     sendLogMessage("Failed to auto-launch PrismLauncher", "error");
+    //   }
+    // }
 
-    if (config.topographic_auto_launch_projector === true) {
-      sendLogMessage(
-        "Auto-launching Projection based on settings...",
-        "normal"
-      );
+    // if (config.topographic_auto_launch_projector === true) {
+    //   sendLogMessage(
+    //     "Auto-launching Projection based on settings...",
+    //     "normal"
+    //   );
 
-      // Launch Projection
-      const projectionLaunched = await launchProjection(mainWindow);
-      if (projectionLaunched) {
-        sendLogMessage("Projection auto-launched successfully", "success");
-      } else {
-        sendLogMessage("Failed to auto-launch Projection", "error");
-      }
-    }
+    //   // Launch Projection
+    //   const projectionLaunched = await launchProjection(mainWindow);
+    //   if (projectionLaunched) {
+    //     sendLogMessage("Projection auto-launched successfully", "success");
+    //   } else {
+    //     sendLogMessage("Failed to auto-launch Projection", "error");
+    //   }
+    // }
 
     ipcMain.on("start-launch", async (event, instanceName) => {
-      const launched = await launchPrismLauncher(instanceName, mainWindow);
-      const projectionLaunched = await launchProjection(mainWindow);
-      if (launched) {
+      config = await readConfig();
+      let launched;
+      let projectionLaunched;
+
+      if (config.minecraft_auto_launch === true) {
+        sendLogMessage("Launching Minecraft based on settings...", "normal");
+
+        // Launch Minecraft with PrismLauncher
+        launched = await launchPrismLauncher("1.21.5", mainWindow);
+        if (launched) {
+          sendLogMessage("PrismLauncher auto-launched successfully", "success");
+        } else {
+          sendLogMessage("Failed to auto-launch PrismLauncher", "error");
+        }
+      }
+
+      if (config.topographic_auto_launch_projector === true) {
+        sendLogMessage("Launching Projection based on settings...", "normal");
+
+        // Launch Projection
+        projectionLaunched = await launchProjection(mainWindow);
+        if (projectionLaunched) {
+          sendLogMessage("Projection auto-launched successfully", "success");
+        } else {
+          sendLogMessage("Failed to auto-launch Projection", "error");
+        }
+      }
+
+      if (config.minecraft_auto_launch === true) {
         //sendLogMessage(`PrismLauncher launch requested for ${instanceName}`, 'normal')
       } else {
         sendLogMessage(
-          `PrismLauncher launch failed for ${instanceName}`,
-          "error"
+          `PrismLauncher is not enabled for Open on Launch.`,
+          "warning"
         );
+        // send an update to fronend to remove "launching" text
+        mainWindow.webContents.send("minecraft-ready", true);
       }
-      if (projectionLaunched) {
+      if (config.topographic_auto_launch_projector === true) {
         //sendLogMessage(`Projection launch requested for ${instanceName}`, 'normal')
       } else {
-        sendLogMessage(`Projection launch failed for ${instanceName}`, "error");
+        sendLogMessage(
+          `Projection is not enabled for Open on Launch.`,
+          "warning"
+        );
       }
     });
     ipcMain.on("serverCommand", async (event, command) => {

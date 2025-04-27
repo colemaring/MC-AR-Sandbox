@@ -9,8 +9,9 @@ export const SettingsConfigProvider = ({ children }) => {
   const [y1, setY1] = useState(0);
   const [x2, setX2] = useState(0);
   const [y2, setY2] = useState(0);
-  const [distance, setDistance] = useState(0);
+  const [yCoordOffset, setYCoordOffset] = useState(0);
   const [captureSpeed, setCaptureSpeed] = useState(50);
+  const [kinectDistanceMM, setKinectDistanceMM] = useState(0);
 
   // Topographic settings
   const [displayTopographic, setDisplayTopographic] = useState("Display 1");
@@ -36,11 +37,12 @@ export const SettingsConfigProvider = ({ children }) => {
         setY1(config?.kinect_view_crop?.y1 || 0);
         setX2(config?.kinect_view_crop?.x2 || 0);
         setY2(config?.kinect_view_crop?.y2 || 0);
-        setDistance(config?.kinect_surface_distance_cm || 0);
+        setYCoordOffset(config?.y_coord_offset || 0);
         setCaptureSpeed(config?.kinect_capture_speed || 15);
         setDisplayTopographic(
           config?.topographic_display_assignment || "Display 1"
         );
+        setKinectDistanceMM(config?.kinect_distance_mm || 0);
         setSmoothing(config?.topographic_smoothing || 40);
         setColorMode(config?.topographic_color_mode || "Default");
         setInterpolation(config?.topographic_interpolation || "None");
@@ -69,8 +71,9 @@ export const SettingsConfigProvider = ({ children }) => {
   const writeToConfig = useCallback(async () => {
     const config = {
       kinect_view_crop: { x1, y1, x2, y2 },
-      kinect_surface_distance_cm: distance,
+      y_coord_offset: yCoordOffset,
       kinect_capture_speed: captureSpeed,
+      kinect_distance_mm: kinectDistanceMM,
       topographic_display_assignment: displayTopographic,
       topographic_smoothing: smoothing,
       topographic_color_mode: colorMode,
@@ -106,7 +109,8 @@ export const SettingsConfigProvider = ({ children }) => {
     y1,
     x2,
     y2,
-    distance,
+    kinectDistanceMM,
+    yCoordOffset,
     displayTopographic,
     smoothing,
     elevation,
@@ -126,19 +130,21 @@ export const SettingsConfigProvider = ({ children }) => {
         y1,
         x2,
         y2,
-        distance,
+        yCoordOffset,
         displayTopographic,
         smoothing,
         elevation,
         setElevation,
         colorMode,
         displayMinecraft,
+        kinectDistanceMM,
+        setKinectDistanceMM,
         prismlauncherPath,
         setX1,
         setY1,
         setX2,
         setY2,
-        setDistance,
+        setYCoordOffset,
         setDisplayTopographic,
         setSmoothing,
         setColorMode,

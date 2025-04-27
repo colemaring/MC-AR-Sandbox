@@ -101,7 +101,7 @@ input[type="range"]::-ms-thumb {
   color: #333; /* Optional: Change the text color for better readability */
   border: 1px solid #ccc; /* Optional: Add a border for visual clarity */
   border-radius: 5px;
-  height: 69vh; /* Adjust as needed */
+  height: 71vh; /* Adjust as needed */
   overflow-y: auto;
   white-space: pre-line; /* Preserve line breaks */
   font-family: monospace; /* Optional: Use a monospace font */

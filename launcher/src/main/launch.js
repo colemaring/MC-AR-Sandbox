@@ -76,6 +76,8 @@ export async function launchPrismLauncher(instanceName, mainWindow) {
       console.log(`PrismLauncher stdout: ${stdout}`);
     });
 
+    
+
     // 7. Start checking for Minecraft
     let minecraftCheckInterval = setInterval(async () => {
       if (process.platform === "win32") {
