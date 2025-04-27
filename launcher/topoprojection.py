@@ -21,7 +21,14 @@ config = {
     "topographic_display_assignment": "Display 2",
     "topographic_smoothing": 20,
     "topographic_color_mode": "Rainbow",
-    "topographic_interpolation": "None"
+    "kinect_distance_mm": 2000,
+    "topographic_interpolation": "None",
+    "kinect_view_crop": {
+        "x1": 0,
+        "y1": 0,
+        "x2": 512,
+        "y2": 424
+    }
 }
 
 latest_data = None
@@ -48,6 +55,15 @@ def load_config():
                     config["topographic_color_mode"] = loaded_config["topographic_color_mode"]
                 if "topographic_interpolation" in loaded_config:
                     config["topographic_interpolation"] = loaded_config["topographic_interpolation"]
+                if "kinect_distance_mm" in loaded_config:
+                    config["kinect_distance_mm"] = loaded_config["kinect_distance_mm"]
+                if "kinect_view_crop" in loaded_config:
+                    config["kinect_view_crop"] = {
+                        "x1": loaded_config["kinect_view_crop"]["x1"],
+                        "y1": loaded_config["kinect_view_crop"]["y1"],
+                        "x2": loaded_config["kinect_view_crop"]["x2"],
+                        "y2": loaded_config["kinect_view_crop"]["y2"]
+                    }
                 
                 print("Configuration loaded:")
                 print(f"  Auto Launch: {config['topographic_auto_launch_projector']}")
@@ -55,6 +71,8 @@ def load_config():
                 print(f"  Smoothing: {config['topographic_smoothing']}")
                 print(f"  Color Mode: {config['topographic_color_mode']}")
                 print(f"  Interpolation: {config['topographic_interpolation']}")
+                print(f"  Kinect Distance (mm): {config['kinect_distance_mm']}")
+                print(f"  Kinect View Crop: x1={config['kinect_view_crop']['x1']}, y1={config['kinect_view_crop']['y1']}, x2={config['kinect_view_crop']['x2']}, y2={config['kinect_view_crop']['y2']}")
                 
     except Exception as e:
         print(f"Error loading configuration: {e}")
@@ -146,7 +164,7 @@ def main():
     else:  # Default
         cmap = plt.get_cmap('viridis')
         
-    levels = np.linspace(0, 255, 100)
+    levels = np.linspace(config["kinect_distance_mm"] - 1000, config["kinect_distance_mm"] + 1000, 100)
     fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
 
     img_artist = None
@@ -161,6 +179,13 @@ def main():
                 try:
                     # Process incoming data
                     arr = np.array(latest_data)
+
+                    x1 = config["kinect_view_crop"]["x1"]
+                    y1 = config["kinect_view_crop"]["y1"]
+                    x2 = config["kinect_view_crop"]["x2"]
+                    y2 = config["kinect_view_crop"]["y2"]
+
+                    arr = arr[y1:y2, x1:x2]
                     
                     # Apply smoothing based on current config
                     current_smoothing = config["topographic_smoothing"]
@@ -171,7 +196,7 @@ def main():
                         print(f"Gaussian Blur would be applied with sigma={current_smoothing/10}")
                         arr = median_filter(arr, size=current_smoothing)  # Fallback to median filter
                         
-                    arr = np.fliplr(arr)
+                    arr = np.flipud(np.fliplr(arr))
 
                     # Initialize or update the image artist
                     if img_artist is None:
