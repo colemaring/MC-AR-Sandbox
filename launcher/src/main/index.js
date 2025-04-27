@@ -154,7 +154,10 @@ function createWindow() {
         // Launch Projection
         projectionLaunched = await launchProjection(mainWindow);
         if (projectionLaunched) {
-          sendLogMessage("Projection auto-launched successfully", "success");
+          // sendLogMessage(
+          //   "Projection auto-launched successfully. Press q to quit.",
+          //   "success"
+          // );
         } else {
           sendLogMessage("Failed to auto-launch Projection", "error");
         }

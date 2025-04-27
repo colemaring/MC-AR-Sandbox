@@ -76,8 +76,6 @@ export async function launchPrismLauncher(instanceName, mainWindow) {
       console.log(`PrismLauncher stdout: ${stdout}`);
     });
 
-    
-
     // 7. Start checking for Minecraft
     let minecraftCheckInterval = setInterval(async () => {
       if (process.platform === "win32") {
@@ -274,7 +272,10 @@ export async function launchProjection(mainWindow) {
 
     // Store the process for cleanup
     global.projectionProcess = projectionProcess;
-    sendLogMessage("Projection started successfully", "success");
+    sendLogMessage(
+      "Projection started successfully. Press q to quit.",
+      "success"
+    );
 
     return true;
   } catch (error) {
