@@ -25,7 +25,7 @@ export async function readConfig() {
         topographic_interpolation: "Median Filter",
         topographic_auto_launch_projector: false,
         minecraft_display_on_launch: false,
-        minecraft_elevation: 85,
+        minecraft_elevation: 6,
         minecraft_display_assignment: "Display 1",
         minecraft_auto_launch: false,
         minecraft_prismlauncher_path:

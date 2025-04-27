@@ -69,7 +69,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     icon: custom_icon,
     width: 800,
-    height: 746,
+    height: 770,
     show: false,
     autoHideMenuBar: true,
     // ...(process.platform === 'linux' ? { icon } : {}),

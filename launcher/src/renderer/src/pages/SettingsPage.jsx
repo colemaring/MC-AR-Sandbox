@@ -380,27 +380,40 @@ function SettingsPage() {
           </OverlayTrigger>
         </div>
         {/* Uncomment and wrap this section if you re-add the Elevation Multiplier */}
-        {/* <div className="mt-1 centerRange">
+        <div className="mt-1 centerRange">
           <OverlayTrigger
             placement="right"
             delay={{ show: 250, hide: 400 }}
-            overlay={renderTooltip("Choose how much y axis range you'd like in Minecraft.")}
-            // container={overlayContainer} // Add back if using portal
+            overlay={renderTooltip(
+              "Choose how much y axis range you'd like in Minecraft."
+            )}
           >
-            <span style={{ display: 'inline-block' }}> {/* Wrapper for trigger area */}
-        {/* <span>Elevation Multipler</span>
+            <span style={{ display: "flex" }}>
+              <span>Elevation Multiplier</span>
               <Form.Range
-                min={0}
-                max={100} // Adjust range as needed
+                min={2}
+                max={20}
                 step={1}
                 value={elevation}
                 onChange={(e) => setElevation(Number(e.target.value))}
-                style={{ width: '10rem', display: 'inline-block', marginLeft: '1rem' }}
+                style={{
+                  width: "10rem",
+                  display: "inline-block",
+                  marginLeft: "1rem",
+                }}
               />
-              <span style={{ marginLeft: '1rem', minWidth: '3em', display: 'inline-block', textAlign: 'right' }}>({elevation})</span>
+              <span
+                style={{
+                  minWidth: "3em",
+                  display: "inline-block",
+                  textAlign: "right",
+                }}
+              >
+                ({elevation})
+              </span>
             </span>
           </OverlayTrigger>
-        </div> */}
+        </div>
       </div>
       <div className="mt-1">
         <OverlayTrigger

@@ -1,64 +1,70 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react'
-import { useLogMessages } from './LogMessageContext'
-export const SettingsConfigContext = createContext()
+import React, { createContext, useState, useEffect, useCallback } from "react";
+import { useLogMessages } from "./LogMessageContext";
+export const SettingsConfigContext = createContext();
 
 export const SettingsConfigProvider = ({ children }) => {
-  const { addLogMessage } = useLogMessages() // call to add message to log context state
+  const { addLogMessage } = useLogMessages(); // call to add message to log context state
   // Kinect settings
-  const [x1, setX1] = useState(0)
-  const [y1, setY1] = useState(0)
-  const [x2, setX2] = useState(0)
-  const [y2, setY2] = useState(0)
-  const [distance, setDistance] = useState(0)
-  const [captureSpeed, setCaptureSpeed] = useState(50)
+  const [x1, setX1] = useState(0);
+  const [y1, setY1] = useState(0);
+  const [x2, setX2] = useState(0);
+  const [y2, setY2] = useState(0);
+  const [distance, setDistance] = useState(0);
+  const [captureSpeed, setCaptureSpeed] = useState(50);
 
   // Topographic settings
-  const [displayTopographic, setDisplayTopographic] = useState('Display 1')
-  const [smoothing, setSmoothing] = useState(40)
-  const [colorMode, setColorMode] = useState('Default')
-  const [autoLaunchProjector, setAutoLaunchProjector] = useState(false)
-  const [interpolation, setInterpolation] = useState('None')
+  const [displayTopographic, setDisplayTopographic] = useState("Display 1");
+  const [smoothing, setSmoothing] = useState(40);
+  const [colorMode, setColorMode] = useState("Default");
+  const [autoLaunchProjector, setAutoLaunchProjector] = useState(false);
+  const [interpolation, setInterpolation] = useState("None");
 
   // Minecraft settings
-  const [displayMinecraft, setDisplayMinecraft] = useState('Display 2')
+  const [displayMinecraft, setDisplayMinecraft] = useState("Display 2");
   const [prismlauncherPath, setPrismlauncherPath] = useState(
-    'C:\\Users\\colem\\AppData\\Local\\Programs\\PrismLauncher\\prismlauncher.exe'
-  )
-  const [autoLaunchMinecraft, setAutoLaunchMinecraft] = useState(false)
-  const [elevation, setElevation] = useState(40)
+    "C:\\Users\\colem\\AppData\\Local\\Programs\\PrismLauncher\\prismlauncher.exe"
+  );
+  const [autoLaunchMinecraft, setAutoLaunchMinecraft] = useState(false);
+  const [elevation, setElevation] = useState(6);
 
   useEffect(() => {
     const loadConfig = async () => {
       try {
-        const config = await window.electronAPI.readConfig()
+        const config = await window.electronAPI.readConfig();
 
-        setX1(config?.kinect_view_crop?.x1 || 0)
-        setY1(config?.kinect_view_crop?.y1 || 0)
-        setX2(config?.kinect_view_crop?.x2 || 0)
-        setY2(config?.kinect_view_crop?.y2 || 0)
-        setDistance(config?.kinect_surface_distance_cm || 0)
-        setCaptureSpeed(config?.kinect_capture_speed || 15)
-        setDisplayTopographic(config?.topographic_display_assignment || 'Display 1')
-        setSmoothing(config?.topographic_smoothing || 40)
-        setColorMode(config?.topographic_color_mode || 'Default')
-        setInterpolation(config?.topographic_interpolation || 'None')
-        setAutoLaunchProjector(config?.topographic_auto_launch_projector || false)
-        setElevation(config?.minecraft_elevation || 40)
-        setDisplayMinecraft(config?.minecraft_display_assignment || 'Display 2')
-        setAutoLaunchMinecraft(config?.minecraft_auto_launch || false)
+        setX1(config?.kinect_view_crop?.x1 || 0);
+        setY1(config?.kinect_view_crop?.y1 || 0);
+        setX2(config?.kinect_view_crop?.x2 || 0);
+        setY2(config?.kinect_view_crop?.y2 || 0);
+        setDistance(config?.kinect_surface_distance_cm || 0);
+        setCaptureSpeed(config?.kinect_capture_speed || 15);
+        setDisplayTopographic(
+          config?.topographic_display_assignment || "Display 1"
+        );
+        setSmoothing(config?.topographic_smoothing || 40);
+        setColorMode(config?.topographic_color_mode || "Default");
+        setInterpolation(config?.topographic_interpolation || "None");
+        setAutoLaunchProjector(
+          config?.topographic_auto_launch_projector || false
+        );
+        setElevation(config?.minecraft_elevation || 40);
+        setDisplayMinecraft(
+          config?.minecraft_display_assignment || "Display 2"
+        );
+        setAutoLaunchMinecraft(config?.minecraft_auto_launch || false);
         setPrismlauncherPath(
           config?.minecraft_prismlauncher_path ||
-            'C:\\Users\\colem\\AppData\\Local\\Programs\\PrismLauncher\\prismlauncher.exe'
-        )
-        addLogMessage('Configuration loaded successfully', 'success')
+            "C:\\Users\\colem\\AppData\\Local\\Programs\\PrismLauncher\\prismlauncher.exe"
+        );
+        addLogMessage("Configuration loaded successfully", "success");
       } catch (error) {
-        console.error('Failed to load config:', error)
-        addLogMessage(`Failed to load config`, 'error')
+        console.error("Failed to load config:", error);
+        addLogMessage(`Failed to load config`, "error");
       }
-    }
+    };
 
-    loadConfig()
-  }, [])
+    loadConfig();
+  }, []);
 
   const writeToConfig = useCallback(async () => {
     const config = {
@@ -73,24 +79,27 @@ export const SettingsConfigProvider = ({ children }) => {
       minecraft_elevation: elevation,
       minecraft_display_assignment: displayMinecraft,
       minecraft_auto_launch: autoLaunchMinecraft,
-      minecraft_prismlauncher_path: prismlauncherPath
-    }
+      minecraft_prismlauncher_path: prismlauncherPath,
+    };
 
     try {
-      const result = await window.electronAPI.writeConfig(config)
+      const result = await window.electronAPI.writeConfig(config);
       if (result?.success) {
-        console.log('Config written successfully to file')
-        addLogMessage('Settings saved successfully', 'success')
-        return true
+        console.log("Config written successfully to file");
+        addLogMessage("Settings saved successfully", "success");
+        return true;
       } else {
-        console.error('Failed to write config to file:', result?.error)
-        addLogMessage(`Failed to save settings: ${result?.error || 'Unknown error'}`, 'error')
-        return false
+        console.error("Failed to write config to file:", result?.error);
+        addLogMessage(
+          `Failed to save settings: ${result?.error || "Unknown error"}`,
+          "error"
+        );
+        return false;
       }
     } catch (error) {
-      console.error('Failed to write config to file:', error)
-      addLogMessage(`Failed to save settings: ${error.message}`, 'error')
-      return false
+      console.error("Failed to write config to file:", error);
+      addLogMessage(`Failed to save settings: ${error.message}`, "error");
+      return false;
     }
   }, [
     x1,
@@ -107,8 +116,8 @@ export const SettingsConfigProvider = ({ children }) => {
     autoLaunchMinecraft,
     autoLaunchProjector,
     captureSpeed,
-    interpolation
-  ])
+    interpolation,
+  ]);
 
   return (
     <SettingsConfigContext.Provider
@@ -143,10 +152,10 @@ export const SettingsConfigProvider = ({ children }) => {
         setCaptureSpeed,
         interpolation,
         setInterpolation,
-        writeToConfig // call when you want to write state to config
+        writeToConfig, // call when you want to write state to config
       }}
     >
       {children}
     </SettingsConfigContext.Provider>
-  )
-}
+  );
+};
