@@ -53,20 +53,28 @@ public class WebsocketsHandler {
                         int[][] depthData = new int[rows][cols];
 
                         // Populate the int[][] array with the values from the JsonArray
+                        // read in raw initial
                         for (int i = 0; i < rows; i++) {
                             JsonArray row = depthArray.get(i).getAsJsonArray();
                             for (int j = 0; j < cols; j++)
-                                depthData[i][j] = row.get(j).getAsInt();                            
+                                depthData[i][j] = row.get(j).getAsInt();       
                         }
                         
-                        depthData = TerrainGeneratorHelper.movingMode(depthData);
-                        //depthData = terrainGenerator.tgHelper.stretchTo150(depthData);
+                        
+                        int[][] newDepth = TerrainGeneratorHelper.cropArray(depthData, KinectSandbox.getInstance().settings.x1, KinectSandbox.getInstance().settings.x2, KinectSandbox.getInstance().settings.y1 ,KinectSandbox.getInstance().settings.y2);
+                        //newDepth = TerrainGeneratorHelper.movingMode(newDepth);
+                		newDepth = TerrainGeneratorHelper.modePool(newDepth, 2);
+                        // after performing mode or whatever on data, then we can linear scale down
+                        for (int i = 0; i < newDepth.length; i++)
+                            for (int j = 0; j < newDepth[0].length; j++)
+                            	newDepth[i][j] = (int) Math.round(newDepth[i][j] / (KinectSettings.elevationMultiplier * 1.0));
+
 
                         // Serves as a throttling mechanism
                         if (messageCounter % KinectSandbox.getInstance().settings.captureSpeed != 0)
                             return;
                         
-                        TerrainGenerator.updateTerrain(depthData);
+                        TerrainGenerator.updateTerrain(newDepth);
                         
                     } catch (Exception e) {
                     	KinectSandbox.getInstance().getLogger().warning(e.getMessage());

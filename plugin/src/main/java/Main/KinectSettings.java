@@ -20,6 +20,7 @@ public class KinectSettings {
     public int y2;
     public int kinectDistance;
     public int captureSpeed;
+    public static int elevationMultiplier;
     public String settingsHash;
     private final File settingsFile;
     private final AtomicReference<KinectSettings> settingsReference;
@@ -47,6 +48,7 @@ public class KinectSettings {
             this.y2 = crop.get("y2").getAsInt();
             this.kinectDistance = root.get("kinect_surface_distance_cm").getAsInt();
             this.captureSpeed = root.get("kinect_capture_speed").getAsInt();
+            this.elevationMultiplier = root.get("minecraft_elevation").getAsInt();
             this.settingsHash = this.x1+""+this.x2+""+this.y1+""+this.y2+""+this.kinectDistance;
         } catch (IOException e) {
             e.printStackTrace();

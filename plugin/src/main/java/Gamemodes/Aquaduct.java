@@ -43,13 +43,13 @@ public class Aquaduct {
         	GamemodeHelper.gamemodeRunning = false;
         	Bukkit.broadcastMessage(ChatColor.DARK_RED + "Time's up!");
             cleanUp();
-        }, 63 * 20L).getTaskId();
+        }, 10 * 60 * 20L).getTaskId();
         GamemodeHelper.scheduledTaskIDs.add(gameTaskID);
         
         // Schedule 10-second warning and startCountdown, and store their IDs.
         int warningTaskID = Bukkit.getScheduler().runTaskLater(KinectSandbox.getInstance(), () -> {
-            Bukkit.broadcastMessage(ChatColor.YELLOW + "Warning: 10 seconds remaining to redirect the water!");
-        }, 53 * 20L).getTaskId();
+            Bukkit.broadcastMessage(ChatColor.YELLOW + "Warning: 1 minute remaining to redirect the water!");
+        }, 9 * 60 * 20L).getTaskId();
         GamemodeHelper.scheduledTaskIDs.add(warningTaskID);
         
         GamemodeHelper.countdown("Aquaduct", 3, () -> {
@@ -132,8 +132,8 @@ public class Aquaduct {
 		            boolean allAir = true;
 		            outer:
 		            for (int i = 0; i < 2; i++) {
-		                for (int dx = 0; dx < 6; dx++) {
-		                    for (int dz = 0; dz < 6; dz++) {
+		                for (int dx = 0; dx < 8; dx++) {
+		                    for (int dz = 0; dz < 8; dz++) {
 		                        if (KinectSandbox.getInstance().world
 		                                .getBlockAt(x + dx, y + i, z + dz)
 		                                .getType() != Material.AIR) {
@@ -144,8 +144,8 @@ public class Aquaduct {
 		                }
 		            }
 
-		            if (allAir && y - 1 < bestY) {
-		                bestY = y - 1; // Bucket sits just below the air pocket
+		            if (allAir && y - 3 < bestY) {
+		                bestY = y - 3; // Bucket sits just below the air pocket
 		                bestX = x;
 		                bestZ = z;
 		            }
@@ -165,11 +165,21 @@ public class Aquaduct {
 	            for (int dz = 0; dz < 8; dz++) {
 	                // only rim on layers 1 & 2
 	                if ((i == 1 || i == 2) && dx != 0 && dx != 7 && dz != 0 && dz != 7)
-	                    continue;
+	                {
+	                	KinectSandbox.getInstance()
+	                    .world
+	                    .getBlockAt(bestX + dx, bestY + i, bestZ + dz)
+	                    .setType(Material.AIR);
+	                	continue;
+	                }
+	                    
 	                KinectSandbox.getInstance()
 	                    .world
 	                    .getBlockAt(bestX + dx, bestY + i, bestZ + dz)
 	                    .setType(Material.GOLD_BLOCK);
+	                
+	                KinectSandbox.getInstance().world.getBlockAt(bestX + dx, bestY + i, bestZ + dz).getState().update(true, true);
+	                
 	            }
 	        }
 	    }
@@ -207,7 +217,7 @@ public class Aquaduct {
 	        ChatColor.GREEN + "Aqueduct source and sink have been placed."
 	    );
 	    Bukkit.broadcastMessage(
-	        ChatColor.GREEN + "You have 1 minute to redirect the water."
+	        ChatColor.GREEN + "You have 10 minutes to redirect the water."
 	    );
 
 	    final int finalSinkX = sinkX;

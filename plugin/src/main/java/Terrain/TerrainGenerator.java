@@ -22,19 +22,28 @@ public class TerrainGenerator implements Listener{
 		if (prevDepth == null)
 			prevDepth = currDepth;
 			
-		int[][] newDepth = TerrainGeneratorHelper.cropArray(currDepth, KinectSandbox.getInstance().settings.x1, KinectSandbox.getInstance().settings.x2, KinectSandbox.getInstance().settings.y1 ,KinectSandbox.getInstance().settings.y2);
-		newDepth = TerrainGeneratorHelper.modePool(newDepth, poolSize);
-		newDepth = TerrainGeneratorHelper.mirrorXYAxis(newDepth);
-		newDepth = TerrainGeneratorHelper.convertToCoordinates(newDepth, KinectSandbox.getInstance().settings.kinectDistance/kinectDistanceScalar); 
+		//int[][] newDepth = TerrainGeneratorHelper.cropArray(currDepth, KinectSandbox.getInstance().settings.x1, KinectSandbox.getInstance().settings.x2, KinectSandbox.getInstance().settings.y1 ,KinectSandbox.getInstance().settings.y2);
+		//currDepth = TerrainGeneratorHelper.modePool(currDepth, poolSize);
+		currDepth = TerrainGeneratorHelper.mirrorXYAxis(currDepth);
+		currDepth = TerrainGeneratorHelper.convertToCoordinates(currDepth, KinectSandbox.getInstance().settings.kinectDistance/kinectDistanceScalar); 
+		
+		for (int i = 0; i < currDepth.length; i++) {
+		    for (int j = 0; j < currDepth[0].length; j++) {
+		        if (Math.abs(currDepth[i][j] - prevDepth[i][j]) <= 1) {
+		            // undo any ±1 spike
+		            currDepth[i][j] = prevDepth[i][j];
+		        }
+		    }
+		}
 		
 		if (!prevSettingsHash.equals(KinectSandbox.getInstance().settings.settingsHash))
-			 prevDepth = new int[newDepth.length][newDepth[0].length];
+			 prevDepth = new int[currDepth.length][currDepth[0].length];
     	   
 		// find the difference array
 		// diffDepth[i][k][0] = y coord of top block in range to modify
 		// diffDepth[i][k][1] = y coord of bottom block in range to modify
 		// diffDepth[i][k][2] = 1 if set range to air, 0 otherwise
-		int [][][] diffDepth = TerrainGeneratorHelper.findDifference(prevDepth, newDepth);
+		int [][][] diffDepth = TerrainGeneratorHelper.findDifference(prevDepth, currDepth);
 
 		// Use BukkitRunnable to safely update blocks on the main thread
         new BukkitRunnable() {
@@ -100,8 +109,9 @@ public class TerrainGenerator implements Listener{
             	}
             }
         }.runTask(KinectSandbox.getInstance()); // Ensures synchronous execution on the main thread
+
         
-        prevDepth = newDepth;
+        prevDepth = currDepth;
 	}
 }
 

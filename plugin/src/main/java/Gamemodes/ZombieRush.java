@@ -77,7 +77,7 @@ public class ZombieRush {
         reachedZombies.clear();
         zombieTargets.clear();
         startTimer();
-        for (int i = 0; i < TerrainGeneratorHelper.terrainHeight; i++) {
+        for (int i = 0; i < TerrainGeneratorHelper.findXEnd(); i++) {
             spawnZombie(i, TerrainGeneratorHelper.findZEnd());
             spawnZombie(i - 1, TerrainGeneratorHelper.findZEnd());
         }
@@ -140,7 +140,7 @@ public class ZombieRush {
                     this.cancel();
 //                    Bukkit.broadcastMessage(ChatColor.GOLD + "Zombie Rush has ended!");
                     Bukkit.broadcastMessage(ChatColor.DARK_RED + "Time's up!");
-                    Bukkit.broadcastMessage(ChatColor.AQUA + "" + reachedZombies.size() + "/" + (TerrainGeneratorHelper.terrainHeight*2) + ChatColor.RED + " zombies reached the end.");
+                    Bukkit.broadcastMessage(ChatColor.AQUA + "" + reachedZombies.size() + "/" + ( TerrainGeneratorHelper.findXEnd()*2) + ChatColor.RED + " zombies reached the end.");
                     new BukkitRunnable() {
                         @Override
                         public void run() {

@@ -11,8 +11,6 @@ import org.bukkit.block.data.Levelled;
 import Main.KinectSandbox;
 
 public class TerrainGeneratorHelper {
-	public static int terrainWidth = 0;
-	public static int terrainHeight = 0;
 	public static boolean terrainPaused = false;
 	
 	public static void pauseTerrain()
@@ -32,6 +30,8 @@ public class TerrainGeneratorHelper {
 		{
 			for (int j = 0; j < newDepth[0].length; j++)
 			{
+				
+					
 				// adding blocks
 				if (newDepth[i][j] > prevDepth[i][j])
 				{
@@ -55,7 +55,9 @@ public class TerrainGeneratorHelper {
 				// do nothing
 				else
 					ret[i][j][2] = -1;
-					
+				// 1 block threshold
+//				if (Math.abs(newDepth[i][j] - prevDepth[i][j]) <= 1)
+//					ret[i][j][2] = -1;
 			}
 		}
 		
@@ -97,7 +99,7 @@ public class TerrainGeneratorHelper {
 	    return croppedArray;
 	}
 
-    private final static int MAX_HISTORY = 2;
+    private final static int MAX_HISTORY = 7;
     private final static LinkedList<int[][]> historyFrames = new LinkedList<>();
 
     public static int[][] movingMode(int[][] currentFrame) {
@@ -142,8 +144,6 @@ public class TerrainGeneratorHelper {
 
 	    int newHeight = (height + size - 1) / size;  // Round up division
 	    int newWidth = (width + size - 1) / size;    // Round up division
-	    terrainWidth = newWidth;
-	    terrainHeight = newHeight;
 	    int[][] output = new int[newHeight][newWidth];
 
 	    for (int i = 0; i < newHeight; i++) {
@@ -176,6 +176,50 @@ public class TerrainGeneratorHelper {
 
 	    return output;
 	}
+	
+	public static int[][] applyBlurAndPool(int[][] depthData, int size) {
+	    int rows = depthData.length;
+	    int cols = depthData[0].length;
+	    
+	    // Calculate new dimensions after pooling
+	    int pooledRows = rows / size;
+	    int pooledCols = cols / size;
+	    
+	    // Create a new array to store the blurred and downscaled result
+	    int[][] pooledData = new int[pooledRows][pooledCols];
+	    
+	    // Half of the filter size to handle boundaries
+	    int offset = size / 2;
+
+	    // Apply the blur and pooling
+	    for (int i = 0; i < pooledRows; i++) {
+	        for (int j = 0; j < pooledCols; j++) {
+	            int sum = 0;
+	            int count = 0;
+	            
+	            // Define the region of the kernel to apply
+	            for (int di = 0; di < size; di++) {
+	                for (int dj = 0; dj < size; dj++) {
+	                    // Map the pooling block to the original depthData
+	                    int ni = i * size + di;
+	                    int nj = j * size + dj;
+
+	                    if (ni < rows && nj < cols) {
+	                        sum += depthData[ni][nj];
+	                        count++;
+	                    }
+	                }
+	            }
+	            
+	            // Set the pooled and blurred value for the current block
+	            pooledData[i][j] = sum / count; // Average the values in the block
+	        }
+	    }
+
+	    return pooledData;
+	}
+
+
 
 	// val is an arbitrary scaling factor to concert kinect depth values to minecraft y values
 	// offset represents the distance from kinect to the sandbox (nimplemented)
@@ -187,7 +231,7 @@ public class TerrainGeneratorHelper {
 			{
 				if (depth[i][j] == 0)
 					continue;
-				depth[i][j] = offset - (int)Math.floor(depth[i][j]);
+				depth[i][j] = offset - depth[i][j];
 			}
 		}
 			
@@ -366,7 +410,7 @@ public class TerrainGeneratorHelper {
 		    else
 		        KinectSandbox.getInstance().world.getBlockAt(i, k, j).setType(Material.AIR);
 		}
-
+		KinectSandbox.getInstance().world.getBlockAt(i, k, j).getState().update(true, true);
 	}
 	
 	// add random veins, blocks, or etc to make biomes look more natural

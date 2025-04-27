@@ -126,8 +126,8 @@ public class MiscHandlers implements Listener{
 	    while (!world.getBlockAt(0, 0, z).isEmpty())
 	        z++;
 
-	    int middleX = TerrainGeneratorHelper.terrainHeight / 2;
-	    int middleZ =TerrainGeneratorHelper.terrainWidth / 2;
+	    int middleX = TerrainGeneratorHelper.findXEnd() / 2;
+	    int middleZ =TerrainGeneratorHelper.findZEnd() / 2;
 	    int middleY = 81;
 
 	    Location target = new Location(world, middleX + 0.5, middleY, middleZ + 0.5);
