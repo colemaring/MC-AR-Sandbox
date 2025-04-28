@@ -5,16 +5,16 @@
     "x2": 404,
     "y2": 348
   },
-  "y_coord_offset": 2000,
+  "y_coord_offset": 850,
   "kinect_capture_speed": 25,
   "kinect_distance_mm": 2000,
   "topographic_display_assignment": "Display 2",
   "topographic_smoothing": 19,
   "topographic_color_mode": "Default",
-  "topographic_interpolation": "Median Filter",
-  "topographic_auto_launch_projector": false,
-  "minecraft_elevation": 6,
+  "topographic_interpolation": "None",
+  "topographic_auto_launch_projector": true,
+  "minecraft_elevation": 7,
   "minecraft_display_assignment": "Display 1",
-  "minecraft_auto_launch": false,
+  "minecraft_auto_launch": true,
   "minecraft_prismlauncher_path": "C:\\Users\\colem\\AppData\\Local\\Programs\\PrismLauncher\\prismlauncher.exe"
 }

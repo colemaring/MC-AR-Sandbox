@@ -15,6 +15,10 @@ from scipy.ndimage import median_filter
 from PyQt5.QtWidgets import QApplication
 from PyQt5 import QtCore
 
+def on_key_press(event):
+    if event.key == 'escape':
+        plt.close('all')
+
 # Default configuration values
 config = {
     "topographic_auto_launch_projector": False,
@@ -150,7 +154,8 @@ def main():
 
     fig, ax = plt.subplots()
     fig.patch.set_facecolor('black')
-    fig.canvas.manager.set_window_title("Topographic Projection: q to quit")
+    fig.canvas.mpl_connect('key_press_event', on_key_press)
+    fig.canvas.manager.set_window_title("Topographic Projection: ESC to quit")
     qt_window = fig.canvas.manager.window
     qt_window.setGeometry(0, 1080, 3840, 2160)
     qt_window.setWindowFlags(QtCore.Qt.WindowFlags(QtCore.Qt.Tool))
@@ -219,9 +224,7 @@ def main():
                 except Exception as e:
                     print(f"Error updating plot: {e}")
 
-            # Small pause for event loop
-            if plt.waitforbuttonpress(0.05) == 'q':
-                break
+            plt.pause(0.05)
     finally:
         config_observer.stop()
         config_observer.join()

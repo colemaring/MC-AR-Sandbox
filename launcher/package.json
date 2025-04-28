@@ -1,6 +1,6 @@
 {
   "name": "mc-ar-launcher",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "./out/main/index.js",
   "author": "Colton Maring",
@@ -48,6 +48,10 @@
       {
         "from": "server/spigot.yml",
         "to": "spigot.yml"
+      },
+      {
+        "from": "server/server-icon.png",
+        "to": "server-icon.png"
       },
       {
         "from": "server/world",

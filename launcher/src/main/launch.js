@@ -273,7 +273,7 @@ export async function launchProjection(mainWindow) {
     // Store the process for cleanup
     global.projectionProcess = projectionProcess;
     sendLogMessage(
-      "Projection started successfully. Press q to quit.",
+      "Projection started successfully. Press ESC to quit.",
       "success"
     );
 
