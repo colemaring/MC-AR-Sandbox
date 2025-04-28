@@ -144,7 +144,7 @@
                       <groupId>${project.groupId}</groupId>
                       <artifactId>${project.artifactId}</artifactId>
                       <version>${project.version}</version>
-                      <outputDirectory>C:\Users\colem\Desktop\mcar\launcher\server\plugins</outputDirectory>
+                      <outputDirectory>C:\Users\colem\Desktop\MC-AR-Sandbox-main\launcher\server\plugins</outputDirectory>
                       <destFileName>${project.artifactId}.jar</destFileName>
                     </artifactItem>
                   </artifactItems>
