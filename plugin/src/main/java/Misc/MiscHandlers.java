@@ -30,6 +30,15 @@ import Main.KinectSandbox;
 import Terrain.TerrainGeneratorHelper;
 
 public class MiscHandlers implements Listener{
+	private static long lastBroadcastTime = 0;
+	
+	public static void printSaveMessage() {
+	    long now = System.currentTimeMillis();
+	    if (now - lastBroadcastTime > 500) {
+	        Bukkit.broadcastMessage("Changes applied");
+	        lastBroadcastTime = now;
+	    }
+	}
 	
 	// Prevent hand swap
 	@EventHandler
@@ -55,6 +64,7 @@ public class MiscHandlers implements Listener{
 	}
 	
 	// Prevent grass from turning into dirt
+	// Dont use for such a simple thing
 //	@EventHandler
 //	public void onBlockPhysicsEvent(BlockPhysicsEvent event)
 //	{

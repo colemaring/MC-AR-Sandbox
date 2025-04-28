@@ -25,7 +25,7 @@ public class TerrainGenerator implements Listener{
 		//int[][] newDepth = TerrainGeneratorHelper.cropArray(currDepth, KinectSandbox.getInstance().settings.x1, KinectSandbox.getInstance().settings.x2, KinectSandbox.getInstance().settings.y1 ,KinectSandbox.getInstance().settings.y2);
 		//currDepth = TerrainGeneratorHelper.modePool(currDepth, poolSize);
 		currDepth = TerrainGeneratorHelper.mirrorXYAxis(currDepth);
-		currDepth = TerrainGeneratorHelper.convertToCoordinates(currDepth, KinectSandbox.getInstance().settings.kinectDistance/kinectDistanceScalar); 
+		currDepth = TerrainGeneratorHelper.convertToCoordinates(currDepth, KinectSandbox.getInstance().settings.yCoordOffset/kinectDistanceScalar); 
 		
 		for (int i = 0; i < currDepth.length; i++) {
 		    for (int j = 0; j < currDepth[0].length; j++) {

@@ -13,12 +13,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import Misc.MiscHandlers;
+
 public class KinectSettings {
     public int x1;
     public int x2;
     public int y1;
     public int y2;
-    public int kinectDistance;
+    public int yCoordOffset;
     public int captureSpeed;
     public static int elevationMultiplier;
     public String settingsHash;
@@ -46,10 +48,10 @@ public class KinectSettings {
             this.y1 = crop.get("y1").getAsInt();
             this.x2 = crop.get("x2").getAsInt();
             this.y2 = crop.get("y2").getAsInt();
-            this.kinectDistance = root.get("kinect_surface_distance_cm").getAsInt();
+            this.yCoordOffset = root.get("y_coord_offset").getAsInt();
             this.captureSpeed = root.get("kinect_capture_speed").getAsInt();
             this.elevationMultiplier = root.get("minecraft_elevation").getAsInt();
-            this.settingsHash = this.x1+""+this.x2+""+this.y1+""+this.y2+""+this.kinectDistance;
+            this.settingsHash = this.x1+""+this.x2+""+this.y1+""+this.y2+""+this.yCoordOffset;
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to read settings from file: " + settingsFile.getAbsolutePath());
@@ -72,9 +74,7 @@ public class KinectSettings {
                             if (modifiedFile.equals(settingsFile.toPath().getFileName())) {
                                 // File has changed, reload settings
                                 loadSettings();
-//                                for (Player player : Bukkit.getOnlinePlayers()) {
-//                                    player.sendMessage(ChatColor.GREEN + "Loading new settings..");
-//                                }
+                                MiscHandlers.printSaveMessage();
 
                                 // Update the reference to the latest settings
                                 settingsReference.set(this);

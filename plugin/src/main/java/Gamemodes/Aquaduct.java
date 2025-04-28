@@ -5,6 +5,7 @@ import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Firework;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -91,7 +92,7 @@ public class Aquaduct {
 				}
 			}
 		}
-		Bukkit.broadcastMessage("Source spawned at x: " + maxX + ", z: " + maxZ + ", y: " + max);
+//		Bukkit.broadcastMessage("Source spawned at x: " + maxX + ", z: " + maxZ + ", y: " + max);
 		
 		// Create the source 2x3x3, centered at maxX, maxZ
 		for (int i = 0; i < 2; i ++)
@@ -209,10 +210,10 @@ public class Aquaduct {
 	    );
 	    firework.setFireworkMeta(meta);
 
-	    Bukkit.broadcastMessage(
-	        ChatColor.GREEN + "Sink spawned at x: " +
-	        sinkX + ", z: " + sinkZ + ", y: " + sinkY
-	    );
+//	    Bukkit.broadcastMessage(
+//	        ChatColor.GREEN + "Sink spawned at x: " +
+//	        sinkX + ", z: " + sinkZ + ", y: " + sinkY
+//	    );
 	    Bukkit.broadcastMessage(
 	        ChatColor.GREEN + "Aqueduct source and sink have been placed."
 	    );
@@ -231,24 +232,32 @@ public class Aquaduct {
 	            // scan the 6×6 interior at y = sinkY + 1
 	            for (int dx = 1; dx <= 6; dx++) {
 	                for (int dz = 1; dz <= 6; dz++) {
-	                    if (KinectSandbox.getInstance().world
-	                            .getBlockAt(finalSinkX + dx, finalSinkY + 1, finalSinkZ + dz)
-	                            .getType() == Material.WATER) {
-	                        int elapsedSec = (int)((System.currentTimeMillis() - startTime) / 1000);
-	                        Bukkit.broadcastMessage(
-	                            ChatColor.GOLD +
-	                            "You completed the aquaduct in " +
-	                            elapsedSec +
-	                            " seconds!"
-	                        );
-	                        this.cancel();
-	                        new BukkitRunnable() {
-	                            @Override
-	                            public void run() {
-	                                GamemodeHelper.stopCurrentGamemodeIfRunning();
-	                            }
-	                        }.runTaskLater(KinectSandbox.getInstance(), 2 * 20L);
-	                        return;
+	                    for (int dy = 1; dy <= 5; dy++) { // Loop vertically from sinkY + 1 to sinkY + 5
+	                        Block block = KinectSandbox.getInstance().world.getBlockAt(finalSinkX + dx, finalSinkY + dy, finalSinkZ + dz);
+	                        Material type = block.getType();
+	                        
+	                        if (dy == 1 && type == Material.WATER) { 
+	                            // Only check for water at sinkY + 1
+	                            int elapsedSec = (int)((System.currentTimeMillis() - startTime) / 1000);
+	                            Bukkit.broadcastMessage(
+	                                ChatColor.GOLD +
+	                                "You completed the aquaduct in " +
+	                                elapsedSec +
+	                                " seconds!"
+	                            );
+	                            this.cancel();
+	                            new BukkitRunnable() {
+	                                @Override
+	                                public void run() {
+	                                    GamemodeHelper.stopCurrentGamemodeIfRunning();
+	                                }
+	                            }.runTaskLater(KinectSandbox.getInstance(), 2 * 20L);
+	                            return;
+	                        }
+
+	                        if (type != Material.AIR) {
+	                            block.setType(Material.AIR);
+	                        }
 	                    }
 	                }
 	            }
@@ -257,10 +266,6 @@ public class Aquaduct {
 	    .runTaskTimer(KinectSandbox.getInstance(), 20L, 20L)
 	    .getTaskId();
 	    GamemodeHelper.scheduledTaskIDs.add(taskID);
-		
-		
-		Bukkit.broadcastMessage(ChatColor.GREEN + "Aquaduct source and sink have been placed.");
-		Bukkit.broadcastMessage(ChatColor.GREEN + "You have 1 minute to redirect the water.");
 	}
 	
 	public static void cleanUp()

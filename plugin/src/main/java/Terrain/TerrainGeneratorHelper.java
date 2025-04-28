@@ -67,7 +67,7 @@ public class TerrainGeneratorHelper {
 	// set all blocks to air in the region that depth encompasses
 	public static void resetBlocks() {
         for (int x = -2; x < 525; x++) {
-            for (int y = -70; y < 255; y++) {
+            for (int y = -70; y < 350; y++) {
                 for (int z = -2; z < 525; z++) {
                 	KinectSandbox.getInstance().world.getBlockAt(x, y, z).setType(Material.AIR);
                 }
@@ -420,7 +420,21 @@ public class TerrainGeneratorHelper {
 	{
 		if (biome.equals("grass"))
 		{
-			
+//			for (int i = 0; i < TerrainGeneratorHelper.findXEnd(); i++)
+//			{
+//				for (int j = 0; j < TerrainGeneratorHelper.findZEnd(); j++)
+//				{
+//					for (int y = 0; y < 21; y++)
+//					{
+//						if (KinectSandbox.getInstance().world.getBlockAt(i, y+1, j).getType().equals(Material.AIR) && KinectSandbox.getInstance().world.getBlockAt(i, y, j).getType().equals(Material.DIRT))
+//						{
+//							KinectSandbox.getInstance().world.getBlockAt(i, y, j).setType(Material.GRASS_BLOCK);
+//						}
+//						if (y > 15 && KinectSandbox.getInstance().world.getBlockAt(i, y, j).getType().equals(Material.STONE) && KinectSandbox.getInstance().world.getBlockAt(i, y+1, j).getType().equals(Material.AIR))
+//							KinectSandbox.getInstance().world.getBlockAt(i, y, j).setType(Material.SNOW);
+//					}
+//				}
+//			}
 		}
 		else if (biome.equals("sand"))
 		{
