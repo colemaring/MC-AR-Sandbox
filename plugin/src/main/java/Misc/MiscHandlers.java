@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Animals;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
@@ -30,16 +31,6 @@ import Main.KinectSandbox;
 import Terrain.TerrainGeneratorHelper;
 
 public class MiscHandlers implements Listener{
-	private static long lastBroadcastTime = 0;
-	
-	public static void printSaveMessage() {
-	    long now = System.currentTimeMillis();
-	    if (now - lastBroadcastTime > 500) {
-	        Bukkit.broadcastMessage("Changes applied");
-	        lastBroadcastTime = now;
-	    }
-	}
-	
 	// Prevent hand swap
 	@EventHandler
     public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
@@ -62,19 +53,6 @@ public class MiscHandlers implements Listener{
 	    else if (event.getEntityType() != EntityType.ZOMBIE && event.getEntityType() != EntityType.ARMOR_STAND)
 	        event.setCancelled(true);
 	}
-	
-	// Prevent grass from turning into dirt
-	// Dont use for such a simple thing
-//	@EventHandler
-//	public void onBlockPhysicsEvent(BlockPhysicsEvent event)
-//	{
-//		if (event.getChangedType().equals(Material.DIRT))
-//		{
-//			event.setCancelled(true);
-//		}
-//	}
-
-
 	
 	// Prevent item drops when entities die
 	@EventHandler
@@ -164,12 +142,12 @@ public class MiscHandlers implements Listener{
     // Remove any kind of entity, except players
     public static void killEntities() {
         for (World world : Bukkit.getWorlds()) {
-            for (Entity entity : world.getEntities()) {
-                // Check if the entity is not a player
-                if (!(entity instanceof Player)) {
-                    entity.remove(); // Remove the entity if it's not a player
-                }
-            }
+        	 for (Entity entity : world.getEntities()) {
+                 if (entity instanceof Player) continue;
+                 if (entity instanceof Display) continue; // Skip BlockDisplay for wall placement on ore hunt 2p
+                 
+                 entity.remove();
+             }
         }
     }
 

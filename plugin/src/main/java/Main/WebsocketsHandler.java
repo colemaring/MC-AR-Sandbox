@@ -62,7 +62,6 @@ public class WebsocketsHandler {
                         
                         
                         int[][] newDepth = TerrainGeneratorHelper.cropArray(depthData, KinectSandbox.getInstance().settings.x1, KinectSandbox.getInstance().settings.x2, KinectSandbox.getInstance().settings.y1 ,KinectSandbox.getInstance().settings.y2);
-                        //newDepth = TerrainGeneratorHelper.movingMode(newDepth);
                 		newDepth = TerrainGeneratorHelper.modePool(newDepth, 2);
                         // after performing mode or whatever on data, then we can linear scale down
                         for (int i = 0; i < newDepth.length; i++)

@@ -1,5 +1,8 @@
 package Gamemodes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -16,15 +19,18 @@ import Terrain.TerrainGenerator;
 import Terrain.TerrainGeneratorHelper;
 import net.md_5.bungee.api.ChatColor;
 
+
+// TODO
+// remove calls to resetBlocks(), replace with more efficient method
 public class Aquaduct {
 	private static int taskID = -1;
+	private static List<Location> placedBlocks = new ArrayList<>();
 	public static void startCountdown() {
 		// First stop any games if they exist
     	GamemodeHelper.stopCurrentGamemodeIfRunning();
         GamemodeHelper.setCurrentGameStopper(() -> {
             cleanUp();
             GamemodeHelper.cancelAllTasks(taskID);
-            TerrainGeneratorHelper.unpauseTerrain();
             Bukkit.broadcastMessage(ChatColor.GOLD + "Aquaduct has ended!");
             // reset terrain here
             return;
@@ -92,7 +98,6 @@ public class Aquaduct {
 				}
 			}
 		}
-//		Bukkit.broadcastMessage("Source spawned at x: " + maxX + ", z: " + maxZ + ", y: " + max);
 		
 		// Create the source 2x3x3, centered at maxX, maxZ
 		for (int i = 0; i < 2; i ++)
@@ -179,6 +184,11 @@ public class Aquaduct {
 	                    .getBlockAt(bestX + dx, bestY + i, bestZ + dz)
 	                    .setType(Material.GOLD_BLOCK);
 	                
+	                placedBlocks.add(new Location(
+                            KinectSandbox.getInstance().world,
+                            bestX + dx, bestY + i, bestZ + dz
+                        ));
+	                
 	                KinectSandbox.getInstance().world.getBlockAt(bestX + dx, bestY + i, bestZ + dz).getState().update(true, true);
 	                
 	            }
@@ -210,12 +220,8 @@ public class Aquaduct {
 	    );
 	    firework.setFireworkMeta(meta);
 
-//	    Bukkit.broadcastMessage(
-//	        ChatColor.GREEN + "Sink spawned at x: " +
-//	        sinkX + ", z: " + sinkZ + ", y: " + sinkY
-//	    );
 	    Bukkit.broadcastMessage(
-	        ChatColor.GREEN + "Aqueduct source and sink have been placed."
+	        ChatColor.GREEN + "Aquaduct source and sink have been placed."
 	    );
 	    Bukkit.broadcastMessage(
 	        ChatColor.GREEN + "You have 10 minutes to redirect the water."
@@ -270,11 +276,18 @@ public class Aquaduct {
 	
 	public static void cleanUp()
 	{
+		for (Location veinCorner : placedBlocks)
+		{
+			//Bukkit.broadcastMessage("removing from placedVeins  " + veinCorner.getX() + " " + veinCorner.getY() + " " + veinCorner.getZ());
+			for (int x = veinCorner.getBlockX(); x < veinCorner.getBlockX() + 2; x++)
+				for (int y = veinCorner.getBlockY(); y < veinCorner.getBlockY() + 2; y++)
+					for (int z = veinCorner.getBlockZ(); z < veinCorner.getBlockZ() + 2; z++)
+						KinectSandbox.getInstance().world.getBlockAt(x, y, z).setType(Material.AIR);
+		}
 		GamemodeHelper.currentGameStopper = null;
 		GamemodeHelper.gamemodeRunning = false;
 		KinectSandbox.allowWaterFlow = false;
 		TerrainGenerator.prevDepth = new int[TerrainGenerator.prevDepth.length][TerrainGenerator.prevDepth[0].length];
 		TerrainGeneratorHelper.resetBlocks();
-		
 	}
 }

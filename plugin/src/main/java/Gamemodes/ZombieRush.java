@@ -13,7 +13,6 @@ import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -37,30 +36,15 @@ public class ZombieRush {
         GamemodeHelper.setCurrentGameStopper(() -> {
             cleanupZombiesAndTargets();
             GamemodeHelper.cancelAllTasks(taskID);
-            TerrainGeneratorHelper.unpauseTerrain();
             Bukkit.broadcastMessage(ChatColor.GOLD + "Zombie Rush has ended!");
             // reset terrain here
             return;
         });
+
         
-        Bukkit.broadcastMessage(ChatColor.GREEN + "You have 30 seconds to prepare your terrain before the Zombie Rush begins.");
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            player.sendTitle(ChatColor.GOLD + "Prepare your terrain!", "", 2, 60, 2);
-        }
-        
-        // Schedule 10-second warning and startCountdown, and store their IDs.
-        int warningTaskID = Bukkit.getScheduler().runTaskLater(KinectSandbox.getInstance(), () -> {
-            Bukkit.broadcastMessage(ChatColor.YELLOW + "Warning: 10 seconds remaining to prepare your terrain!");
-        }, 20 * 20L).getTaskId();
-        GamemodeHelper.scheduledTaskIDs.add(warningTaskID);
-        
-        int countdownTaskID = Bukkit.getScheduler().runTaskLater(KinectSandbox.getInstance(), () -> { 
-            startCountdown();
-        }, 27 * 20L).getTaskId();
-        GamemodeHelper.scheduledTaskIDs.add(countdownTaskID);
+        startCountdown();
     }
 
-    
     public static void startCountdown() {
         GamemodeHelper.countdown("Zombie Rush", 3, () -> {
             // Runs after countdown finishes
@@ -72,7 +56,6 @@ public class ZombieRush {
     	running = true;
         Bukkit.broadcastMessage(ChatColor.GOLD + "Zombie Rush has begun. 1 minute remains!");
      // Start the timer
-        TerrainGeneratorHelper.pauseTerrain();
         timeLeft = 60;
         reachedZombies.clear();
         zombieTargets.clear();
@@ -186,7 +169,5 @@ public class ZombieRush {
                 entity.remove();
             }
         }
-        
-        TerrainGeneratorHelper.unpauseTerrain();
     }
 }

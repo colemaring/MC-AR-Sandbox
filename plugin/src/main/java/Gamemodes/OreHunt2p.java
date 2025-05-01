@@ -10,18 +10,22 @@ import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import Main.KinectSandbox;
-import Terrain.TerrainGenerator;
 import Terrain.TerrainGeneratorHelper;
 import net.md_5.bungee.api.ChatColor;
 
 public class OreHunt2p {
 	
 	private static List<Location> placedVeins = new ArrayList<>();
+	private static List<Location> placedVeins2 = new ArrayList<>();
 	private static int leftFoundCount = 0;
 	private static int rightFoundCount = 0;
 	private static int taskID = -1;
@@ -32,7 +36,7 @@ public class OreHunt2p {
 	public static void initOreHunt()
 	{
 		//Bukkit.broadcastMessage(TerrainGeneratorHelper.findXEnd() + " " + TerrainGeneratorHelper.findZEnd());
-		placeWall();
+		placeWallFake();
 		placedVeins = new ArrayList<>();
     	leftFoundCount = 0;
     	rightFoundCount = 0;
@@ -49,18 +53,38 @@ public class OreHunt2p {
         startCountdown();
 	}
 	
-	public static void placeWall()
-	{
-		int mid = TerrainGeneratorHelper.findZEnd()/2;
-		for (int i = 0; i <= TerrainGeneratorHelper.findXEnd(); i++)
-		{
-			for (int j = 0; j <= 64; j++)
-			{
-				KinectSandbox.getInstance().world.getBlockAt(i, j, mid).setType(Material.BEDROCK);
-			}
-		}
-		
+	public static void placeWallFake() {
+	    World world = KinectSandbox.getInstance().world;
+	    int midZ = TerrainGeneratorHelper.findZEnd() / 2;
+
+	    for (int x = 0; x <= TerrainGeneratorHelper.findXEnd(); x++) {
+	        for (int y = 0; y <= 64; y++) {
+	            Location location = new Location(world, x + 0.5, y + 0.5, midZ + 0.5); // Centered in block space
+	            BlockDisplay blockDisplay = (BlockDisplay) world.spawnEntity(location, EntityType.BLOCK_DISPLAY);
+
+	            blockDisplay.setBlock(Bukkit.createBlockData(Material.BEDROCK));
+
+	            // Optional: make it not collide or move
+	            blockDisplay.setPersistent(true); // Survives reloads
+	           // blockDisplay.setInvisible(false); // Should be visible
+	            blockDisplay.setGravity(false);
+
+	            // Optional: tag them to remove later
+	            blockDisplay.addScoreboardTag("fake_wall");
+	        }
+	    }
 	}
+	
+	public static void removeFakeWall() {
+	    World world = KinectSandbox.getInstance().world;
+	    for (Entity entity : world.getEntitiesByClass(BlockDisplay.class)) {
+	        if (entity.getScoreboardTags().contains("fake_wall")) {
+	            entity.remove();
+	        }
+	    }
+	}
+
+
 	
 	public static void startCountdown() {
         GamemodeHelper.countdown("Ore Hunt (2P)", 3, () -> {
@@ -235,6 +259,10 @@ public class OreHunt2p {
 	                                    KinectSandbox.getInstance().world,
 	                                    startX, startY, startZ
 	                                ));
+	                                placedVeins2.add(new Location(
+	                                        KinectSandbox.getInstance().world,
+	                                        startX, startY, startZ
+	                                    ));
 	                            }
 	                        }
 	                    }
@@ -267,10 +295,45 @@ public class OreHunt2p {
 	
 	public static void cleanUp()
 	{
+		for (Location veinCorner : placedVeins2)
+		{
+			if (isVeinExposed(veinCorner))
+			{
+				for (int x = veinCorner.getBlockX(); x < veinCorner.getBlockX() + 2; x++)
+				{
+					for (int y = veinCorner.getBlockY(); y < veinCorner.getBlockY() + 2; y++)
+					{
+						for (int z = veinCorner.getBlockZ(); z < veinCorner.getBlockZ() + 2; z++)
+						{
+								TerrainGeneratorHelper.placeAsBiome(x, y, z, KinectSandbox.biome, false, true);
+						}
+					}
+						
+				}
+			}
+			else
+			{
+				for (int x = veinCorner.getBlockX(); x < veinCorner.getBlockX() + 2; x++)
+				{
+					for (int y = veinCorner.getBlockY(); y < veinCorner.getBlockY() + 2; y++)
+					{
+						for (int z = veinCorner.getBlockZ(); z < veinCorner.getBlockZ() + 2; z++)
+						{
+								TerrainGeneratorHelper.placeAsBiome(x, y, z, KinectSandbox.biome, true, true);
+						}
+					}
+						
+				}
+			}			
+		}
+			
+
+		placedVeins2.clear(); // Clear the list after restoring blocks
+		placedVeins.clear();
+		removeFakeWall();
+		
 		GamemodeHelper.currentGameStopper = null;
 		GamemodeHelper.gamemodeRunning = false;
-		TerrainGenerator.prevDepth = new int[TerrainGenerator.prevDepth.length][TerrainGenerator.prevDepth[0].length];
-        TerrainGeneratorHelper.resetBlocks();
 		leftPoints = 0;
 		rightPoints = 0;
 	}

@@ -22,6 +22,7 @@ import net.md_5.bungee.api.ChatColor;
 public class OreHunt {
 	
 	private static List<Location> placedVeins = new ArrayList<>();
+	private static List<Location> placedVeins2 = new ArrayList<>();
 	private static int foundCount = 0;
 	private static int taskID = -1;
 	private static int points = 0;
@@ -35,6 +36,7 @@ public class OreHunt {
 		GamemodeHelper.stopCurrentGamemodeIfRunning();
         GamemodeHelper.setCurrentGameStopper(() -> {
             cleanUp();
+            
             GamemodeHelper.cancelAllTasks(taskID);
             Bukkit.broadcastMessage(ChatColor.GOLD + "Ore Hunt has ended!");
             return;
@@ -72,11 +74,6 @@ public class OreHunt {
 		            Location center = it.next();
 		            if (isVeinExposed(center)) {
 		                foundCount++;
-//		                Bukkit.broadcastMessage(ChatColor.AQUA 
-//		                    + " vein found at " 
-//		                    + center.getBlockX() + ", " 
-//		                    + center.getBlockY() + ", " 
-//		                    + center.getBlockZ() + "!");
 		                
 		                if (KinectSandbox.getInstance().world.getBlockAt(center.getBlockX(), center.getBlockY(), center.getBlockZ()).getType().equals(Material.COAL_BLOCK)) {
 		                	points += 5;
@@ -145,14 +142,14 @@ public class OreHunt {
 	            {
 	                for (int j = 0; j < TerrainGeneratorHelper.findZEnd(); j += 2)
 	                {
-	                    for (int k = -100; k < 100 - 2; k += 2)
+	                    for (int k = 0; k < TerrainGenerator.yCoordThreshold; k += 2)
 	                    {
 
 	                        // Define the core 2x2x2 placement area's min corner
 	                        int startX = i + 1;
 	                        int startY = k + 1;
 	                        int startZ = j + 1;
-
+	                        
 	                        boolean touchesAir = false;
 
 	                        // Check a 4x4x4 volume centered around the 2x2x2 placement area
@@ -201,6 +198,10 @@ public class OreHunt {
 	                                    KinectSandbox.getInstance().world,
 	                                    startX, startY, startZ
 	                                ));
+	                                placedVeins2.add(new Location(
+	                                        KinectSandbox.getInstance().world,
+	                                        startX, startY, startZ
+	                                    ));
 	                            }
 	                        }
 	                    }
@@ -231,12 +232,46 @@ public class OreHunt {
         return true;
     }
 	
-	public static void cleanUp()
-	{
+	public static void cleanUp() {
+		// Restore the original blocks at the placed vein locations
+		for (Location veinCorner : placedVeins2)
+		{
+			if (isVeinExposed(veinCorner))
+			{
+				for (int x = veinCorner.getBlockX(); x < veinCorner.getBlockX() + 2; x++)
+				{
+					for (int y = veinCorner.getBlockY(); y < veinCorner.getBlockY() + 2; y++)
+					{
+						for (int z = veinCorner.getBlockZ(); z < veinCorner.getBlockZ() + 2; z++)
+						{
+								TerrainGeneratorHelper.placeAsBiome(x, y, z, KinectSandbox.biome, false, true);
+						}
+					}
+						
+				}
+			}
+			else
+			{
+				for (int x = veinCorner.getBlockX(); x < veinCorner.getBlockX() + 2; x++)
+				{
+					for (int y = veinCorner.getBlockY(); y < veinCorner.getBlockY() + 2; y++)
+					{
+						for (int z = veinCorner.getBlockZ(); z < veinCorner.getBlockZ() + 2; z++)
+						{
+								TerrainGeneratorHelper.placeAsBiome(x, y, z, KinectSandbox.biome, true, true);
+						}
+					}
+						
+				}
+			}			
+		}
+			
+
+		placedVeins2.clear(); // Clear the list after restoring blocks
+		placedVeins.clear();
 		GamemodeHelper.currentGameStopper = null;
 		GamemodeHelper.gamemodeRunning = false;
-		TerrainGenerator.prevDepth = new int[TerrainGenerator.prevDepth.length][TerrainGenerator.prevDepth[0].length];
-        TerrainGeneratorHelper.resetBlocks();
+
 		points = 0;
 	}
 

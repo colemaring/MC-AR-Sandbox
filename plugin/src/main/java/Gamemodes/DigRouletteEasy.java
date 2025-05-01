@@ -15,15 +15,15 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import Main.KinectSandbox;
-import Terrain.TerrainGenerator;
 import Terrain.TerrainGeneratorHelper;
 import net.md_5.bungee.api.ChatColor;
 
 public class DigRouletteEasy {
 	private static List<Location> placedVeins = new ArrayList<>();
+	private static List<Location> placedVeins2 = new ArrayList<>();
 	private static int foundCount = 0;
 	private static int taskID = -1;
-	private static int DIFFICULTY = 1000; // how common blocks are to spawn (tnt and gold), difficulty is a bad name
+	private static int DIFFICULTY = 1000; // 1 in DIFFICULTY chance that if there is a valid spot to put a block, we will put it there (either gold or TNT)
 	
 	public static void initDigRoulette()
 	{
@@ -42,7 +42,6 @@ public class DigRouletteEasy {
 	
 	public static void startCountdown() {
         GamemodeHelper.countdown("Dig Roulette", 3, () -> {
-            // Runs after countdown finishes
         	startDigRoulette();
         });
     }
@@ -55,12 +54,12 @@ public class DigRouletteEasy {
 		Bukkit.broadcastMessage(ChatColor.GREEN + "Remember, the gold must be completely uncovered for it to count");
 		placeBlocks();
 		
-		// start the “uncovered” checker: runs once per second
+		// start the uncovered checker
 		new BukkitRunnable() {
 		    @Override
 		    public void run() {
 		        if (!GamemodeHelper.gamemodeRunning) {
-		            this.cancel(); // Stop the task if the game has ended
+		            this.cancel();
 		            return;
 		        }
 
@@ -68,19 +67,11 @@ public class DigRouletteEasy {
 		        while (it.hasNext()) {
 		            Location center = it.next();
 		            if (isVeinExposed(center)) {
-		                
-//		                Bukkit.broadcastMessage(ChatColor.AQUA 
-//		                    + " vein found at " 
-//		                    + center.getBlockX() + ", " 
-//		                    + center.getBlockY() + ", " 
-//		                    + center.getBlockZ() + "!");
-		                
-		                if (KinectSandbox.getInstance().world.getBlockAt(center.getBlockX(), center.getBlockY(), center.getBlockZ()).getType().equals(Material.GOLD_BLOCK)) {
+		                if (KinectSandbox.getInstance().world.getBlockAt(center.getBlockX(), center.getBlockY(), center.getBlockZ()).getType().equals(Material.GOLD_BLOCK))
 		                	foundCount++;
-		                }
 
 		                // Launch a firework at the center
-		                Location fireworkLoc = center.clone().add(1, 1, 1); // Centered above the vein
+		                Location fireworkLoc = center.clone().add(1, 1, 1);
 		                Firework firework = (Firework) center.getWorld().spawn(fireworkLoc, Firework.class);
 
 		                FireworkMeta meta = firework.getFireworkMeta();
@@ -96,9 +87,8 @@ public class DigRouletteEasy {
 
 		                it.remove();
 		                
-		                if (KinectSandbox.getInstance().world.getBlockAt(center.getBlockX(), center.getBlockY(), center.getBlockZ()).getType().equals(Material.TNT)) {
-		                	gameOver();
-		                }
+		                if (KinectSandbox.getInstance().world.getBlockAt(center.getBlockX(), center.getBlockY(), center.getBlockZ()).getType().equals(Material.TNT))
+		                    gameOver();
 		            }
 
 		        }
@@ -181,6 +171,10 @@ public class DigRouletteEasy {
 	                                    KinectSandbox.getInstance().world,
 	                                    startX, startY, startZ
 	                                ));
+	                                placedVeins2.add(new Location(
+	                                        KinectSandbox.getInstance().world,
+	                                        startX, startY, startZ
+	                                    ));
 	                            }
 	                        }
 	                    }
@@ -227,9 +221,43 @@ public class DigRouletteEasy {
 	
 	public static void cleanUp()
 	{
+		for (Location veinCorner : placedVeins2)
+		{
+			if (isVeinExposed(veinCorner))
+			{
+				for (int x = veinCorner.getBlockX(); x < veinCorner.getBlockX() + 2; x++)
+				{
+					for (int y = veinCorner.getBlockY(); y < veinCorner.getBlockY() + 2; y++)
+					{
+						for (int z = veinCorner.getBlockZ(); z < veinCorner.getBlockZ() + 2; z++)
+						{
+								TerrainGeneratorHelper.placeAsBiome(x, y, z, KinectSandbox.biome, false, true);
+						}
+					}
+						
+				}
+			}
+			else
+			{
+				for (int x = veinCorner.getBlockX(); x < veinCorner.getBlockX() + 2; x++)
+				{
+					for (int y = veinCorner.getBlockY(); y < veinCorner.getBlockY() + 2; y++)
+					{
+						for (int z = veinCorner.getBlockZ(); z < veinCorner.getBlockZ() + 2; z++)
+						{
+								TerrainGeneratorHelper.placeAsBiome(x, y, z, KinectSandbox.biome, true, true);
+						}
+					}
+						
+				}
+			}			
+		}		
+
+		placedVeins2.clear(); // Clear the list after restoring blocks
+		placedVeins.clear();
+		
 		GamemodeHelper.currentGameStopper = null;
 		GamemodeHelper.gamemodeRunning = false;
-		TerrainGenerator.prevDepth = new int[TerrainGenerator.prevDepth.length][TerrainGenerator.prevDepth[0].length];
-        TerrainGeneratorHelper.resetBlocks();
+		foundCount = 0;
 	}
 }

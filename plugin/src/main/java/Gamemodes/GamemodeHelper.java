@@ -9,8 +9,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import Main.KinectSandbox;
 import Misc.MiscHandlers;
-import Terrain.TerrainGenerator;
-import Terrain.TerrainGeneratorHelper;
 import net.md_5.bungee.api.ChatColor;
 
 public class GamemodeHelper {
@@ -66,8 +64,6 @@ public class GamemodeHelper {
             currentGameStopper.run();
             currentGameStopper = null;
             MiscHandlers.killEntities();
-            TerrainGenerator.prevDepth = new int[KinectSandbox.getInstance().settings.y2 - KinectSandbox.getInstance().settings.y1 + 1][KinectSandbox.getInstance().settings.x2 - KinectSandbox.getInstance().settings.x1 + 1];
-            TerrainGeneratorHelper.resetBlocks();
         }
         else
         {
