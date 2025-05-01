@@ -68,7 +68,6 @@ public class WebsocketsHandler {
                             for (int j = 0; j < newDepth[0].length; j++)
                             	newDepth[i][j] = (int) Math.round(newDepth[i][j] / (KinectSettings.elevationMultiplier * 1.0));
 
-
                         // Serves as a throttling mechanism
                         if (messageCounter % KinectSandbox.getInstance().settings.captureSpeed != 0)
                             return;

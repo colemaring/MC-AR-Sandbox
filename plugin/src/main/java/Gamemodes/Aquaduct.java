@@ -42,8 +42,7 @@ public class Aquaduct {
 			KinectSandbox.getInstance().waterEnabled = false;
 			BiomeGui.waterElement.setState("waterDisabled");
 			Bukkit.broadcastMessage(ChatColor.RED + "Disabling terrain water before starting Aquaduct");
-			TerrainGenerator.prevDepth = new int[TerrainGenerator.prevDepth.length][TerrainGenerator.prevDepth[0].length];
-	        TerrainGeneratorHelper.resetBlocks();
+			TerrainGeneratorHelper.removeWater(20, 20, null);
 		}
         
         int gameTaskID = Bukkit.getScheduler().runTaskLater(KinectSandbox.getInstance(), () -> {
@@ -150,8 +149,8 @@ public class Aquaduct {
 		                }
 		            }
 
-		            if (allAir && y - 3 < bestY) {
-		                bestY = y - 3; // Bucket sits just below the air pocket
+		            if (allAir && y - 5 < bestY) {
+		                bestY = y - 5; // Bucket sits just below the air pocket
 		                bestX = x;
 		                bestZ = z;
 		            }
@@ -166,11 +165,24 @@ public class Aquaduct {
 	    }
 
 	    // Build the 8×8×3 “bucket” of GOLD_BLOCK
-	    for (int i = 0; i < 3; i++) {
+	    for (int i = 0; i < 6; i++) {
 	        for (int dx = 0; dx < 8; dx++) {
 	            for (int dz = 0; dz < 8; dz++) {
 	                // only rim on layers 1 & 2
 	                if ((i == 1 || i == 2) && dx != 0 && dx != 7 && dz != 0 && dz != 7)
+	                {
+	                	KinectSandbox.getInstance()
+	                    .world
+	                    .getBlockAt(bestX + dx, bestY + i, bestZ + dz)
+	                    .setType(Material.AIR);
+	                	placedBlocks.add(new Location(
+	                            KinectSandbox.getInstance().world,
+	                            bestX + dx, bestY + i, bestZ + dz
+	                        ));
+	                	continue;
+	                }
+	                
+	                if (i==3 || i == 4 || i == 5)
 	                {
 	                	KinectSandbox.getInstance()
 	                    .world
@@ -242,7 +254,7 @@ public class Aquaduct {
 	                        Block block = KinectSandbox.getInstance().world.getBlockAt(finalSinkX + dx, finalSinkY + dy, finalSinkZ + dz);
 	                        Material type = block.getType();
 	                        
-	                        if (dy == 1 && type == Material.WATER) { 
+	                        if ((dy == 1 || dy == 2) && type == Material.WATER) { 
 	                            // Only check for water at sinkY + 1
 	                            int elapsedSec = (int)((System.currentTimeMillis() - startTime) / 1000);
 	                            Bukkit.broadcastMessage(
@@ -276,18 +288,24 @@ public class Aquaduct {
 	
 	public static void cleanUp()
 	{
+		// copy array
+		int [][] prevDepthMinusBucket = new int[TerrainGenerator.prevDepth.length][TerrainGenerator.prevDepth[0].length];
+		for (int i = 0; i < prevDepthMinusBucket.length; i++)
+			for (int j = 0; j < prevDepthMinusBucket[0].length; j++)
+				prevDepthMinusBucket[i][j] = TerrainGenerator.prevDepth[i][j];
+		
+		
 		for (Location veinCorner : placedBlocks)
 		{
-			//Bukkit.broadcastMessage("removing from placedVeins  " + veinCorner.getX() + " " + veinCorner.getY() + " " + veinCorner.getZ());
-			for (int x = veinCorner.getBlockX(); x < veinCorner.getBlockX() + 2; x++)
-				for (int y = veinCorner.getBlockY(); y < veinCorner.getBlockY() + 2; y++)
-					for (int z = veinCorner.getBlockZ(); z < veinCorner.getBlockZ() + 2; z++)
-						KinectSandbox.getInstance().world.getBlockAt(x, y, z).setType(Material.AIR);
+			TerrainGeneratorHelper.placeAsBiome(veinCorner.getBlockX(), veinCorner.getBlockY(), veinCorner.getBlockZ(), KinectSandbox.biome, true, true);
+			prevDepthMinusBucket[veinCorner.getBlockX()][veinCorner.getBlockZ()] = 0; // this will force and update on these x, z coords 
 		}
 		GamemodeHelper.currentGameStopper = null;
 		GamemodeHelper.gamemodeRunning = false;
 		KinectSandbox.allowWaterFlow = false;
-		TerrainGenerator.prevDepth = new int[TerrainGenerator.prevDepth.length][TerrainGenerator.prevDepth[0].length];
-		TerrainGeneratorHelper.resetBlocks();
+		TerrainGeneratorHelper.removeWater(20, 20, null);
+		
+		TerrainGenerator.prevDepth = prevDepthMinusBucket;
+//		TerrainGeneratorHelper.resetBlocks();
 	}
 }

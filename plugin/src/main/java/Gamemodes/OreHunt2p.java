@@ -97,7 +97,7 @@ public class OreHunt2p {
 	{
 		
 		GamemodeHelper.gamemodeRunning = true;
-		Bukkit.broadcastMessage(ChatColor.GOLD + "Ore Hunt (2P) has begun, 30 second remain!");
+		Bukkit.broadcastMessage(ChatColor.GOLD + "Ore Hunt (2P) has begun, 1 minute remains!");
 		Bukkit.broadcastMessage(ChatColor.GREEN + "Remember, the vein must be completely uncovered for it to count");
 		placeOres();
 		
@@ -173,7 +173,7 @@ public class OreHunt2p {
 
 		int warningTaskID = Bukkit.getScheduler().runTaskLater(KinectSandbox.getInstance(), () -> {
             Bukkit.broadcastMessage(ChatColor.YELLOW + "Warning: 10 seconds remaining!");
-        }, 20 * 20L).getTaskId();
+        }, 50 * 20L).getTaskId();
         GamemodeHelper.scheduledTaskIDs.add(warningTaskID);
 
 
@@ -188,7 +188,7 @@ public class OreHunt2p {
                 	GamemodeHelper.stopCurrentGamemodeIfRunning();
                 }
             }.runTaskLater(KinectSandbox.getInstance(), 2 * 20L);
-        }, 30 * 20L).getTaskId();
+        }, 60 * 20L).getTaskId();
         GamemodeHelper.scheduledTaskIDs.add(gameTaskID);
 	}
 	

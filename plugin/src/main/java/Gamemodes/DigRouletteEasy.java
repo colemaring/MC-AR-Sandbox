@@ -50,7 +50,7 @@ public class DigRouletteEasy {
 	{
 		
 		GamemodeHelper.gamemodeRunning = true;
-		Bukkit.broadcastMessage(ChatColor.GOLD + "Dig Roulette (easy) has begun, 30 second remain!");
+		Bukkit.broadcastMessage(ChatColor.GOLD + "Dig Roulette has begun, 1 minute remains!");
 		Bukkit.broadcastMessage(ChatColor.GREEN + "Remember, the gold must be completely uncovered for it to count");
 		placeBlocks();
 		
@@ -98,7 +98,7 @@ public class DigRouletteEasy {
 
 		int warningTaskID = Bukkit.getScheduler().runTaskLater(KinectSandbox.getInstance(), () -> {
             Bukkit.broadcastMessage(ChatColor.YELLOW + "Warning: 10 seconds remaining!");
-        }, 20 * 20L).getTaskId();
+        }, 50 * 20L).getTaskId();
         GamemodeHelper.scheduledTaskIDs.add(warningTaskID);
 
 
@@ -106,7 +106,7 @@ public class DigRouletteEasy {
         	GamemodeHelper.gamemodeRunning = false;
             Bukkit.broadcastMessage(ChatColor.RED + "Time's up, you found " + foundCount + " gold.");
             cleanUp();
-        }, 30 * 20L).getTaskId();
+        }, 60 * 20L).getTaskId();
         GamemodeHelper.scheduledTaskIDs.add(gameTaskID);
 	}
 	
