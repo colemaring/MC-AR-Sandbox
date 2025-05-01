@@ -5,7 +5,7 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
 - Comprehensive one-click launcher that automates almost everything.
 - Configurable settings to adapt to any environment.
 - BuildTools integration for Mojang [compliance](https://github.com/github/dmca/blob/master/2014/2014-09-05-CraftBukkit.md).
-- Plugin consists of 7 biomes and 7 unique gamemodes to choose from.
+- Plugin consists of 7 biomes and 5 unique gamemodes to choose from.
 
 # Installation
 - Download [Python 3.12 from the Microsoft Store](https://apps.microsoft.com/detail/9NCVDN91XZQP?hl=en-us&gl=US&ocid=pdpshare), [PrismLauncher](https://prismlauncher.org/download/windows/), [Kinect SDK](https://www.microsoft.com/en-us/download/details.aspx?id=44561), and [Java 21+](https://www.oracle.com/java/technologies/downloads/#java21). <br>
@@ -15,30 +15,32 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
 
 # Hardware
 - A Kinect V2 sensor / Xbox One sensor.
-- A windows 10/11 PC with a Decent CPU and GPU.
+- A windows 10/11 PC with a Decent CPU.
 - (Optional) A projector.
 
 ## [Home Page](https://github.com/user-attachments/assets/f27ef5f5-a43b-4053-8044-72e953e55e1f)
 - Color coded logs showing MC-AR Launcher status.
 - Send commands to the running Minecraft server (eg. op <username>).
-- Launch Minecreaft & Projection if Auto Launch not toggled.
+- Launch Minecreaft & Topographic Projection.
 
 ## [Settings Page](https://github.com/user-attachments/assets/611abce0-67b2-4a2d-b5cf-1073f39617b0)
 ### Kinect Settings:
 - Crop Kinect View: Drag the crop edges to correspond with the boundaries of your sandbox.
-- Kinect to Surface Offset: The distance from your Kinect sensor to the sand, units undefined as it is arbitrary.
 - Capture Speed: Change the speed at which the Kinect sends updates to Minecraft.
+- Kinect to Sandbox Distance: The distance from your Kinect sensor to the sand in milimeters. This value is only used by the topographic projection.
 
 ### Topographic Projection Settings:
-- Auto Launch: Toggle to automatically launch the projection when the MC-AR Launcher opens.
+- Open on Launch: Open the projection when the Launch button on home page is clicked.
 - Show On: Choose which display device to launch the projection on.
 - Smoothing: Determine how much detail you want on your topographic layer lines.
 - Color: Choose which color profile to project onto the sand.
 - Interpolation: Choose which type of interpolation to smooth the noise.
 
 ### Minecraft Settings:
-- Auto Launch: Toggle to automatically launch Minecraft when the MC-AR Launcher opens.
+- Open on Launch: Open Minecraft when the Launch button on home page is clicked.
 - Show On: Choose which display device to launch Minecraft on.
+- Elevation Multiplier: Choose how much y axis range you'd like in Minecraft.
+- Y Coordinate Offset: Needs to be tuned to fit the Kinect/Sandbox environment. Needs to be re-adjusted when elevation multiplier is changed.
 - PrismLauncher Filepath: Specify the filepath to the Prismlauncher exe.
   
 Save button: Save your configuration to persist between launches and reflect changes in the currently running Minecraft instance.
