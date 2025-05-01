@@ -18,12 +18,12 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
 - A windows 10/11 PC with a Decent CPU.
 - (Optional) A projector.
 
-## [Home Page](https://github.com/user-attachments/assets/f27ef5f5-a43b-4053-8044-72e953e55e1f)
+## [Home Page](https://github.com/user-attachments/assets/a496e483-e3c3-402b-b334-d6574a2d83e5)
 - Color coded logs showing MC-AR Launcher status.
 - Send commands to the running Minecraft server (eg. op <username>).
 - Launch Minecreaft & Topographic Projection.
 
-## [Settings Page](https://github.com/user-attachments/assets/611abce0-67b2-4a2d-b5cf-1073f39617b0)
+## [Settings Page](https://github.com/user-attachments/assets/80c60829-81a5-4212-820d-e3af01e85768)
 ### Kinect Settings:
 - Crop Kinect View: Drag the crop edges to correspond with the boundaries of your sandbox.
 - Capture Speed: Change the speed at which the Kinect sends updates to Minecraft.
@@ -45,7 +45,7 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
   
 Save button: Save your configuration to persist between launches and reflect changes in the currently running Minecraft instance.
 
-## [Info Page](https://github.com/user-attachments/assets/04bb55f9-e500-4f6b-9cf1-bec1d613143a)
+## [Info Page](https://github.com/user-attachments/assets/ac30290d-91f7-4108-8d40-1fcfa91d41c5)
 - Gamemode Information
 - In-Game Commands (Outdated, changed to GUIs)
 
