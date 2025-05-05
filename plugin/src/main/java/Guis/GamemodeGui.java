@@ -15,6 +15,7 @@ import Gamemodes.ZombieRush;
 import Main.KinectSandbox;
 import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
+import net.md_5.bungee.api.ChatColor;
 
 public class GamemodeGui {
 	
@@ -36,7 +37,7 @@ public class GamemodeGui {
 			        GamemodeHelper.stopCurrentGamemodeIfRunning();
 			    	return true;
 			    },
-			    "§aEnd current gamemode"
+			    ChatColor.RED + "End current gamemode"
 			));
 
 		ItemStack diamondPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
@@ -156,7 +157,7 @@ public class GamemodeGui {
 			        player.closeInventory();
 			    	return true;
 			    },
-			    "§aTo be developed.."
+			    ChatColor.RED + "To be developed.."
 			));
 		
 		gui.addElement(new StaticGuiElement('g',
@@ -167,7 +168,7 @@ public class GamemodeGui {
 			        player.closeInventory();
 			    	return true;
 			    },
-			    "§aTo be developed.."
+			    ChatColor.RED + "To be developed.."
 			));
 
 		

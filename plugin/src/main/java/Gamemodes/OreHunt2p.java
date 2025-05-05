@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import Main.KinectSandbox;
+import Terrain.TerrainGenerator;
 import Terrain.TerrainGeneratorHelper;
 import net.md_5.bungee.api.ChatColor;
 
@@ -87,11 +88,13 @@ public class OreHunt2p {
 
 	
 	public static void startCountdown() {
-        GamemodeHelper.countdown("Ore Hunt (2P)", 3, () -> {
-            // Runs after countdown finishes
-        	startOreHunt();
-        });
-    }
+		 int taskId  =GamemodeHelper.countdown("Ore Hunt (2P)", 3, () -> {
+			if (!GamemodeHelper.gamemodeRunning)
+				return;
+       	startOreHunt();
+       });
+       GamemodeHelper.scheduledTaskIDs.add(taskId);
+   }
 	
 	public static void startOreHunt()
 	{
@@ -199,9 +202,9 @@ public class OreHunt2p {
 	            Random random = new Random();
 
 	            // Iterate through potential starting points for the 2x2x2 vein center
-	            for (int i = 0; i < TerrainGeneratorHelper.findXEnd() ; i += 2)
+	            for (int i = 0; i < TerrainGeneratorHelper.findXEnd() -3; i += 2)
 	            {
-	                for (int j = 0; j < TerrainGeneratorHelper.findZEnd(); j += 2)
+	                for (int j = 0; j < TerrainGeneratorHelper.findZEnd() -3; j += 2)
 	                {
 	                    for (int k = -100; k < 100 - 2; k += 2)
 	                    {
@@ -295,37 +298,27 @@ public class OreHunt2p {
 	
 	public static void cleanUp()
 	{
-		for (Location veinCorner : placedVeins2)
-		{
-			if (isVeinExposed(veinCorner))
-			{
-				for (int x = veinCorner.getBlockX(); x < veinCorner.getBlockX() + 2; x++)
+		// copy array
+				int [][] prevDepthMinusBucket = new int[TerrainGenerator.prevDepth.length][TerrainGenerator.prevDepth[0].length];
+				for (int i = 0; i < prevDepthMinusBucket.length; i++)
+					for (int j = 0; j < prevDepthMinusBucket[0].length; j++)
+						prevDepthMinusBucket[i][j] = TerrainGenerator.prevDepth[i][j];
+				
+				// Restore the original blocks at the placed vein locations
+				for (Location veinCorner : placedVeins2)
 				{
-					for (int y = veinCorner.getBlockY(); y < veinCorner.getBlockY() + 2; y++)
+					for (int x = veinCorner.getBlockX(); x < veinCorner.getBlockX() + 2; x++)
 					{
-						for (int z = veinCorner.getBlockZ(); z < veinCorner.getBlockZ() + 2; z++)
+						for (int y = veinCorner.getBlockY(); y < veinCorner.getBlockY() + 2; y++)
 						{
+							for (int z = veinCorner.getBlockZ(); z < veinCorner.getBlockZ() + 2; z++)
+							{
 								TerrainGeneratorHelper.placeAsBiome(x, y, z, KinectSandbox.biome, false, true);
-						}
-					}
-						
+								prevDepthMinusBucket[x][z] = 0; // this will force an update on these x, z coords 
+							}
+						}	
+					}	
 				}
-			}
-			else
-			{
-				for (int x = veinCorner.getBlockX(); x < veinCorner.getBlockX() + 2; x++)
-				{
-					for (int y = veinCorner.getBlockY(); y < veinCorner.getBlockY() + 2; y++)
-					{
-						for (int z = veinCorner.getBlockZ(); z < veinCorner.getBlockZ() + 2; z++)
-						{
-								TerrainGeneratorHelper.placeAsBiome(x, y, z, KinectSandbox.biome, true, true);
-						}
-					}
-						
-				}
-			}			
-		}
 			
 
 		placedVeins2.clear(); // Clear the list after restoring blocks
@@ -334,6 +327,7 @@ public class OreHunt2p {
 		
 		GamemodeHelper.currentGameStopper = null;
 		GamemodeHelper.gamemodeRunning = false;
+		TerrainGenerator.prevDepth = prevDepthMinusBucket;
 		leftPoints = 0;
 		rightPoints = 0;
 	}

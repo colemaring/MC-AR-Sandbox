@@ -15,15 +15,14 @@ import Main.KinectSandbox;
 public class TerrainGeneratorHelper {
 	static Random random = new Random();
 
-	public static void removeWater(int numXLayers, int numZLayers, Runnable onComplete) {
+	public static void removeWater(int numXLayers, int numZLayers) {
 	    if (numXLayers <= 0 || numZLayers <= 0) {
 	        Bukkit.getLogger().warning("Invalid layer size for water removal!");
-	        onComplete.run();
 	        return;
 	    }
 
-	    int xEnd = findXEnd();
-	    int zEnd = findZEnd();
+	    int xEnd = findXEnd() + 1;
+	    int zEnd = findZEnd() + 1;
 	    int yMax = TerrainGenerator.yCoordThreshold + 1;
 
 	    final int startX = -2;
@@ -48,7 +47,6 @@ public class TerrainGeneratorHelper {
 	            if (world == null) {
 	                Bukkit.getLogger().warning("World is null, canceling task.");
 	                this.cancel();
-	                onComplete.run();
 	                return;
 	            }
 
@@ -58,13 +56,12 @@ public class TerrainGeneratorHelper {
 
 	                if (currentY > yMax) {
 	                    this.cancel();
-	                    onComplete.run();
 	                    return;
 	                }
 
 	                if (targetX <= xEnd && targetZ <= zEnd) {
 	                    Block block = world.getBlockAt(targetX, currentY, targetZ);
-	                    if (block.getType() == Material.WATER) {
+	                    if (block.getType() == Material.WATER || block.getType() == Material.LAVA ) {
 	                        block.setType(Material.AIR);
 	                    }
 	                    blocksProcessed++;
@@ -94,12 +91,10 @@ public class TerrainGeneratorHelper {
 	            }
 	        }
 	    };
-
-	    // Runs every 2 ticks; tweak as needed
 	    task.runTaskTimer(KinectSandbox.getInstance(), 0L, 1L);
 	}
 	
-	public static void addWater(int numXLayers, int numZLayers, Runnable onComplete, String biome)
+	public static void addWater(int numXLayers, int numZLayers, String biome)
 	{
 		
 		int waterLevel = -1;
@@ -115,7 +110,6 @@ public class TerrainGeneratorHelper {
 					
 	    if (numXLayers <= 0 || numZLayers <= 0) {
 	        Bukkit.getLogger().warning("Invalid layer size for water removal!");
-	        onComplete.run();
 	        return;
 	    }
 
@@ -145,7 +139,6 @@ public class TerrainGeneratorHelper {
 	            if (world == null) {
 	                Bukkit.getLogger().warning("World is null, canceling task.");
 	                this.cancel();
-	                onComplete.run();
 	                return;
 	            }
 
@@ -155,14 +148,16 @@ public class TerrainGeneratorHelper {
 
 	                if (currentY > yMax) {
 	                    this.cancel();
-	                    onComplete.run();
 	                    return;
 	                }
 
 	                if (targetX <= xEnd && targetZ <= zEnd) {
 	                    Block block = world.getBlockAt(targetX, currentY, targetZ);
 	                    if (block.getType() == Material.AIR) {
-	                        block.setType(Material.WATER);
+	                    	if (biome.equals("nether"))
+	                    		block.setType(Material.LAVA);
+	                    	else
+	                    		block.setType(Material.WATER);
 	                    }
 	                    blocksProcessed++;
 	                }
@@ -191,123 +186,22 @@ public class TerrainGeneratorHelper {
 	            }
 	        }
 	    };
-
-	    // Runs every 2 ticks; tweak as needed
 	    task.runTaskTimer(KinectSandbox.getInstance(), 0L, 1L);
 	}
-	
-	public static void removeAllBlocks(int numXLayers, int numZLayers, Runnable onComplete) {
-	    if (numXLayers <= 0 || numZLayers <= 0) {
-	        Bukkit.getLogger().warning("Invalid layer size for water removal!");
-	        onComplete.run();
-	        return;
-	    }
-
-	    int xEnd = findXEnd();
-	    int zEnd = findZEnd();
-	    int yMax = TerrainGenerator.yCoordThreshold;
-
-	    final int startX = -2;
-	    final int startZ = -2;
-	    final int startY = 0;
-
-	    final int blocksPerTick = 15000; // Adjust for performance balance
-
-	    BukkitRunnable task = new BukkitRunnable() {
-	        int currentX = startX;
-	        int currentZ = startZ;
-	        int currentY = startY;
-
-	        int innerX = 0;
-	        int innerZ = 0;
-
-	        @Override
-	        public void run() {
-	            int blocksProcessed = 0;
-	            World world = KinectSandbox.getInstance().world;
-
-	            if (world == null) {
-	                Bukkit.getLogger().warning("World is null, canceling task.");
-	                this.cancel();
-	                onComplete.run();
-	                return;
-	            }
-
-	            while (blocksProcessed < blocksPerTick) {
-	                int targetX = currentX + innerX;
-	                int targetZ = currentZ + innerZ;
-
-	                if (currentY > yMax) {
-	                    this.cancel();
-	                    onComplete.run();
-	                    return;
-	                }
-
-	                if (targetX <= xEnd && targetZ <= zEnd) {
-	                    Block block = world.getBlockAt(targetX, currentY, targetZ);
-	                    //if (block.getType() == Material.WATER || block.getType() == Material.GOLD_BLOCK) {
-	                        block.setType(Material.AIR);
-	                    //}
-	                    blocksProcessed++;
-	                }
-
-	                innerZ++;
-
-	                if (innerZ >= numZLayers || targetZ >= zEnd) {
-	                    innerZ = 0;
-	                    innerX++;
-
-	                    if (innerX >= numXLayers || targetX >= xEnd) {
-	                        innerX = 0;
-	                        currentX += numXLayers;
-
-	                        if (currentX > xEnd) {
-	                            currentX = startX;
-	                            currentZ += numZLayers;
-
-	                            if (currentZ > zEnd) {
-	                                currentZ = startZ;
-	                                currentY++;
-	                            }
-	                        }
-	                    }
-	                }
-	            }
-	        }
-	    };
-
-	    // Runs every 2 ticks; tweak as needed
-	    task.runTaskTimer(KinectSandbox.getInstance(), 0L, 1L);
-	}
-
-	
 	
 	
 	public static void updateBiome(String biome, int numXLayers, int numZLayers, Runnable onComplete) {
-	    if (numXLayers <= 0) {
-	        Bukkit.getLogger().warning("numXLayers must be positive!");
-	        onComplete.run(); // Call complete immediately if invalid input
-	        return;
-	    }
-	     if (numZLayers <= 0) {
-	        Bukkit.getLogger().warning("numZLayers must be positive!");
-	        onComplete.run(); // Call complete immediately if invalid input
-	        return;
-	    }
-	     
-	    //Bukkit.broadcastMessage("updateBiome called");
+
+		removeWater(20, 20);
 
 	    int xEnd = findXEnd();
 	    int zEnd = findZEnd();
-	    int yMax = TerrainGenerator.yCoordThreshold; // Maximum Y coordinate to process up to (inclusive)
+	    int yMax = TerrainGenerator.yCoordThreshold; 
 
 	    final int startX = 0;
 	    final int startZ = 0;
 	    final int startY = 0;
-
-	    // Adjust blocksPerTick based on server performance.
-	    // This is the maximum number of blocks to attempt to process in a single tick.
-	    final int blocksPerTick = 20000; // Example value
+	    final int blocksPerTick = 20000;
 
 	    BukkitRunnable task = new BukkitRunnable() {
 	        // Current position in the overall iteration (start of the current numXLayers * numZLayers block)
@@ -335,96 +229,50 @@ public class TerrainGeneratorHelper {
 	            // Main loop continues as long as we haven't processed all blocks for this tick
 	            while (blocksProcessedThisTick < blocksPerTick) {
 
-	                // Calculate target coordinates based on current block start and inner offsets
 	                int targetX = currentX + innerX;
 	                int targetZ = currentZ + innerZ;
 
-	                // --- Check for completion of the entire area ---
-	                // If currentY has exceeded the max, we are done.
 	                if (currentY > yMax) {
 	                    this.cancel(); // Cancel the task
 	                    onComplete.run(); // Execute the completion callback
 	                    return; // Exit the run method
 	                }
 
-	                // --- Check if we need to move to the next block within the current Y layer ---
-	                // Check if we have finished the current row of Z blocks within the current X column
-	                // or if the next innerZ would go beyond the overall Z boundary for the current currentZ block.
 	                if (currentZ + innerZ > zEnd || innerZ >= numZLayers) {
 	                    innerZ = 0; // Reset inner Z offset
 	                    innerX++; // Move to the next X column within the current block
-
-	                    // Check if we have finished the current block of X columns within the current Z block
-	                    // or if the next innerX would go beyond the overall X boundary for the current currentX block.
 	                    if (currentX + innerX > xEnd || innerX >= numXLayers) {
 	                        innerX = 0; // Reset inner X offset
-	                        // Move to the start of the next numXLayers * numZLayers block in X
 	                        currentX += numXLayers;
-
-	                        // Check if we have finished the current row of numXLayers blocks in X
-	                        // or if the next currentX is beyond the overall X boundary.
 	                        if (currentX > xEnd) {
 	                            currentX = startX; // Reset current X position to the start of the area
-	                            // Move to the start of the next numZLayers block in Z
 	                            currentZ += numZLayers;
-
-	                            // Check if we have finished the current Z slice
-	                            // or if the next currentZ is beyond the overall Z boundary.
 	                            if (currentZ > zEnd) {
 	                                currentZ = startZ; // Reset current Z position to the start of the area
 	                                currentY++; // Move to the next Y layer
-
-	                                // Check if we have finished the entire area after incrementing Y.
-	                                // This will be caught by the completion check at the start of the while loop in the next tick.
-	                                // No need for an explicit return here, let the loop continue or finish.
 	                            }
 	                        }
 	                    }
-	                    // Continue to the next iteration of the while loop to process the block at the new position
 	                    continue; // Skip block processing in this iteration as we just moved to a new position
 	                }
 
-	                // --- Process the block at the current (targetX, currentY, targetZ) ---
-	                // Ensure target coordinates are within the overall bounds before processing.
 	                if (targetX <= xEnd && targetZ <= zEnd) {
 	                    Block block = world.getBlockAt(targetX, currentY, targetZ);
 
-	                    // ONLY call placeAsBiome if the block is NOT air
-	                    if (block.getType() != Material.AIR) {
-	                        // Call placeAsBiome to update the block to the specified biome type.
-	                        // We pass 'true' for 'adding' because we are setting the block to the new biome type.
-	                        placeAsBiome(targetX, currentY, targetZ, biome, true, false);
-	                    }
+	                    if (block.getType() != Material.AIR && block.getType() != Material.WATER && block.getType() != Material.LAVA)
+	                            placeAsBiome(targetX, currentY, targetZ, biome, true, false);
 
 	                    blocksProcessedThisTick++; // Increment count for each block coordinate considered
 	                } else {
-	                     // If target coordinates are out of bounds, it means we finished the current block
-	                     // or are at the edge of the overall area. The increment logic above
-	                     // should have already handled moving to the next valid position.
-	                     // If we reach here and targetX/targetZ are out of bounds, it indicates an issue
-	                     // with the increment logic or boundaries. For safety, we can break the while loop
-	                     // to avoid potential infinite loops, and the task will resume in the next tick.
+
 	                     Bukkit.getLogger().warning("Block coordinates out of bounds during processing: (" + targetX + ", " + currentY + ", " + targetZ + ")");
 	                     break; // Exit the while loop for this tick
 	                }
 
-
-	                // --- Move to the next block in the iteration sequence within the current numXLayers * numZLayers block ---
-	                // This is done after processing a block, so the next iteration of the while loop
-	                // will process the next block in the Z direction within the current X column.
-	                // The logic at the top of the loop handles wrapping around X and Z blocks and Y layers.
 	                innerZ++; // Move to the next Z position within the current X column
-
-
-	                // If the while loop finishes because blocksPerTick was reached, the runnable
-	                // will be scheduled again, continuing from the last saved position (currentX, currentZ, currentY, innerX, innerZ).
 	            }
 	        }
 	    };
-
-	    // Schedule the task to run immediately and repeat every 1 tick.
-	    // Running every tick (1L) provides the smoothest clearing animation but might
-	    // cause more lag if blocksPerTick is too high. Adjust the period as needed.
 	    task.runTaskTimer(KinectSandbox.getInstance(), 0L, 1L);
 	}
 
@@ -694,11 +542,10 @@ public class TerrainGeneratorHelper {
 	    for (int z = 0; z < 525; z++) {
 	        Block block = KinectSandbox.getInstance().world.getHighestBlockAt(0, z); // ✅ Correct order: x, z
 	        Material type = block.getType();
-	        if (type.isSolid()) {
+	        if (!type.isAir()) {
 	            lastNonZeroZ = z;
 	        }
 	    }
-
 	    return lastNonZeroZ;
 	}
 
@@ -708,11 +555,10 @@ public class TerrainGeneratorHelper {
 	    for (int x = 0; x < 525; x++) {
 	        Block block = KinectSandbox.getInstance().world.getHighestBlockAt(x, 0);
 	        Material type = block.getType();
-	        if (type.isSolid()) {
+	        if (!type.isAir()) {
 	            lastNonZeroX = x;
 	        }
 	    }
-
 	    return lastNonZeroX;
 	}
 
@@ -750,9 +596,9 @@ public class TerrainGeneratorHelper {
 			else
 				block.setType(Material.AIR);
 			
-			int waterLevel = 6;
-			if (KinectSandbox.getInstance().waterEnabled)
-				placeLiquid(i, waterLevel, j, "water");
+//			int waterLevel = 6;
+//			if (KinectSandbox.getInstance().waterEnabled)
+//				placeLiquid(i, waterLevel, j, "water");
 		}
 		if (biome.equals("snow"))
 		{	
@@ -769,10 +615,10 @@ public class TerrainGeneratorHelper {
 			}
 			else
 				block.setType(Material.AIR);
-			
-			int waterLevel = 10;
-			if (KinectSandbox.getInstance().waterEnabled)
-				placeLiquid(i, waterLevel, j, "water");
+//			
+//			int waterLevel = 10;
+//			if (KinectSandbox.getInstance().waterEnabled)
+//				placeLiquid(i, waterLevel, j, "water");
 		}
 		if (biome.equals("sand"))
 		{	
@@ -844,9 +690,9 @@ public class TerrainGeneratorHelper {
 			else
 				block.setType(Material.AIR);
 			
-			int lavaLevel = 14;
-			if (KinectSandbox.getInstance().waterEnabled)
-				placeLiquid(i, lavaLevel, j, "lava");
+//			int lavaLevel = 14;
+//			if (KinectSandbox.getInstance().waterEnabled)
+//				placeLiquid(i, lavaLevel, j, "lava");
 		}
 		if (biome.equals("rainbow"))
 		{	

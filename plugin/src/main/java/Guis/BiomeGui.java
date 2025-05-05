@@ -7,6 +7,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import Gamemodes.GamemodeHelper;
 import Main.KinectSandbox;
+import Terrain.TerrainGenerator;
+import Terrain.TerrainGeneratorHelper;
 import de.themoep.inventorygui.DynamicGuiElement;
 import de.themoep.inventorygui.GuiStateElement;
 import de.themoep.inventorygui.InventoryGui;
@@ -18,7 +20,7 @@ public class BiomeGui {
 	public InventoryGui createGui()
 	{
 		String[] guiSetup = {
-				"         ",
+				"        x",
 	            " abcdefg ",
 	            "    w    "
 	        };
@@ -48,7 +50,7 @@ public class BiomeGui {
 		                Bukkit.broadcastMessage(ChatColor.RED + "Can't enable water while gamemode in progress.");
 		                return; // Stop execution
 		            }
-		            if (KinectSandbox.biome.equals("sand") || KinectSandbox.biome.equals("mesa") || KinectSandbox.biome.equals("rainbow")) {
+		            if (KinectSandbox.biome.equals("sand") || KinectSandbox.biome.equals("mesa") || KinectSandbox.biome.equals("rainbow") || KinectSandbox.biome.equals("stone") ) {
 		                Bukkit.broadcastMessage(ChatColor.RED + "This biome doesn't allow water."); // Use RED for errors/restrictions
 		                // Ensure the state remains consistent if enabling fails
 		                if (KinectSandbox.getInstance().waterEnabled) { // Check if it somehow got enabled elsewhere
@@ -239,6 +241,13 @@ public class BiomeGui {
 			        	return true;
 			        }
 			    	KinectSandbox.biome = "stone";
+			    	if (KinectSandbox.getInstance().waterEnabled)
+			    	{
+			    		Bukkit.broadcastMessage(ChatColor.RED + "Disabling water for this biome.");
+			    		KinectSandbox.getInstance().waterEnabled = false;
+				    	waterElement.setState("waterDisabled");
+			    	}
+			    	
 			    	for (Player p : Bukkit.getOnlinePlayers()) {
 						p.sendMessage(ChatColor.GREEN + "Changing biome to stony peaks..");
 					}
@@ -302,8 +311,31 @@ public class BiomeGui {
 		    	"§aRainbow Biome",
 		       "§7Click to change.");
 		}));
-
-
+		
+		gui.addElement(new StaticGuiElement('x',
+			    new ItemStack(Material.BARRIER),
+			    1,
+			    click -> {
+			    	Player player = (Player) click.getWhoClicked();
+			        player.closeInventory();
+			        
+			        for (Player p : Bukkit.getOnlinePlayers()) {
+						p.sendMessage(ChatColor.GREEN + "Hard resetting all terrain..");
+					}
+			        
+			        new BukkitRunnable() {
+				        @Override
+				        public void run() {
+				        	TerrainGenerator.prevDepth = new int[KinectSandbox.getInstance().settings.y2 - KinectSandbox.getInstance().settings.y1 + 1][KinectSandbox.getInstance().settings.x2 - KinectSandbox.getInstance().settings.x1 + 1];
+					        TerrainGeneratorHelper.resetBlocks();
+				        }
+				    }.runTaskLater(KinectSandbox.getInstance(), 1L);
+			        
+			    	return true;
+			    },
+			    ChatColor.RED + "Reset terrain",
+			    "§7Perform a hard reset on the terrain."
+			));
 		
 		return gui;
 	}

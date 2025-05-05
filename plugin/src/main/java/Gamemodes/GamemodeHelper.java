@@ -6,6 +6,7 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import Main.KinectSandbox;
 import Misc.MiscHandlers;
@@ -16,8 +17,8 @@ public class GamemodeHelper {
     // This Runnable will hold the cleanup logic for the currently running gamemode.
     public static Runnable currentGameStopper = null;
     public static Set<Integer> scheduledTaskIDs = new HashSet<>();
-	 public static void countdown(String name, int time, Runnable onFinish) {
-	        new BukkitRunnable() {
+	 public static int countdown(String name, int time, Runnable onFinish) {
+		 BukkitTask task = new BukkitRunnable() {
 	            int secondsLeft = time;
 
 	            @Override
@@ -46,6 +47,7 @@ public class GamemodeHelper {
 	                }
 	            }
 	        }.runTaskTimer(KinectSandbox.getInstance(), 0L, 20L);
+	        return task.getTaskId();
 	    }
 
 	 

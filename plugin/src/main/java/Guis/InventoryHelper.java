@@ -1,7 +1,9 @@
 package Guis;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,9 +11,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import Main.KinectSandbox;
+import Terrain.TerrainGeneratorHelper;
 import de.themoep.inventorygui.InventoryGui;
 
 public class InventoryHelper implements Listener{
@@ -45,6 +51,32 @@ public class InventoryHelper implements Listener{
 	 {
 		 giveInventory();
 	 }
+	 
+	 @EventHandler
+	public void onPlayerRespawn(PlayerRespawnEvent event)
+	{
+		Bukkit.broadcastMessage("Someone died");
+		Player player = event.getPlayer();
+	    World world = player.getWorld();
+
+	    int middleX = TerrainGeneratorHelper.findXEnd() / 2;
+	    int middleZ =TerrainGeneratorHelper.findZEnd() / 2;
+	    int middleY = 81;
+
+	    Location target = new Location(world, middleX + 0.5, middleY, middleZ + 0.5);
+	    target.setPitch(90);
+	    target.setYaw(90);
+
+	    new BukkitRunnable() {
+	        @Override
+	        public void run() {
+	            player.teleport(target);
+	            player.setAllowFlight(true);
+	            player.setFlying(true);
+	            giveInventory();
+	        }
+	    }.runTaskLater(KinectSandbox.getInstance(), 2L); // <- make sure to replace `yourPluginInstance`
+	}
     
     public void giveInventory()
     {

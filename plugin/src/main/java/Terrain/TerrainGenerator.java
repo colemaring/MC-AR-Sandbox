@@ -1,5 +1,6 @@
 package Terrain;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -92,22 +93,22 @@ public class TerrainGenerator implements Listener{
         	    if (!prevSettingsHash.equals(KinectSandbox.getInstance().settings.settingsHash))
         	    {
         	    	 initialized = 0;
-        	    	 Bukkit.broadcastMessage(ChatColor.GOLD + "Changes Applied");
+        	    	 Bukkit.broadcastMessage(ChatColor.GREEN + "Changes Applied");
         	    }
 
         	    if (!prevBiome.equals(KinectSandbox.biome)) {
         	        prevBiome = KinectSandbox.biome;
         	        // when finished return a callback where you then update terrainPaused to false
-        	        TerrainGeneratorHelper.updateBiome(KinectSandbox.biome, 12, 12, () -> {});
+        	        TerrainGeneratorHelper.updateBiome(KinectSandbox.biome, 12, 12, () -> {if (KinectSandbox.getInstance().waterEnabled) TerrainGeneratorHelper.addWater(20, 20, KinectSandbox.biome);});
         	    }
         	    
         	    if(prevWaterEnabled != KinectSandbox.getInstance().waterEnabled)
         	    {
         	    	prevWaterEnabled = KinectSandbox.getInstance().waterEnabled;
         	    	if (KinectSandbox.getInstance().waterEnabled)
-        	    		TerrainGeneratorHelper.addWater(20, 20, null, KinectSandbox.biome);
+        	    		TerrainGeneratorHelper.addWater(20, 20, KinectSandbox.biome);
         	    	else
-        	    		TerrainGeneratorHelper.removeWater(20, 20, null);
+        	    		TerrainGeneratorHelper.removeWater(20, 20);
         	    }
         	    	
 				// exists for threading issues where run statement from previous update call is still processing while next call is initiated.
@@ -115,8 +116,16 @@ public class TerrainGenerator implements Listener{
             	if (!prevSettingsHash.equals(KinectSandbox.getInstance().settings.settingsHash))
             	{
             	    prevSettingsHash = KinectSandbox.getInstance().settings.settingsHash;
-            	    prevDepth = new int[KinectSandbox.getInstance().settings.y2 - KinectSandbox.getInstance().settings.y1 + 1][KinectSandbox.getInstance().settings.x2 - KinectSandbox.getInstance().settings.x1 + 1];
-            	    TerrainGeneratorHelper.resetBlocks();
+            	    for (Player p : Bukkit.getOnlinePlayers()) {
+						p.sendMessage(ChatColor.GREEN + "Hard resetting all terrain..");
+					}
+            	    new BukkitRunnable() {
+				        @Override
+				        public void run() {
+				        	TerrainGenerator.prevDepth = new int[KinectSandbox.getInstance().settings.y2 - KinectSandbox.getInstance().settings.y1 + 1][KinectSandbox.getInstance().settings.x2 - KinectSandbox.getInstance().settings.x1 + 1];
+					        TerrainGeneratorHelper.resetBlocks();
+				        }
+				    }.runTaskLater(KinectSandbox.getInstance(), 1L);
             	    // read by main thread bukkit api to check if current updateTerrain called needs to cancel current block placements
             	    resetCalled = true;
             	}

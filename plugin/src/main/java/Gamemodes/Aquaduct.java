@@ -19,9 +19,6 @@ import Terrain.TerrainGenerator;
 import Terrain.TerrainGeneratorHelper;
 import net.md_5.bungee.api.ChatColor;
 
-
-// TODO
-// remove calls to resetBlocks(), replace with more efficient method
 public class Aquaduct {
 	private static int taskID = -1;
 	private static List<Location> placedBlocks = new ArrayList<>();
@@ -35,14 +32,15 @@ public class Aquaduct {
             // reset terrain here
             return;
         });
-        
+        int extraTime = 0;
         // Remove water if it is enabled
 		if (KinectSandbox.getInstance().waterEnabled == true)
 		{
 			KinectSandbox.getInstance().waterEnabled = false;
 			BiomeGui.waterElement.setState("waterDisabled");
 			Bukkit.broadcastMessage(ChatColor.RED + "Disabling terrain water before starting Aquaduct");
-			TerrainGeneratorHelper.removeWater(20, 20, null);
+			TerrainGeneratorHelper.removeWater(20, 20);
+			extraTime += 5; // Add 5 seconds to allow removeWater to finish
 		}
         
         int gameTaskID = Bukkit.getScheduler().runTaskLater(KinectSandbox.getInstance(), () -> {
@@ -58,14 +56,16 @@ public class Aquaduct {
         }, 9 * 60 * 20L).getTaskId();
         GamemodeHelper.scheduledTaskIDs.add(warningTaskID);
         
-        GamemodeHelper.countdown("Aquaduct", 3, () -> {
-            // Runs after countdown finishes
-        	KinectSandbox.allowWaterFlow = true;
-        	createSourceAndSink();
-        	// Allow water to flow for the duration of the gamemode
+        
+        int taskId  =GamemodeHelper.countdown("Aquaduct", 3 + extraTime, () -> {
+   			if (!GamemodeHelper.gamemodeRunning)
+   				return;
+   			// Allow water to flow for the duration of the gamemode
         	// Ensure the source (water source) cannot be deleted
-        	
-        });
+   			KinectSandbox.allowWaterFlow = true;
+        	createSourceAndSink();
+           });
+           GamemodeHelper.scheduledTaskIDs.add(taskId);
     }
 	
 	public static void createSourceAndSink()
@@ -149,8 +149,8 @@ public class Aquaduct {
 		                }
 		            }
 
-		            if (allAir && y - 5 < bestY) {
-		                bestY = y - 5; // Bucket sits just below the air pocket
+		            if (allAir && y - 3 < bestY) {
+		                bestY = y - 3; // Bucket sits just below the air pocket
 		                bestX = x;
 		                bestZ = z;
 		            }
@@ -297,15 +297,14 @@ public class Aquaduct {
 		
 		for (Location veinCorner : placedBlocks)
 		{
-			TerrainGeneratorHelper.placeAsBiome(veinCorner.getBlockX(), veinCorner.getBlockY(), veinCorner.getBlockZ(), KinectSandbox.biome, true, true);
+			TerrainGeneratorHelper.placeAsBiome(veinCorner.getBlockX(), veinCorner.getBlockY(), veinCorner.getBlockZ(), KinectSandbox.biome, false, true);
 			prevDepthMinusBucket[veinCorner.getBlockX()][veinCorner.getBlockZ()] = 0; // this will force and update on these x, z coords 
 		}
 		GamemodeHelper.currentGameStopper = null;
 		GamemodeHelper.gamemodeRunning = false;
 		KinectSandbox.allowWaterFlow = false;
-		TerrainGeneratorHelper.removeWater(20, 20, null);
+		TerrainGeneratorHelper.removeWater(20, 20);
 		
 		TerrainGenerator.prevDepth = prevDepthMinusBucket;
-//		TerrainGeneratorHelper.resetBlocks();
 	}
 }

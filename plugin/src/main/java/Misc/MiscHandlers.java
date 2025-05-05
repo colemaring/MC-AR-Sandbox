@@ -16,6 +16,7 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -44,6 +45,18 @@ public class MiscHandlers implements Listener{
 	        event.setCancelled(true);
 	    }
 	}
+	
+	// Stop ice from melting
+	@EventHandler
+    public void onBlockFade(BlockFadeEvent event) {
+        Block affectedBlock = event.getBlock();
+
+        // Check if the block that is fading is ice
+        if (affectedBlock.getType() == Material.ICE) {
+            // Cancel the event, preventing the ice from melting
+            event.setCancelled(true);
+        }
+    }
 	
 	// If zombie rush is running, allow zombie spawns, otherwise disable everything
 	@EventHandler
@@ -104,15 +117,6 @@ public class MiscHandlers implements Listener{
 	public void onPlayerJoin(PlayerJoinEvent event) {
 	    Player player = event.getPlayer();
 	    World world = player.getWorld();
-
-	    // find world bounds 
-	    // this solution is so naive and bad 
-	    int x = 0;
-	    int z = 0;
-	    while (!world.getBlockAt(x, 0, 0).isEmpty())
-	        x++;
-	    while (!world.getBlockAt(0, 0, z).isEmpty())
-	        z++;
 
 	    int middleX = TerrainGeneratorHelper.findXEnd() / 2;
 	    int middleZ =TerrainGeneratorHelper.findZEnd() / 2;

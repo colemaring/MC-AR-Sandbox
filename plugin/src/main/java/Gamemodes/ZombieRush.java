@@ -46,11 +46,13 @@ public class ZombieRush {
     }
 
     public static void startCountdown() {
-        GamemodeHelper.countdown("Zombie Rush", 3, () -> {
-            // Runs after countdown finishes
-            startZombieRush();
-        });
-    }
+		 int taskId  =GamemodeHelper.countdown("Zombie Rush", 3, () -> {
+			if (!GamemodeHelper.gamemodeRunning)
+				return;
+			startZombieRush();
+       });
+       GamemodeHelper.scheduledTaskIDs.add(taskId);
+   }
     
     public static void startZombieRush() {
     	running = true;
@@ -59,10 +61,12 @@ public class ZombieRush {
         timeLeft = 60;
         reachedZombies.clear();
         zombieTargets.clear();
+        int xEnd = TerrainGeneratorHelper.findXEnd();
+        int zEnd = TerrainGeneratorHelper.findZEnd();
         startTimer();
-        for (int i = 0; i < TerrainGeneratorHelper.findXEnd(); i++) {
-            spawnZombie(i, TerrainGeneratorHelper.findZEnd());
-            spawnZombie(i - 1, TerrainGeneratorHelper.findZEnd());
+        for (int i = 0; i < xEnd; i++) {
+            spawnZombie(i, zEnd);
+            spawnZombie(i - 1, zEnd);
         }
         
     }
