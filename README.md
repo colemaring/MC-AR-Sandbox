@@ -12,6 +12,7 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
 - Log into PrismLauncher with your Microsoft/Minecraft account. <br>
 - Download the latest [MC-AR Launcher release](https://github.com/colemaring/MC-AR-Sandbox/releases). (First-Time setup takes about 5 minutes)<br>
 - [Tune the Kinect settings](#tuning-the-settings). <br>
+- In Minecraft, navigate to Options > Video Settings > Chunk Builder, and switch to Fully Blocking. <br>
 
 # Hardware
 - A Kinect V2 sensor / Xbox One sensor.
