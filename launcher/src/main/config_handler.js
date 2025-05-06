@@ -21,7 +21,7 @@ export async function readConfig() {
         kinect_distance_mm: 1800,
         kinect_capture_speed: 25,
         topographic_smoothing: 19,
-        topographic_color_mode: "Default",
+        topographic_color_mode: "Natural",
         topographic_interpolation: "None",
         topographic_auto_launch_projector: false,
         minecraft_display_on_launch: false,
