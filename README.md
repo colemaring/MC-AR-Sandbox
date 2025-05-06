@@ -32,14 +32,13 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
 
 ### Topographic Projection Settings:
 - Open on Launch: Open the projection when the Launch button on home page is clicked.
-- Show On: Choose which display device to launch the projection on.
 - Smoothing: Determine how much detail you want on your topographic layer lines.
 - Color: Choose which color profile to project onto the sand.
 - Interpolation: Choose which type of interpolation to smooth the noise.
+- Note: Projection will prioritize being displayed on secondary display.
 
 ### Minecraft Settings:
 - Open on Launch: Open Minecraft when the Launch button on home page is clicked.
-- Show On: Choose which display device to launch Minecraft on.
 - Elevation Multiplier: Choose how much y axis range you'd like in Minecraft.
 - Y Coordinate Offset: Needs to be tuned to fit the Kinect/Sandbox environment. Needs to be re-adjusted when elevation multiplier is changed.
 - PrismLauncher Filepath: Specify the filepath to the Prismlauncher exe.
@@ -47,8 +46,8 @@ A real-time Minecraft terrain visualizer for augmented reality sandboxes using X
 Save button: Save your configuration to persist between launches and reflect changes in the currently running Minecraft instance.
 
 ## [Info Page](https://github.com/user-attachments/assets/ac30290d-91f7-4108-8d40-1fcfa91d41c5)
+- In-Game GUI
 - Gamemode Information
-- In-Game Commands (Outdated, changed to GUIs)
 
 ## Tuning the settings
 todo
