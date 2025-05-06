@@ -34,14 +34,10 @@ function InfoPage() {
           <Accordion.Header>Zombie Rush</Accordion.Header>
           <Accordion.Body>
             Stop an army of zombies from traversing your terrain! <br></br>
-            Before the Zombie Rush beings, you will have 30 second to prepare
-            your terrain. The more difficult your terrain is to traverse, the
-            less likely zombies are to reach the other side. After the 30
-            seconds are up, the terrain will be locked and no further edits can
-            be made for 1 minute while the zombies attempt to traverse it.
-            Zombie start on the left and move right. After the 1 minute is up,
-            you will be informed of how many zombies crossed the terrain and the
-            terrain will be unlocked.
+            The more difficult your terrain is to traverse, the less likely
+            zombies are to reach the other side. Zombie start on the left and
+            move right. After the 1 minute is up, you will be informed of how
+            many zombies crossed the terrain.
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="1">
@@ -74,8 +70,8 @@ function InfoPage() {
             Redirect the flow of water from the source to the sink! <br></br>
             The source will be placed at the highest point of the terrain, and
             the sink will be randomly placed at a lower elevation point. You
-            have 1 minute to sculpt the terrain to have the water flow into the
-            sink.
+            have 10 minutes to sculpt the terrain to have the water flow into
+            the sink.
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>

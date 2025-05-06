@@ -14,14 +14,12 @@ export const SettingsConfigProvider = ({ children }) => {
   const [kinectDistanceMM, setKinectDistanceMM] = useState(0);
 
   // Topographic settings
-  const [displayTopographic, setDisplayTopographic] = useState("Display 1");
   const [smoothing, setSmoothing] = useState(40);
   const [colorMode, setColorMode] = useState("Default");
   const [autoLaunchProjector, setAutoLaunchProjector] = useState(false);
   const [interpolation, setInterpolation] = useState("None");
 
   // Minecraft settings
-  const [displayMinecraft, setDisplayMinecraft] = useState("Display 2");
   const [prismlauncherPath, setPrismlauncherPath] = useState(
     "C:\\Users\\colem\\AppData\\Local\\Programs\\PrismLauncher\\prismlauncher.exe"
   );
@@ -39,9 +37,6 @@ export const SettingsConfigProvider = ({ children }) => {
         setY2(config?.kinect_view_crop?.y2 || 0);
         setYCoordOffset(config?.y_coord_offset || 0);
         setCaptureSpeed(config?.kinect_capture_speed || 15);
-        setDisplayTopographic(
-          config?.topographic_display_assignment || "Display 1"
-        );
         setKinectDistanceMM(config?.kinect_distance_mm || 0);
         setSmoothing(config?.topographic_smoothing || 40);
         setColorMode(config?.topographic_color_mode || "Default");
@@ -50,9 +45,6 @@ export const SettingsConfigProvider = ({ children }) => {
           config?.topographic_auto_launch_projector || false
         );
         setElevation(config?.minecraft_elevation || 40);
-        setDisplayMinecraft(
-          config?.minecraft_display_assignment || "Display 2"
-        );
         setAutoLaunchMinecraft(config?.minecraft_auto_launch || false);
         setPrismlauncherPath(
           config?.minecraft_prismlauncher_path ||
@@ -74,13 +66,11 @@ export const SettingsConfigProvider = ({ children }) => {
       y_coord_offset: yCoordOffset,
       kinect_capture_speed: captureSpeed,
       kinect_distance_mm: kinectDistanceMM,
-      topographic_display_assignment: displayTopographic,
       topographic_smoothing: smoothing,
       topographic_color_mode: colorMode,
       topographic_interpolation: interpolation,
       topographic_auto_launch_projector: autoLaunchProjector,
       minecraft_elevation: elevation,
-      minecraft_display_assignment: displayMinecraft,
       minecraft_auto_launch: autoLaunchMinecraft,
       minecraft_prismlauncher_path: prismlauncherPath,
     };
@@ -111,11 +101,9 @@ export const SettingsConfigProvider = ({ children }) => {
     y2,
     kinectDistanceMM,
     yCoordOffset,
-    displayTopographic,
     smoothing,
     elevation,
     colorMode,
-    displayMinecraft,
     prismlauncherPath,
     autoLaunchMinecraft,
     autoLaunchProjector,
@@ -131,12 +119,10 @@ export const SettingsConfigProvider = ({ children }) => {
         x2,
         y2,
         yCoordOffset,
-        displayTopographic,
         smoothing,
         elevation,
         setElevation,
         colorMode,
-        displayMinecraft,
         kinectDistanceMM,
         setKinectDistanceMM,
         prismlauncherPath,
@@ -145,10 +131,8 @@ export const SettingsConfigProvider = ({ children }) => {
         setX2,
         setY2,
         setYCoordOffset,
-        setDisplayTopographic,
         setSmoothing,
         setColorMode,
-        setDisplayMinecraft,
         setPrismlauncherPath,
         autoLaunchMinecraft,
         setAutoLaunchMinecraft,

@@ -8,6 +8,7 @@ import { useContext } from "react"; // Removed useState, useEffect if not using 
 import { SettingsConfigContext } from "../context/SettingsConfigContext";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
+import { useState } from "react"; // Added useState for saving state
 
 function SettingsPage() {
   const navigate = useNavigate();
@@ -49,6 +50,8 @@ function SettingsPage() {
     writeToConfig,
   } = useContext(SettingsConfigContext);
 
+  const [isSaving, setIsSaving] = useState(false);
+
   // --- Removed state/effect for portal container, assuming simpler wrapping for now ---
   // const [overlayContainer, setOverlayContainer] = useState(null);
   // useEffect(() => {
@@ -62,7 +65,19 @@ function SettingsPage() {
   };
 
   const handleSaveSettings = async () => {
-    await writeToConfig();
+    setIsSaving(true); // Disable button and show "Saving..."
+    try {
+      await writeToConfig();
+      // Optionally add a success message here
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      // Optionally show an error message to the user
+    } finally {
+      // Re-enable the button after 1 second
+      setTimeout(() => {
+        setIsSaving(false);
+      }, 1000); // 1000 milliseconds = 1 second
+    }
   };
 
   // Helper function to render tooltips
@@ -114,7 +129,6 @@ function SettingsPage() {
           </Button>
         </OverlayTrigger>
       </div>
-
       <div className="mt-1 centerRange">
         <OverlayTrigger
           placement="bottom"
@@ -152,7 +166,7 @@ function SettingsPage() {
           placement="right"
           delay={{ show: 250, hide: 400 }}
           overlay={renderTooltip(
-            "Flatten the sand and measure the distance from the Kinect to the sand. This value only is only used in the projection. In milimeters."
+            "This value only is only used in the projection. Measure in milimeters."
           )}
           // container={overlayContainer} // Add back if using portal
         >
@@ -161,7 +175,7 @@ function SettingsPage() {
             {/* Wrapper for trigger area */}
             <span>Kinect to Sandbox Distance</span>
             <Form.Control
-              type="number"
+              type="text"
               size="sm"
               placeholder="in mm"
               value={kinectDistanceMM}
@@ -176,7 +190,6 @@ function SettingsPage() {
         </OverlayTrigger>
       </div>
       <hr />
-
       {/* --- Topographic Projection Settings --- */}
       <h3 className="mt-2">Projection Settings</h3>
       <div className="mt-1">
@@ -204,34 +217,6 @@ function SettingsPage() {
           </span>
         </OverlayTrigger>
         <br /> {/* Keep line break */}
-        <div className="mt-2">
-          <OverlayTrigger
-            placement="right"
-            delay={{ show: 250, hide: 400 }}
-            overlay={renderTooltip(
-              "(WIP) Display device to launch the projection on."
-            )}
-            // container={overlayContainer} // Add back if using portal
-          >
-            <span style={{ display: "inline-block" }}>
-              {" "}
-              {/* Wrapper for trigger area */}
-              <span>🛠️🚧 Show on </span>
-              <Dropdown
-                style={{ display: "inline-block", marginLeft: "10px" }}
-                onSelect={(key) => setDisplayTopographic(key)}
-              >
-                <Dropdown.Toggle className="settingsOption" size="sm">
-                  {displayTopographic}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item eventKey="Display 1">Display 1</Dropdown.Item>
-                  <Dropdown.Item eventKey="Display 2">Display 2</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </span>
-          </OverlayTrigger>
-        </div>
       </div>
       <div className="mt-1 centerRange">
         <OverlayTrigger
@@ -249,7 +234,7 @@ function SettingsPage() {
             </span>
             <Form.Range
               min={0}
-              max={100}
+              max={25}
               step={1}
               value={smoothing}
               onChange={(e) => setSmoothing(Number(e.target.value))}
@@ -263,7 +248,6 @@ function SettingsPage() {
           </div>
         </OverlayTrigger>
       </div>
-
       <div className="mt-1">
         <OverlayTrigger
           placement="right"
@@ -284,10 +268,7 @@ function SettingsPage() {
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 <Dropdown.Item eventKey="Rainbow">Rainbow</Dropdown.Item>
-                <Dropdown.Item eventKey="Earthchromic">
-                  Earthchromic
-                </Dropdown.Item>
-                <Dropdown.Item eventKey="Default">Default</Dropdown.Item>
+                <Dropdown.Item eventKey="Natural">Natural</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           </span>
@@ -316,16 +297,12 @@ function SettingsPage() {
                 <Dropdown.Item eventKey="Median Filter">
                   Median Filter
                 </Dropdown.Item>
-                <Dropdown.Item eventKey="Gaussian Blur">
-                  Gaussian Blur
-                </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           </span>
         </OverlayTrigger>
       </div>
       <hr />
-
       {/* --- Minecraft Settings --- */}
       <h3 className="mt-2">Minecraft Settings</h3>
       <div className="mt-1">
@@ -353,34 +330,6 @@ function SettingsPage() {
           </span>
         </OverlayTrigger>
         <br /> {/* Keep line break */}
-        <div className="mt-2">
-          <OverlayTrigger
-            placement="right"
-            delay={{ show: 250, hide: 400 }}
-            overlay={renderTooltip(
-              "(WIP) Display device to launch Minecraft on."
-            )}
-            // container={overlayContainer} // Add back if using portal
-          >
-            <span style={{ display: "inline-block" }}>
-              {" "}
-              {/* Wrapper for trigger area */}
-              <span>🛠️🚧 Show on </span>
-              <Dropdown
-                style={{ display: "inline-block", marginLeft: "10px" }}
-                onSelect={(key) => setDisplayMinecraft(key)}
-              >
-                <Dropdown.Toggle className="settingsOption" size="sm">
-                  {displayMinecraft}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item eventKey="Display 1">Display 1</Dropdown.Item>
-                  <Dropdown.Item eventKey="Display 2">Display 2</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </span>
-          </OverlayTrigger>
-        </div>
         {/* Uncomment and wrap this section if you re-add the Elevation Multiplier */}
         <div className="mt-1 centerRange">
           <OverlayTrigger
@@ -430,7 +379,7 @@ function SettingsPage() {
               {/* Wrapper for trigger area */}
               <span>Y Coordinate Offset</span>
               <Form.Control
-                type="number"
+                type="text"
                 size="sm"
                 value={yCoordOffset}
                 onChange={(e) => setYCoordOffset(Number(e.target.value))}
@@ -471,23 +420,39 @@ function SettingsPage() {
         </OverlayTrigger>
       </div>
       <hr />
+      Stand clear of the Kinect's view before saving.
       <div>
         <OverlayTrigger
           placement="top" // Place above the button
           delay={{ show: 250, hide: 400 }}
           overlay={renderTooltip(
-            "Changes persist between sessions and are made immediately upon saving."
+            isSaving
+              ? "Saving settings..."
+              : "Changes persist between sessions and are made immediately upon saving."
           )}
-          // container={overlayContainer} // Add back if using portal
         >
-          <Button className="mt-1 saveButton" onClick={handleSaveSettings}>
-            <img
-              style={{ width: "1.2rem", height: "1.2rem" }}
-              src={saveIcon}
-              alt="Save"
-            />{" "}
-            Save
-          </Button>
+          {/* Span needed for OverlayTrigger on disabled button */}
+          <span className="d-inline-block">
+            <Button
+              className="mt-3 saveButton"
+              onClick={!isSaving ? handleSaveSettings : null} // Prevent click while saving
+              disabled={isSaving} // Disable button when saving
+              style={isSaving ? { pointerEvents: "none" } : {}} // Ensure tooltip works on disabled
+            >
+              {isSaving ? (
+                "Saving..." // Show "Saving..." text
+              ) : (
+                <>
+                  <img
+                    style={{ width: "1.2rem", height: "1.2rem" }}
+                    src={saveIcon}
+                    alt="Save"
+                  />{" "}
+                  Save
+                </> // Show icon and "Save" text
+              )}
+            </Button>
+          </span>
         </OverlayTrigger>
       </div>
     </div>

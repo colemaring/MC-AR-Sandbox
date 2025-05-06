@@ -157,28 +157,58 @@ def main():
     fig.canvas.mpl_connect('key_press_event', on_key_press)
     fig.canvas.manager.set_window_title("Topographic Projection: ESC to quit")
     qt_window = fig.canvas.manager.window
-    qt_window.setGeometry(0, 1080, 3840, 2160)
-    qt_window.setWindowFlags(QtCore.Qt.WindowFlags(QtCore.Qt.Tool))
+
+    screen = app.screens()[1] if len(app.screens()) > 1 else app.primaryScreen() # Default to second screen if available
+    screen_geometry = screen.geometry()
+    window_width = screen_geometry.width() // 2
+    window_height = screen_geometry.height() // 2
+    window_x = screen_geometry.x() + (screen_geometry.width() - window_width) // 2
+    window_y = screen_geometry.y() + (screen_geometry.height() - window_height) // 2
+    qt_window.setGeometry(window_x, window_y, window_width, window_height)
+
+
+    # Change window flags to make it a normal, movable window
+    qt_window.setWindowFlags(QtCore.Qt.Window)
+    
+    # Show as a normal window instead of fullscreen
+    qt_window.showNormal() 
     qt_window.showFullScreen()
 
     # Choose colormap based on config
     if config["topographic_color_mode"] == "Rainbow":
         cmap = plt.get_cmap('gist_rainbow')
-    elif config["topographic_color_mode"] == "Earthchromic":
-        cmap = plt.get_cmap('terrain')
     else:  # Default
         cmap = plt.get_cmap('viridis')
         
-    levels = np.linspace(config["kinect_distance_mm"] - 1000, config["kinect_distance_mm"] + 1000, 100)
     fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
 
     img_artist = None
-    print("Starting live plot. Press 'q' in the window to quit.")
+    print("Starting live plot. Press ESC in the window to quit.")
+
+    # Store current kinect_distance_mm to detect changes
+    last_kinect_distance_mm = config["kinect_distance_mm"] 
+    # Define the range for color mapping around kinect_distance_mm
+    color_map_range = 200 
+    
+    # Calculate initial levels
+    current_kinect_distance = config["kinect_distance_mm"]
+    levels = np.linspace(current_kinect_distance - color_map_range, current_kinect_distance + color_map_range, 100)
+
 
     try:
         while True:
             if not plt.fignum_exists(fig.number):
                 break
+
+            # --- DYNAMIC KINECT DISTANCE UPDATE ---
+            current_kinect_distance = config["kinect_distance_mm"]
+            if current_kinect_distance != last_kinect_distance_mm:
+                print(f"Kinect distance changed from {last_kinect_distance_mm} to {current_kinect_distance}. Updating color scale.")
+                levels = np.linspace(current_kinect_distance - color_map_range, current_kinect_distance + color_map_range, 100)
+                if img_artist:
+                    img_artist.set_clim(vmin=levels[0], vmax=levels[-1])
+                last_kinect_distance_mm = current_kinect_distance
+            # --- END DYNAMIC KINECT DISTANCE UPDATE ---
 
             if latest_data is not None:
                 try:
@@ -190,34 +220,45 @@ def main():
                     x2 = config["kinect_view_crop"]["x2"]
                     y2 = config["kinect_view_crop"]["y2"]
 
-                    arr = arr[y1:y2, x1:x2]
+                    if x1 >= x2 or y1 >= y2:
+                        print(f"Invalid crop coordinates: x1={x1}, y1={y1}, x2={x2}, y2={y2}. Using full image.")
+                    else:
+                        arr = arr[y1:y2, x1:x2]
                     
-                    # Apply smoothing based on current config
                     current_smoothing = config["topographic_smoothing"]
                     if config["topographic_interpolation"] == "Median Filter" and current_smoothing > 0:
                         arr = median_filter(arr, size=current_smoothing)
-                    elif config["topographic_interpolation"] == "Gaussian Blur" and current_smoothing > 0:
-                        # Gaussian blur could be implemented, but for now just print it
-                        print(f"Gaussian Blur would be applied with sigma={current_smoothing/10}")
-                        arr = median_filter(arr, size=current_smoothing)  # Fallback to median filter
                         
-                    arr = np.flipud(np.fliplr(arr))
+                    arr = np.flipud(arr)
 
-                    # Initialize or update the image artist
+                    current_color_mode = config["topographic_color_mode"]
+                    if current_color_mode == "Rainbow":
+                        new_cmap = plt.get_cmap('gist_rainbow')
+                    elif current_color_mode == "Natural":
+                        new_cmap = plt.get_cmap('terrain')
+                    else:
+                        new_cmap = plt.get_cmap('viridis')
+
                     if img_artist is None:
                         img_artist = ax.imshow(
                             arr,
-                            cmap=cmap,
+                            cmap=new_cmap,
                             interpolation='nearest' if config["topographic_interpolation"] == "None" else 'bilinear',
-                            vmin=levels[0],
-                            vmax=levels[-1]
+                            vmin=levels[0], # Use current levels
+                            vmax=levels[-1] # Use current levels
                         )
                         ax.set_xticks([])
                         ax.set_yticks([])
                     else:
                         img_artist.set_data(arr)
+                        if img_artist.get_cmap().name != new_cmap.name:
+                            img_artist.set_cmap(new_cmap)
+                        # Ensure clim is also set if levels changed before img_artist was created
+                        # This check might be redundant if the above dynamic kinect distance update handles it
+                        current_vmin, current_vmax = img_artist.get_clim()
+                        if current_vmin != levels[0] or current_vmax != levels[-1]:
+                            img_artist.set_clim(vmin=levels[0], vmax=levels[-1])
 
-                    # Efficient redraw
                     fig.canvas.draw_idle()
                     fig.canvas.flush_events()
 
