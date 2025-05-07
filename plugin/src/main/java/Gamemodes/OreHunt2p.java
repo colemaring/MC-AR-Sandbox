@@ -101,7 +101,7 @@ public class OreHunt2p {
 		
 		GamemodeHelper.gamemodeRunning = true;
 		Bukkit.broadcastMessage(ChatColor.GOLD + "Ore Hunt (2P) has begun, 1 minute remains!");
-		Bukkit.broadcastMessage(ChatColor.GREEN + "Remember, the vein must be completely uncovered for it to count");
+		Bukkit.broadcastMessage(ChatColor.GREEN + "Remember, the vein must be completely uncovered at some point for it to count");
 		placeOres();
 		
 		// start the “uncovered” checker: runs once per second

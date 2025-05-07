@@ -18,6 +18,7 @@ public class TerrainGenerator implements Listener{
     public static int findOffset = -1;
     public static int diff = -1;
     public static volatile boolean resetCalled = false;
+    public static boolean waterUpdated = true;
 
     public TerrainGenerator() {
         TerrainGenerator.prevSettingsHash = "";
@@ -99,14 +100,37 @@ public class TerrainGenerator implements Listener{
         	    if (!prevBiome.equals(KinectSandbox.biome)) {
         	        prevBiome = KinectSandbox.biome;
         	        // when finished return a callback where you then update terrainPaused to false
-        	        TerrainGeneratorHelper.updateBiome(KinectSandbox.biome, 12, 12, () -> {if (KinectSandbox.getInstance().waterEnabled) TerrainGeneratorHelper.addWater(20, 20, KinectSandbox.biome);});
+        	        waterUpdated = false;
+        	        TerrainGeneratorHelper.updateBiome(KinectSandbox.biome, 12, 12, () -> {
+        	        	if (KinectSandbox.getInstance().waterEnabled)
+        	        	{
+        	        		TerrainGeneratorHelper.addWater(
+        	                        20,
+        	                        20,
+        	                        KinectSandbox.biome,
+        	                        () -> {
+        	                        	waterUpdated = true;
+        	                        }
+        	                    );
+        	        	}
+        	        });
         	    }
         	    
         	    if(prevWaterEnabled != KinectSandbox.getInstance().waterEnabled)
         	    {
         	    	prevWaterEnabled = KinectSandbox.getInstance().waterEnabled;
         	    	if (KinectSandbox.getInstance().waterEnabled)
-        	    		TerrainGeneratorHelper.addWater(20, 20, KinectSandbox.biome);
+        	    	{
+        	    		waterUpdated = false;
+    	        		TerrainGeneratorHelper.addWater(
+    	                        20,
+    	                        20,
+    	                        KinectSandbox.biome,
+    	                        () -> {
+    	                        	waterUpdated = true;
+    	                        }
+    	                    );
+        	    	}
         	    	else
         	    		TerrainGeneratorHelper.removeWater(20, 20);
         	    }

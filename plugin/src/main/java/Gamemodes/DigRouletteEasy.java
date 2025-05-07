@@ -55,7 +55,7 @@ public class DigRouletteEasy {
 		
 		GamemodeHelper.gamemodeRunning = true;
 		Bukkit.broadcastMessage(ChatColor.GOLD + "Dig Roulette has begun, 1 minute remains!");
-		Bukkit.broadcastMessage(ChatColor.GREEN + "Remember, the gold must be completely uncovered for it to count");
+		Bukkit.broadcastMessage(ChatColor.GREEN + "Remember, the gold must be completely uncovered at some point for it to count");
 		placeBlocks();
 		
 		// start the uncovered checker

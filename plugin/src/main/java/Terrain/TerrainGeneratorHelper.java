@@ -94,88 +94,77 @@ public class TerrainGeneratorHelper {
 	    task.runTaskTimer(KinectSandbox.getInstance(), 0L, 1L);
 	}
 	
-	public static void addWater(int numXLayers, int numZLayers, String biome)
-	{
-		
-		int waterLevel = -1;
-				
-		if (biome.equals("grass"))
-			waterLevel = 6;
-		else if (biome.equals("nether"))
-			waterLevel = 14;
-		else if (biome.equals("snow"))
-			waterLevel = 10;
-		else
-			return; // a biome where we dont place water
-					
+	public static void addWater(int numXLayers, int numZLayers, String biome, Runnable onComplete) {
+	    int waterLevel;
+	    switch (biome) {
+	        case "grass": waterLevel = 6; break;
+	        case "nether": waterLevel = 14; break;
+	        case "snow": waterLevel = 10; break;
+	        default:
+	            // no water in this biome → just fire callback immediately
+	            if (onComplete != null) onComplete.run();
+	            return;
+	    }
+
 	    if (numXLayers <= 0 || numZLayers <= 0) {
-	        Bukkit.getLogger().warning("Invalid layer size for water removal!");
+	        Bukkit.getLogger().warning("Invalid layer size for water placement!");
+	        if (onComplete != null) onComplete.run();
 	        return;
 	    }
 
-	    int xEnd = findXEnd();
-	    int zEnd = findZEnd();
-	    int yMax = waterLevel;
-
-	    final int startX = 0;
-	    final int startZ = 0;
-	    final int startY = 0;
-
-	    final int blocksPerTick = 15000; // Adjust for performance balance
+	    final int xEnd = findXEnd();
+	    final int zEnd = findZEnd();
+	    final int yMax = waterLevel;
+	    final int startX = 0, startZ = 0, startY = 0;
+	    final int blocksPerTick = 15_000;
 
 	    BukkitRunnable task = new BukkitRunnable() {
-	        int currentX = startX;
-	        int currentZ = startZ;
-	        int currentY = startY;
-
-	        int innerX = 0;
-	        int innerZ = 0;
+	        int currentX = startX, currentZ = startZ, currentY = startY;
+	        int innerX = 0, innerZ = 0;
 
 	        @Override
 	        public void run() {
 	            int blocksProcessed = 0;
 	            World world = KinectSandbox.getInstance().world;
-
 	            if (world == null) {
-	                Bukkit.getLogger().warning("World is null, canceling task.");
-	                this.cancel();
+	                Bukkit.getLogger().warning("World is null, canceling addWater task.");
+	                cancel();
+	                if (onComplete != null) onComplete.run();
 	                return;
 	            }
 
 	            while (blocksProcessed < blocksPerTick) {
-	                int targetX = currentX + innerX;
-	                int targetZ = currentZ + innerZ;
-
 	                if (currentY > yMax) {
-	                    this.cancel();
+	                    // we've filled up to waterLevel, finish
+	                    cancel();
+	                    if (onComplete != null) onComplete.run();
 	                    return;
 	                }
+
+	                int targetX = currentX + innerX;
+	                int targetZ = currentZ + innerZ;
 
 	                if (targetX <= xEnd && targetZ <= zEnd) {
 	                    Block block = world.getBlockAt(targetX, currentY, targetZ);
 	                    if (block.getType() == Material.AIR) {
-	                    	if (biome.equals("nether"))
-	                    		block.setType(Material.LAVA);
-	                    	else
-	                    		block.setType(Material.WATER);
+	                        if (biome.equals("nether")) {
+	                            block.setType(Material.LAVA);
+	                        } else {
+	                            block.setType(Material.WATER);
+	                        }
 	                    }
 	                    blocksProcessed++;
 	                }
 
-	                innerZ++;
-
-	                if (innerZ >= numZLayers || targetZ >= zEnd) {
+	                // move to next block
+	                if (++innerZ >= numZLayers || targetZ >= zEnd) {
 	                    innerZ = 0;
-	                    innerX++;
-
-	                    if (innerX >= numXLayers || targetX >= xEnd) {
+	                    if (++innerX >= numXLayers || targetX >= xEnd) {
 	                        innerX = 0;
 	                        currentX += numXLayers;
-
 	                        if (currentX > xEnd) {
 	                            currentX = startX;
 	                            currentZ += numZLayers;
-
 	                            if (currentZ > zEnd) {
 	                                currentZ = startZ;
 	                                currentY++;
@@ -186,8 +175,10 @@ public class TerrainGeneratorHelper {
 	            }
 	        }
 	    };
+
 	    task.runTaskTimer(KinectSandbox.getInstance(), 0L, 1L);
 	}
+
 	
 	
 	public static void updateBiome(String biome, int numXLayers, int numZLayers, Runnable onComplete) {
@@ -596,9 +587,9 @@ public class TerrainGeneratorHelper {
 			else
 				block.setType(Material.AIR);
 			
-//			int waterLevel = 6;
-//			if (KinectSandbox.getInstance().waterEnabled)
-//				placeLiquid(i, waterLevel, j, "water");
+			int waterLevel = 6;
+			if (KinectSandbox.getInstance().waterEnabled && TerrainGenerator.waterUpdated)
+				placeLiquid(i, waterLevel, j, "water");
 		}
 		if (biome.equals("snow"))
 		{	
@@ -616,9 +607,9 @@ public class TerrainGeneratorHelper {
 			else
 				block.setType(Material.AIR);
 //			
-//			int waterLevel = 10;
-//			if (KinectSandbox.getInstance().waterEnabled)
-//				placeLiquid(i, waterLevel, j, "water");
+			int waterLevel = 10;
+			if (KinectSandbox.getInstance().waterEnabled && TerrainGenerator.waterUpdated)
+				placeLiquid(i, waterLevel, j, "water");
 		}
 		if (biome.equals("sand"))
 		{	
@@ -690,9 +681,9 @@ public class TerrainGeneratorHelper {
 			else
 				block.setType(Material.AIR);
 			
-//			int lavaLevel = 14;
-//			if (KinectSandbox.getInstance().waterEnabled)
-//				placeLiquid(i, lavaLevel, j, "lava");
+			int lavaLevel = 14;
+			if (KinectSandbox.getInstance().waterEnabled && TerrainGenerator.waterUpdated)
+				placeLiquid(i, lavaLevel, j, "lava");
 		}
 		if (biome.equals("rainbow"))
 		{	
@@ -766,13 +757,13 @@ public class TerrainGeneratorHelper {
 	{
 		if (type.equals("water"))
 		{
-			for (int x = 0; x < level; x++)
+			for (int x = 0; x <= level; x++)
 				if (KinectSandbox.getInstance().world.getBlockAt(i, x, j).getType().equals(Material.AIR))
 					KinectSandbox.getInstance().world.getBlockAt(i, x, j).setType(Material.WATER);
 		}
 		else
 		{
-			for (int x = 0; x < level; x++)
+			for (int x = 0; x <= level; x++)
 				if (KinectSandbox.getInstance().world.getBlockAt(i, x, j).getType().equals(Material.AIR))
 					KinectSandbox.getInstance().world.getBlockAt(i, x, j).setType(Material.LAVA);
 		}
