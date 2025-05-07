@@ -1,5 +1,6 @@
 # MC-AR-Sandbox
 A real-time Minecraft terrain visualizer for augmented reality sandboxes using Xbox Kinect <br>
+[Manual](https://github.com/user-attachments/files/20087963/MCAR.pdf) <br>
 
 # Features
 - Comprehensive one-click launcher that automates almost everything.
